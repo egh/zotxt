@@ -50,6 +50,9 @@ var endpoints = {
     }
 }
 
+/**
+ * Function to load our endpoints into the Zotero connector server.
+ */
 function loadEndpoints () {
     Components.utils.import("resource://gre/modules/Services.jsm");
     z = Components.classes["@zotero.org/Zotero;1"].
@@ -68,15 +71,19 @@ function startup(data, reason) {
                                 "final-ui-startup", false);
 }
 
+
+function shutdown (data, reason) {
+    /* pass */
+}
+
 function uninstall(data, reason) {
+    /* pass */
 }
 
 function install(data, reason) {
     /* turn on http server if it is not on */
+    /* TODO turn this off when uninstalled? */
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
     prefs.setBoolPref("httpServer.enabled", true);
-}
-
-function shutdown (data, reason) {
 }
