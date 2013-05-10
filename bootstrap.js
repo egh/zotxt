@@ -1,19 +1,13 @@
+Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
-
-function parseQueryString (s) {
-    if (typeof s == "string" || (typeof s == "object" && s.constructor === String)) {
-        return z.Server.decodeQueryString(s);
-    } else {
-        return s;
-    }
-}
+var console = Services.console;
 
 var endpoints = {
     "item" : {
-	"supportedMethods":["POST"],
+	"supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
-        "init" : function (data, sendResponseCallback) {
-            var q = parseQueryString(data);
+        "init" : function (url, data, sendResponseCallback) {
+            var q = url['query'];
             var itemId = null;
             if (q["itemId"]) {
                 itemId = null;
@@ -54,7 +48,6 @@ var endpoints = {
  * Function to load our endpoints into the Zotero connector server.
  */
 function loadEndpoints () {
-    Components.utils.import("resource://gre/modules/Services.jsm");
     z = Components.classes["@zotero.org/Zotero;1"].
         getService(Components.interfaces.nsISupports).wrappedJSObject;
     
