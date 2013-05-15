@@ -2,6 +2,43 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
 
+function makeCslEngine (styleId) {
+    if (!styleid.match(/^http:/)) {
+	styleid = 'http://www.zotero.org/styles/' + styleid;
+    }
+    var style = zotero.Styles.get(styleid);
+    /* TODO Allow passing in locale? **/
+    var locale = zotero.Prefs.get('export.bibliographyLocale');
+    if(!locale) {
+	locale = zotero.locale;
+	if(!locale) {
+	    locale = 'en-US';
+	}
+    }
+    return new zotero.CiteProc.CSL.Engine(mySys, style.getXML(), locale);
+}
+
+function findByDynamicKey(creator, title, date) {
+    var s = new z.Search();
+    s.addCondition("creator", "contains", creator);
+    if (title != null) {
+        s.addCondition("title", "contains", title);
+    }
+    if (date != null) {
+        s.addCondition("date", "is", date);
+    }
+    var i = s.search();
+    if (!i) {
+        return null;
+    } else if (i.length == 0) {
+        return null;
+    } else if (i.length > 1) {
+        throw {'name': "TooManyResults", "message": "search failed to return a single item"};
+    } else {
+        return z.Items.get(i[0]);
+    }
+}
+
 var endpoints = {
     "item" : {
 	"supportedMethods":["GET"],
@@ -15,27 +52,11 @@ var endpoints = {
                 var creator = q["creator"];
                 var title = q["title"];
                 var date = q["date"];
-                
-                var s = new z.Search();
-                s.addCondition("creator", "contains", creator);
-                if (title != null) {
-                    s.addCondition("title", "contains", title);
-                }
-                if (date != null) {
-                    s.addCondition("date", "is", date);
-                }
-                var i = s.search();
-                if (!i) {
+                var item = findByDynamicKey(creator, title, date);
+                if (item === null) {
                     sendResponseCallback(404);
                 } else {
-                    if (i.length == 0) {
-                        sendResponseCallback(404);
-                    } else if (i.length > 1) {
-                        sendResponseCallback(500);
-                    } else {
-                        var item = z.Utilities.itemToCSLJSON(z.Items.get(i[0]));
-                        sendResponseCallback(200, "application/json", JSON.stringify(item));
-                    }
+                    sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
                 }
             } else {
                 sendResponseCallback(500);
