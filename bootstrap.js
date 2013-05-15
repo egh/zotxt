@@ -40,6 +40,16 @@ function findByDynamicKey(creator, title, date) {
 }
 
 var endpoints = {
+    "bibliography" : {
+        "supportedMethods":  ["POST"],
+        "supportedDataType": ["application/json"],
+        "init": function (url, data, sendResponseCallback) {
+            var cslEngine = makeCslEngine(data["styleId"]);
+            //zotero.localItems = {};
+            cslEngine.setOutputFormat("html");
+            cslEngine.updateItems(ids);
+        }
+    },
     "item" : {
 	"supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
