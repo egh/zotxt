@@ -23,16 +23,12 @@ function makeCslEngine (styleId) {
     if (!styleId.match(/^http:/)) {
 	styleId = 'http://www.zotero.org/styles/' + styleId;
     }
-    var style = z.Style(styleId);
-    /* TODO Allow passing in locale? **/
-    var locale = z.Prefs.get('export.bibliographyLocale');
-    if(!locale) {
-	locale = z.locale;
-	if(!locale) {
-	    locale = 'en-US';
-	}
+    var style = z.Styles.get(styleId);
+    if (!style) {
+        return null;
+    } else {
+        return style.getCiteProc(true);
     }
-    return new zotero.CiteProc.CSL.Engine(mySys, style.getXML(), locale);
 }
 
 function findByDynamicKey(creator, title, date) {
@@ -62,9 +58,13 @@ var endpoints = {
         "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
             var cslEngine = makeCslEngine(data["styleId"]);
-            //zotero.localItems = {};
-            cslEngine.setOutputFormat("html");
-            cslEngine.updateItems(ids);
+            if (!cslEngine) {
+                sendResponseCallback(400, "text/plain", "No style found.");
+            } else {
+                //zotero.localItems = {};
+                cslEngine.setOutputFormat("html");
+                cslEngine.updateItems(ids);
+            }
         }
     },
     "item" : {
