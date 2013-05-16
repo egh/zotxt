@@ -71,6 +71,19 @@ var endpoints = {
             } else {
                 //zotero.localItems = {};
                 cslEngine.setOutputFormat("html");
+                function flatten(a) {
+                    return [].concat.apply([], a);
+                }
+                var citations = data["citations"];
+                var citationItems = citations.map(function (c) { 
+                    return c["citationItems"]; 
+                });
+                var citationIds = flatten(citationItems).map (function (c) { 
+                    return c["id"];
+                });
+                var keys = flatten(citationIds);
+                var items = keys.map(findByDynamicKey);
+                var ids = items.map(function(c){ return c.id; });
                 cslEngine.updateItems(ids);
             }
         }
