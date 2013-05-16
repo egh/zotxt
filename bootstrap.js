@@ -2,6 +2,23 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
 
+/**
+ * Proxy sys item for passing in to citeproc. Wraps the
+ * zotero.Cite.System object, but allows for locally registered items.
+ */
+var mySys = {
+    retrieveLocale : function (lang) {
+        return zotero.Cite.System.retrieveLocale(lang);
+    },
+    retrieveItem : function(id) { 
+        if (zotero.localItems[id] != undefined) {
+            return zotero.localItems[id];
+        } else { 
+            return zotero.Cite.System.retrieveItem(id);
+        }
+    }
+};
+
 function makeCslEngine (styleId) {
     if (!styleid.match(/^http:/)) {
 	styleid = 'http://www.zotero.org/styles/' + styleid;
