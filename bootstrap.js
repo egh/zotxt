@@ -31,24 +31,32 @@ function makeCslEngine (styleId) {
     }
 }
 
-function findByDynamicKey(creator, title, date) {
-    var s = new z.Search();
-    s.addCondition("creator", "contains", creator);
-    if (title != null) {
+function findByDynamicKey(key) {
+    var re = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
+    var result = re.exec(key);
+    if (result) {
+        var creator = result[1];
+        var title = result[2];
+        var date = result[3];
+        
+        var s = new z.Search();
+        s.addCondition("creator", "contains", creator);
+        if (title != null) {
         s.addCondition("title", "contains", title);
-    }
-    if (date != null) {
-        s.addCondition("date", "is", date);
-    }
-    var i = s.search();
-    if (!i) {
-        return null;
-    } else if (i.length == 0) {
-        return null;
-    } else if (i.length > 1) {
-        throw {'name': "TooManyResults", "message": "search failed to return a single item"};
-    } else {
-        return z.Items.get(i[0]);
+        }
+        if (date != null) {
+            s.addCondition("date", "is", date);
+        }
+        var i = s.search();
+        if (!i) {
+            return null;
+        } else if (i.length == 0) {
+            return null;
+        } else if (i.length > 1) {
+            throw {'name': "TooManyResults", "message": "search failed to return a single item"};
+        } else {
+            return z.Items.get(i[0]);
+        }
     }
 }
 
