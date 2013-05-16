@@ -20,14 +20,14 @@ var mySys = {
 };
 
 function makeCslEngine (styleId) {
-    if (!styleid.match(/^http:/)) {
-	styleid = 'http://www.zotero.org/styles/' + styleid;
+    if (!styleId.match(/^http:/)) {
+	styleId = 'http://www.zotero.org/styles/' + styleId;
     }
-    var style = zotero.Styles.get(styleid);
+    var style = z.Style(styleId);
     /* TODO Allow passing in locale? **/
-    var locale = zotero.Prefs.get('export.bibliographyLocale');
+    var locale = z.Prefs.get('export.bibliographyLocale');
     if(!locale) {
-	locale = zotero.locale;
+	locale = z.locale;
 	if(!locale) {
 	    locale = 'en-US';
 	}
