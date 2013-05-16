@@ -59,7 +59,7 @@ function findByDynamicKey(creator, title, date) {
 var endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
-        "supportedDataType": ["application/json"],
+        "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
             var cslEngine = makeCslEngine(data["styleId"]);
             //zotero.localItems = {};
