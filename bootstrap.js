@@ -99,16 +99,16 @@ var endpoints = {
             if (q["itemid"]) {
                 itemId = null;
             } else if (q["easykey"]) {
-                    try {
-                        var item = findByEasyKey(q["easykey"])
-                        if (item === null) {
-                            sendResponseCallback(404);
-                        } else {
-                            sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
-                        }
-                    } catch (ex if ex['name'] === "BadEasyKey") {
-                        sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
+                try {
+                    var item = findByEasyKey(q["easykey"])
+                    if (item === null) {
+                        sendResponseCallback(404);
+                    } else {
+                        sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
                     }
+                } catch (ex if ex['name'] === "BadEasyKey") {
+                    sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
+                }
             } else {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
             }
