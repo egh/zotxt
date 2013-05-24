@@ -94,7 +94,7 @@ var endpoints = {
         "init" : function (url, data, sendResponseCallback) {
             var q = url['query'];
             var itemId = null;
-            if (q["itemId"]) {
+            if (q["itemid"]) {
                 itemId = null;
             } else if (q["creator"]) {
                 var creator = q["creator"];
