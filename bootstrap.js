@@ -127,10 +127,16 @@ function loadEndpoints () {
 }
     
 function startup(data, reason) {
+    /* wait until after zotero is loaded */
     var observerService = Components.classes["@mozilla.org/observer-service;1"].
         getService(Components.interfaces.nsIObserverService);
-    observerService.addObserver({"observe": function(subject, topic, data) { loadEndpoints(); } },
-                                "final-ui-startup", false);
+    observerService.addObserver(
+        { 
+            "observe": function(subject, topic, data) { 
+                loadEndpoints(); 
+            }
+        },
+        "final-ui-startup", false);
 }
 
 
