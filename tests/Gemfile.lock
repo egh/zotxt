@@ -1,0 +1,13 @@
+GEM
+  specs:
+    httpclient (2.2.5)
+    json (1.7.7)
+    minitest (2.5.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  httpclient
+  json
+  minitest
