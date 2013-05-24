@@ -80,10 +80,10 @@ var endpoints = {
                 var citationItems = citations.map(function (c) { 
                     return c["citationItems"]; 
                 });
-                var citationIds = flatten(citationItems).map (function (c) { 
-                    return c["id"];
+                var citationEasyKeys = flatten(citationItems).map (function (c) { 
+                    return c["easyKey"];
                 });
-                var keys = flatten(citationIds);
+                var keys = flatten(citationEasyKeys);
                 var items = keys.map(findByEasyKey);
                 var ids = items.map(function(c){ return c.id; });
                 cslEngine.updateItems(ids);
