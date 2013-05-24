@@ -107,7 +107,7 @@ var endpoints = {
                     sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
                 }
             } else {
-                sendResponseCallback(500);
+                sendResponseCallback(400, "text/plain", "No param supplied!");
             }
         }
     }
