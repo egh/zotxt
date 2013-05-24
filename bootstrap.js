@@ -31,10 +31,12 @@ function makeCslEngine (styleId) {
     }
 }
 
-function findByDynamicKey(key) {
+function findByEasyKey(key) {
     var re = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
     var result = re.exec(key);
-    if (result) {
+    if (!result) {
+        throw {'name': "BadEasyKey", "message": "Unparseable easy key."};
+    } else {
         var creator = result[1];
         var title = result[2];
         var date = result[3];
@@ -82,7 +84,7 @@ var endpoints = {
                     return c["id"];
                 });
                 var keys = flatten(citationIds);
-                var items = keys.map(findByDynamicKey);
+                var items = keys.map(findByEasyKey);
                 var ids = items.map(function(c){ return c.id; });
                 cslEngine.updateItems(ids);
             }
@@ -96,16 +98,17 @@ var endpoints = {
             var itemId = null;
             if (q["itemid"]) {
                 itemId = null;
-            } else if (q["creator"]) {
-                var creator = q["creator"];
-                var title = q["title"];
-                var date = q["date"];
-                var item = findByDynamicKey(creator, title, date);
-                if (item === null) {
-                    sendResponseCallback(404);
-                } else {
-                    sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
-                }
+            } else if (q["easykey"]) {
+                    try {
+                        var item = findByEasyKey(q["easykey"])
+                        if (item === null) {
+                            sendResponseCallback(404);
+                        } else {
+                            sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
+                        }
+                    } catch (ex if ex['name'] === "BadEasyKey") {
+                        sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
+                    }
             } else {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
             }
