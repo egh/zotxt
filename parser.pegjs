@@ -38,7 +38,10 @@ prefix = first:(. !citeKey)* last:.
   return first.map(function (x) { return x[0]; }).join("") + last;
 }
 
-locator = ","? sp first:word sp+ rest:wordWithDigits { return { "locator" : first + " " + rest}; }
+locator = ","? sp first:word rest:(sp wordWithDigits)+
+{
+  return { "locator" : first + " " + rest.map(function(x){ return x[1]; }).join(" ") };
+}
 
 suffix = suffix:[^\];]+
 {
