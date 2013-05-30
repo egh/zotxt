@@ -23,8 +23,8 @@ class ZotxtTest < MiniTest::Unit::TestCase
     r = {
       "styleId" => "chicago-author-date",
       "citations" => [
-        { "citationItems" => [ { "easyKey" => "DoeBook2006" } ] }
-                     ],
+        { "citationItems" => [ { "easyKey" => "DoeBook2005" } ] }
+      ],
       "properties" => { "noteIndex" => 0 }
     }
     header = { 'Content-Type' => 'application/json' }
