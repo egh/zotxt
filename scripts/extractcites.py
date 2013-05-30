@@ -15,7 +15,10 @@ for line in f:
 
 cites = []
 for key in known_keys:
-    cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/item?easykey=%s"%key))
-    cite["id"] = key
-    cites.append(cite)
+    try:
+        cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/item?easykey=%s"%key))
+        cite["id"] = key
+        cites.append(cite)
+    except urllib2.HTTPError:
+        sys.stderr.write("%s not found!\n"%(key))
 print json.dumps(cites, indent=2)
