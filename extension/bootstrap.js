@@ -70,6 +70,7 @@ var endpoints = {
             var cslEngine = makeCslEngine(data["styleId"]);
             if (!cslEngine) {
                 sendResponseCallback(400, "text/plain", "No style found.");
+                return;
             } else {
                 //zotero.localItems = {};
                 cslEngine.setOutputFormat("html");
