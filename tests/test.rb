@@ -32,6 +32,19 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal 200, resp.status
   end
 
+  def test_bad_bibliography
+    r = {
+      "styleId" => "chicago-author-date",
+      "citations" => [
+        { "citationItems" => [ { "easyKey" => "FooBar0000" } ] }
+      ],
+      "properties" => { "noteIndex" => 0 }
+    }
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
+    assert_equal 400, resp.status
+  end
+
   def test_no_param
     resp = @client.get(@item_url)
     assert_equal 400, resp.status

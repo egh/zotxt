@@ -86,6 +86,13 @@ var endpoints = {
                 });
                 var keys = flatten(citationEasyKeys);
                 var items = keys.map(findByEasyKey);
+                // check for unmatched keys
+                for(var i = 0; i<items.length; i++) {
+                    if (items[i] == null) {
+                        sendResponseCallback(400, "text/plain", "easykey " + keys[i] + " not found.");
+                        return;
+                    }
+                }
                 var ids = items.map(function(c){ return c.id; });
                 cslEngine.updateItems(ids);
                 sendResponseCallback(200, "text/plain", "Not implemented");
