@@ -88,6 +88,8 @@ var endpoints = {
                 var items = keys.map(findByEasyKey);
                 var ids = items.map(function(c){ return c.id; });
                 cslEngine.updateItems(ids);
+                sendResponseCallback(200, "text/plain", "Not implemented");
+                return;
             }
         }
     },
