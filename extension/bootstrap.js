@@ -35,7 +35,7 @@ function findByEasyKey(key) {
     var re = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
     var result = re.exec(key);
     if (!result) {
-        throw {'name': "BadEasyKey", "message": "Unparseable easy key."};
+        throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000"};
     } else {
         var creator = result[1];
         var title = result[2];
@@ -51,11 +51,11 @@ function findByEasyKey(key) {
         }
         var i = s.search();
         if (!i) {
-            return null;
+            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
         } else if (i.length == 0) {
-            return null;
+            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
         } else if (i.length > 1) {
-            throw {'name': "TooManyResults", "message": "search failed to return a single item"};
+            throw {'name': "EasyKeyError", "message": "search return multiple items"};
         } else {
             return z.Items.get(i[0]);
         }
@@ -85,18 +85,15 @@ var endpoints = {
                     return c["easyKey"];
                 });
                 var keys = flatten(citationEasyKeys);
-                var items = keys.map(findByEasyKey);
-                // check for unmatched keys
-                for(var i = 0; i<items.length; i++) {
-                    if (items[i] == null) {
-                        sendResponseCallback(400, "text/plain", "easykey " + keys[i] + " not found.");
-                        return;
-                    }
+                try {
+                    var items = keys.map(findByEasyKey);
+                    var ids = items.map(function(c){ return c.id; });
+                    cslEngine.updateItems(ids);
+                    sendResponseCallback(200, "text/plain", "Not implemented");
+                    return;
+                } catch (ex if (ex.name === "EasyKeyError")) {
+                    sendResponseCallback(400, "text/plain", ex.message);
                 }
-                var ids = items.map(function(c){ return c.id; });
-                cslEngine.updateItems(ids);
-                sendResponseCallback(200, "text/plain", "Not implemented");
-                return;
             }
         }
     },
@@ -108,7 +105,8 @@ var endpoints = {
             var items = [];
             if (q["selected"]) {
                 var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
-                var items = ZoteroPane.getSelectedItems();
+                items = ZoteroPane.getSelectedItems();
+                if (!items) { items = []; }
             } else if (q["key"]) {
                 items = q["key"].split(",").map(function (key) {
                     var lkh = z.Items.parseLibraryKeyHash(key);
@@ -119,41 +117,37 @@ var endpoints = {
                     items = q["easykey"].split(",").map(function (key) {
                         return findByEasyKey(key);
                     });
-                } catch (ex if ex['name'] === "BadEasyKey") {
-                    sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
+                } catch (ex if (ex.name === "EasyKeyError")) {
+                    sendResponseCallback(400, "text/plain", ex.message);
                     return;
                 }
             } else {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
                 return;
             }
-            if (items.length == 0) {
-                sendResponseCallback(404);
+            if (q['format'] == 'key') {
+                var responseData = items.map (function (item) {
+                    return ((item.libraryID || "0") + "_" + item.key);
+                });
+                sendResponseCallback(200, "application/json; charset=UTF-8", 
+                                     JSON.stringify(responseData));
+                return;
+            } else if (q['format'] == 'bibliography') {
+                var responseData = items.map (function (item) {
+                    // TODO - make the default style correct
+                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
+                    return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+                });
+                sendResponseCallback(200, "application/json; charset=UTF-8",
+                                     JSON.stringify(responseData));
+                return;
             } else {
-                if (q['format'] == 'key') {
-                    var responseData = items.map (function (item) {
-                        return { "key": (item.libraryID || "0") + "_" + item.key };
-                    });
-                    sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                         JSON.stringify(responseData));
-                    return;
-                } else if (q['format'] == 'bibliography') {
-                    var responseData = items.map (function (item) {
-                        // TODO - make the default style correct
-                        var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
-                        return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
-                    });
-                    sendResponseCallback(200, "application/json; charset=UTF-8",
-                                         JSON.stringify(responseData));
-                    return;
-                } else {
-                    var responseData = items.map (function (item) {
-                        return z.Utilities.itemToCSLJSON(item);
-                    });
-                    sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                         JSON.stringify(responseData));
-                    return;
-                }
+                var responseData = items.map (function (item) {
+                    return z.Utilities.itemToCSLJSON(item);
+                });
+                sendResponseCallback(200, "application/json; charset=UTF-8", 
+                                     JSON.stringify(responseData));
+                return;
             }
         }
     }
