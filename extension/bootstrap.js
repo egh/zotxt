@@ -105,34 +105,41 @@ var endpoints = {
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
             var q = url['query'];
-            var itemId = null;
-            if (q["itemid"]) {
-                itemId = null;
+            var item = null;
+            if (q["key"]) {
+                var lkh = z.Items.parseLibraryKeyHash(q["key"]);
+                item = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
             } else if (q["easykey"]) {
                 try {
-                    var item = findByEasyKey(q["easykey"])
-                    if (item === null) {
-                        sendResponseCallback(404);
-                    } else {
-                        z.debug(q['format']);
-                        if (q['format'] == 'key') {
-                            var libraryId = item.libraryID;
-                            if (!libraryId) {
-                                libraryId = "0";
-                            }
-                            sendResponseCallback(200, "application/json", 
-                                                 JSON.stringify({ "libraryId": libraryId,
-                                                                  "key": item.key}));
-                        } else {                            
-                            sendResponseCallback(200, "application/json", 
-                                                 JSON.stringify(z.Utilities.itemToCSLJSON(item)));
-                        }
-                    }
+                    item = findByEasyKey(q["easykey"])
                 } catch (ex if ex['name'] === "BadEasyKey") {
                     sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
+                    return;
                 }
             } else {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
+                return;
+            }
+            if (item === null) {
+                sendResponseCallback(404);
+            } else {
+                if (q['format'] == 'key') {
+                    var libraryId = item.libraryID || "0";
+                    sendResponseCallback(200, "application/json", 
+                                         JSON.stringify({ "key": libraryId + "_" + item.key}));
+                    return;
+                } else if (q['format'] == 'bibliography') {
+                    // TODO - make the default style correct
+                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
+                    var biblio = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+                    sendResponseCallback(200, "application/json",
+                                         JSON.stringify({ "bibliography" : biblio }));
+                    return;
+                } else {
+                    sendResponseCallback(200, "application/json", 
+                                         JSON.stringify(z.Utilities.itemToCSLJSON(item)));
+                    return;
+                }
             }
         }
     }
