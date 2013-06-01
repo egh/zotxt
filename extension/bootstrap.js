@@ -114,7 +114,19 @@ var endpoints = {
                     if (item === null) {
                         sendResponseCallback(404);
                     } else {
-                        sendResponseCallback(200, "application/json", JSON.stringify(z.Utilities.itemToCSLJSON(item)));
+                        z.debug(q['format']);
+                        if (q['format'] == 'key') {
+                            var libraryId = item.libraryID;
+                            if (!libraryId) {
+                                libraryId = "0";
+                            }
+                            sendResponseCallback(200, "application/json", 
+                                                 JSON.stringify({ "libraryId": libraryId,
+                                                                  "key": item.key}));
+                        } else {                            
+                            sendResponseCallback(200, "application/json", 
+                                                 JSON.stringify(z.Utilities.itemToCSLJSON(item)));
+                        }
                     }
                 } catch (ex if ex['name'] === "BadEasyKey") {
                     sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");

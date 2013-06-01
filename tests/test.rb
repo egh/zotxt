@@ -19,6 +19,14 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "Doe", i["author"][0]["family"]
   end
 
+  def test_item_easykey_key_format
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert (i.key? 'libraryId')
+    assert (i.key? 'key')
+  end
+
   def test_bibliography
     r = {
       "styleId" => "chicago-author-date",
