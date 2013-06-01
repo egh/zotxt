@@ -105,13 +105,17 @@ var endpoints = {
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
             var q = url['query'];
-            var item = null;
+            var items = [];
             if (q["key"]) {
-                var lkh = z.Items.parseLibraryKeyHash(q["key"]);
-                item = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+                items = q["key"].split(",").map(function (key) {
+                    var lkh = z.Items.parseLibraryKeyHash(key);
+                    return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+                });
             } else if (q["easykey"]) {
                 try {
-                    item = findByEasyKey(q["easykey"])
+                    items = q["easykey"].split(",").map(function (key) {
+                        return findByEasyKey(key);
+                    });
                 } catch (ex if ex['name'] === "BadEasyKey") {
                     sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000");
                     return;
@@ -120,24 +124,31 @@ var endpoints = {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
                 return;
             }
-            if (item === null) {
+            if (items.length == 0) {
                 sendResponseCallback(404);
             } else {
                 if (q['format'] == 'key') {
-                    var libraryId = item.libraryID || "0";
+                    var responseData = items.map (function (item) {
+                        return { "key": (item.libraryID || "0") + "_" + item.key };
+                    });
                     sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                         JSON.stringify({ "key": libraryId + "_" + item.key}));
+                                         JSON.stringify(responseData));
                     return;
                 } else if (q['format'] == 'bibliography') {
-                    // TODO - make the default style correct
-                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
-                    var biblio = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+                    var responseData = items.map (function (item) {
+                        // TODO - make the default style correct
+                        var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
+                        return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+                    });
                     sendResponseCallback(200, "application/json; charset=UTF-8",
-                                         JSON.stringify(biblio));
+                                         JSON.stringify(responseData));
                     return;
                 } else {
+                    var responseData = items.map (function (item) {
+                        return z.Utilities.itemToCSLJSON(item);
+                    });
                     sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                         JSON.stringify(z.Utilities.itemToCSLJSON(item)));
+                                         JSON.stringify(responseData));
                     return;
                 }
             }

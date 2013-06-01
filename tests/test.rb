@@ -10,34 +10,39 @@ class ZotxtTest < MiniTest::Unit::TestCase
     @bibliography_url = "#{@base_url}/bibliography"
   end
 
+  def test_item_nothing
+    resp = @client.get(@item_url)
+    assert_equal 400, resp.status
+  end
+
   def test_item_easykey
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal "book", i["type"]
-    assert_equal "First Book", i["title"]
-    assert_equal "Doe", i["author"][0]["family"]
+    assert_equal "book", i[0]["type"]
+    assert_equal "First Book", i[0]["title"]
+    assert_equal "Doe", i[0]["author"][0]["family"]
   end
 
   def test_item_easykey_key_format
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal "0_ZBZQ4KMP", i['key']
+    assert_equal "0_ZBZQ4KMP", i[0]['key']
   end
 
   def test_item_easykey_bibliography_format
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert (i.key? 'html')
+    assert (i[0].key? 'html')
   end
 
   def test_item_key
     resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMP", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal "0_ZBZQ4KMP", i['key']
+    assert_equal "0_ZBZQ4KMP", i[0]['key']
   end
 
   def test_bibliography
