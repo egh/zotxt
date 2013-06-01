@@ -45,6 +45,12 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "0_ZBZQ4KMP", i[0]['key']
   end
 
+  def test_selected
+    resp = @client.get(@item_url, {"selected" => "selected" })
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+  end
+
   def test_bibliography
     r = {
       "styleId" => "chicago-author-date",

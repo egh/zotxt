@@ -106,7 +106,10 @@ var endpoints = {
         "init" : function (url, data, sendResponseCallback) {
             var q = url['query'];
             var items = [];
-            if (q["key"]) {
+            if (q["selected"]) {
+                var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
+                var items = ZoteroPane.getSelectedItems();
+            } else if (q["key"]) {
                 items = q["key"].split(",").map(function (key) {
                     var lkh = z.Items.parseLibraryKeyHash(key);
                     return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
