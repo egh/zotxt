@@ -65,7 +65,7 @@ function findByEasyKey(key) {
 var endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
-        "supportedDataTypes": ["application/json"],
+        "supportedDataTypes": ["application/json; charset=UTF-8"],
         "init": function (url, data, sendResponseCallback) {
             var cslEngine = makeCslEngine(data["styleId"]);
             if (!cslEngine) {
@@ -125,18 +125,18 @@ var endpoints = {
             } else {
                 if (q['format'] == 'key') {
                     var libraryId = item.libraryID || "0";
-                    sendResponseCallback(200, "application/json", 
+                    sendResponseCallback(200, "application/json; charset=UTF-8", 
                                          JSON.stringify({ "key": libraryId + "_" + item.key}));
                     return;
                 } else if (q['format'] == 'bibliography') {
                     // TODO - make the default style correct
                     var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
                     var biblio = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
-                    sendResponseCallback(200, "application/json",
-                                         JSON.stringify({ "bibliography" : biblio }));
+                    sendResponseCallback(200, "application/json; charset=UTF-8",
+                                         JSON.stringify(biblio));
                     return;
                 } else {
-                    sendResponseCallback(200, "application/json", 
+                    sendResponseCallback(200, "application/json; charset=UTF-8", 
                                          JSON.stringify(z.Utilities.itemToCSLJSON(item)));
                     return;
                 }

@@ -26,6 +26,13 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "0_ZBZQ4KMP", i['key']
   end
 
+  def test_item_easykey_bibliography_format
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert (i.key? 'html')
+  end
+
   def test_item_key
     resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMP", "format" => "key"})
     assert_equal 200, resp.status
