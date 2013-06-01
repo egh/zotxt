@@ -65,7 +65,7 @@ function findByEasyKey(key) {
 var endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
-        "supportedDataTypes": ["application/json; charset=UTF-8"],
+        "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
             var cslEngine = makeCslEngine(data["styleId"]);
             if (!cslEngine) {
