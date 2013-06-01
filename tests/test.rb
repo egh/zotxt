@@ -10,12 +10,12 @@ class ZotxtTest < MiniTest::Unit::TestCase
     @bibliography_url = "#{@base_url}/bibliography"
   end
 
-  def test_item_nothing
+  def test_items_nothing
     resp = @client.get(@item_url)
     assert_equal 400, resp.status
   end
 
-  def test_item_easykey
+  def test_items_easykey
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
