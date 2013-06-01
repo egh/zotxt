@@ -45,6 +45,13 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "0_ZBZQ4KMP", i[0]
   end
 
+  def test_items_multiple_easykeys
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005,DoeArticle2006", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal 2, i.length
+  end
+
   def test_selected
     resp = @client.get(@item_url, {"selected" => "selected" })
     assert_equal 200, resp.status
