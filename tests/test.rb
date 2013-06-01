@@ -6,7 +6,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
   def setup
     @client = HTTPClient.new
     @base_url = "http://localhost:23119/zotxt"
-    @item_url = "#{@base_url}/item"
+    @item_url = "#{@base_url}/items"
     @bibliography_url = "#{@base_url}/bibliography"
   end
 

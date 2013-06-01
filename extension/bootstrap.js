@@ -100,7 +100,7 @@ var endpoints = {
             }
         }
     },
-    "item" : {
+    "items" : {
 	"supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
