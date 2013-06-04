@@ -77,16 +77,18 @@ var endpoints = {
                 function flatten(a) {
                     return [].concat.apply([], a);
                 }
+                var keys = {};
                 var citations = data["citations"];
                 var citationItems = citations.map(function (c) { 
-                    return c["citationItems"]; 
+                    c["citationItems"].map(function (item) {
+                        keys[item["easyKey"]] = true;
+                    });
                 });
-                var citationEasyKeys = flatten(citationItems).map (function (c) { 
-                    return c["easyKey"];
-                });
-                var keys = flatten(citationEasyKeys);
                 try {
-                    var items = keys.map(findByEasyKey);
+                    var items = [];
+                    for (var key in keys) {
+                        items.push(findByEasyKey(key));
+                    }
                     var ids = items.map(function(c){ return c.id; });
                     cslEngine.updateItems(ids);
                     var retval = {};
