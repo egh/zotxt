@@ -106,7 +106,8 @@ var endpoints = {
             var q = url['query'];
             var items = [];
             if (q["selected"]) {
-                var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
+                var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+                  getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
                 items = ZoteroPane.getSelectedItems();
                 if (!items) { items = []; }
             } else if (q["key"]) {
