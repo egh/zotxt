@@ -89,7 +89,9 @@ var endpoints = {
                     var items = keys.map(findByEasyKey);
                     var ids = items.map(function(c){ return c.id; });
                     cslEngine.updateItems(ids);
-                    sendResponseCallback(200, "text/plain", "Not implemented");
+                    var retval = {};
+                    retval["bibliography"] = cslEngine.makeBibliography();
+                    sendResponseCallback(200, "application/json", JSON.stringify(retval));
                     return;
                 } catch (ex if (ex.name === "EasyKeyError")) {
                     sendResponseCallback(400, "text/plain", ex.message);
