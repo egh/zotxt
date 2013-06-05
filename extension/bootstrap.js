@@ -122,6 +122,10 @@ var endpoints = {
                     cslEngine.updateItems(extractIds(citationGroups));
                     var retval = {};
                     retval["bibliography"] = cslEngine.makeBibliography();
+                    retval["citationClusters"] = [];
+                    citationGroups.map (function (citationGroup) {
+                        retval["citationClusters"].push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
+                    });
                     sendResponseCallback(200, "application/json", JSON.stringify(retval));
                     return;
                 } catch (ex if (ex.name === "EasyKeyError")) {
