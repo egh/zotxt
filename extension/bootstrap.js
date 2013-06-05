@@ -70,6 +70,41 @@ function findByEasyKey(key) {
     }
 }
 
+/**
+ * Map the easyeys in the citations to ids.
+ */
+function processCitationsGroup (citationGroup) {
+    function processCitationItem (citation) {
+        var retval = {};
+        for (var x in citation) {
+            if (x == "easyKey") {
+                retval["id"] = findByEasyKey(citation[x]).id;
+            } else {
+                retval[x] = citation[x];
+            }
+        }
+        return retval;
+    }
+    var citationItems = citationGroup["citationItems"].map(processCitationItem);
+    return { 
+        "properties" : citationGroup["properties"],
+        "citationItems" : citationItems
+    };
+}
+
+/**
+ *Extract the ids from an array of citationGroups.
+ */
+function extractIds (citationGroups) {
+    var ids = [];
+    citationGroups.map (function(group) {
+        group["citationItems"].map (function(citationItem) {
+            ids.push(citationItem["id"]);
+        });
+    });
+    return ids;
+}
+
 var endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
@@ -85,20 +120,10 @@ var endpoints = {
                 function flatten(a) {
                     return [].concat.apply([], a);
                 }
-                var keys = {};
-                var citations = data["citations"];
-                var citationItems = citations.map(function (c) { 
-                    c["citationItems"].map(function (item) {
-                        keys[item["easyKey"]] = true;
-                    });
-                });
+                /* */
                 try {
-                    var items = [];
-                    for (var key in keys) {
-                        items.push(findByEasyKey(key));
-                    }
-                    var ids = items.map(function(c){ return c.id; });
-                    cslEngine.updateItems(ids);
+                    var citationGroups = data["citationGroups"].map(processCitationsGroup);
+                    cslEngine.updateItems(extractIds(citationGroups));
                     var retval = {};
                     retval["bibliography"] = cslEngine.makeBibliography();
                     sendResponseCallback(200, "application/json", JSON.stringify(retval));
