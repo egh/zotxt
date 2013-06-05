@@ -117,10 +117,6 @@ var endpoints = {
             } else {
                 //zotero.localItems = {};
                 cslEngine.setOutputFormat("html");
-                function flatten(a) {
-                    return [].concat.apply([], a);
-                }
-                /* */
                 try {
                     var citationGroups = data["citationGroups"].map(processCitationsGroup);
                     cslEngine.updateItems(extractIds(citationGroups));
