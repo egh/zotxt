@@ -68,10 +68,10 @@ class ZotxtTest < MiniTest::Unit::TestCase
   def test_bibliography
     r = {
       "styleId" => "chicago-author-date",
-      "citations" => [
-        { "citationItems" => [ { "easyKey" => "DoeBook2005" } ] }
-      ],
-      "properties" => { "noteIndex" => 0 }
+      "citationGroups" => [
+        { "citationItems" => [ { "easyKey" => "DoeBook2005" } ],
+          "properties" => { "noteIndex" => 0 } }
+      ]
     }
     header = { 'Content-Type' => 'application/json' }
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
@@ -81,10 +81,10 @@ class ZotxtTest < MiniTest::Unit::TestCase
   def test_bad_bibliography
     r = {
       "styleId" => "chicago-author-date",
-      "citations" => [
-        { "citationItems" => [ { "easyKey" => "FooBar0000" } ] }
-      ],
-      "properties" => { "noteIndex" => 0 }
+      "citationGroups" => [
+        { "citationItems" => [ { "easyKey" => "FooBar0000" } ],
+          "properties" => { "noteIndex" => 0 } }
+      ]
     }
     header = { 'Content-Type' => 'application/json' }
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
