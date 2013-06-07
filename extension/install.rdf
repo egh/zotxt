@@ -27,12 +27,13 @@
         <em:maxVersion>30.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-     <em:targetApplication>
-       <Description>
-         <em:id>zotero@chnm.gmu.edu</em:id>
-         <em:minVersion>4.0</em:minVersion>
-         <em:maxVersion>4.*</em:maxVersion>
-       </Description>
-     </em:targetApplication>
+    
+    <em:targetApplication>
+      <Description>
+        <em:id>zotero@chnm.gmu.edu</em:id>
+        <em:minVersion>4.0</em:minVersion>
+        <em:maxVersion>4.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
   </Description>
 </RDF>
