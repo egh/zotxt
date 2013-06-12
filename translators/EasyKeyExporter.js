@@ -12,10 +12,6 @@
     "lastUpdated":"2013-06-10 12:02:17"
 }
 
-function titlecase(word) {
-    return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
-}
-
 function determineYear (item) {
     var year = "";
     var rawdate = item['date'];
@@ -34,7 +30,7 @@ function determineAuthor (item) {
     if (creator && creator['lastName']) {
         author = creator['lastName'];
     }
-    return titlecase(author);
+    return ZU.capitalizeTitle(author);
 }
 
 function determineTitleWord(item) {
@@ -45,7 +41,7 @@ function determineTitleWord(item) {
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[0-9]+$')));
     });
     if (filteredWords[0]) {
-        return titlecase(ZU.XRegExp.replace(filteredWords[0], ZU.XRegExp('[^\\w]'), ''));
+        return ZU.capitalizeTitle(ZU.XRegExp.replace(filteredWords[0], ZU.XRegExp('[^\\w]'), ''));
     } else {
         return "Unknown";
     }
