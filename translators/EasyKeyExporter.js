@@ -49,11 +49,17 @@ function determineTitleWord(item) {
 
 function doExport () {
     var item;
+    var first = true;
     while((item = Zotero.nextItem())) {
+        // only write spaces after the first export
+        if (!first) {
+            Zotero.write(" ");
+        } else {
+            first = false;
+        }
         var year = determineYear(item);
         var author = determineAuthor(item);
         var titleword = determineTitleWord(item);
         Zotero.write("@" + author + titleword + year);
-        Zotero.write("\n");
     }
 }
