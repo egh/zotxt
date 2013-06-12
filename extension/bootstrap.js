@@ -228,7 +228,25 @@ function shutdown (data, reason) {
 }
 
 function uninstall(data, reason) {
-    /* pass */
+    /* TODO uninstall exporters? */
+}
+
+function installTranslator(metadata, filename) {
+    loadZotero(); 
+    Components.utils.import("resource://gre/modules/FileUtils.jsm");
+    Components.utils.import("resource://gre/modules/NetUtil.jsm");
+    var file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
+                                           'resource', 'translators', filename]);
+    NetUtil.asyncFetch(file, function(inputStream, status) {
+        if (!Components.isSuccessCode(status)) {
+            z.debug("error reading file");
+            return;
+        }
+
+        var data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+        z.Translators.save(metadata, data);
+        z.Translators.init();
+    });
 }
 
 function install(data, reason) {
@@ -238,4 +256,19 @@ function install(data, reason) {
         .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
     prefs.setBoolPref("httpServer.enabled", true);
     loadEndpoints(); 
+
+    /* load exporters */
+    installTranslator({
+        "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
+        "label": "EasyKey",
+        "creator": "Erik Hetzner",
+        "target": "txt",
+        "minVersion": "2.1.9",
+        "maxVersion": "",
+        "priority": 200,
+        "inRepository": false,
+        "translatorType": 2,
+        "browserSupport": "gcs",
+        "lastUpdated":"2013-06-10 12:02:17"
+    }, "EasyKeyExporter.js");
 }
