@@ -2,6 +2,13 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
 
+function loadZotero () {
+    if (!z) {
+        z = Components.classes["@zotero.org/Zotero;1"].
+            getService(Components.interfaces.nsISupports).wrappedJSObject;
+    }
+}
+
 /**
  * Proxy sys item for passing in to citeproc. Wraps the
  * zotero.Cite.System object, but allows for locally registered items.
@@ -195,9 +202,7 @@ var endpoints = {
  * Function to load our endpoints into the Zotero connector server.
  */
 function loadEndpoints () {
-    z = Components.classes["@zotero.org/Zotero;1"].
-        getService(Components.interfaces.nsISupports).wrappedJSObject;
-    
+    loadZotero();
     for (e in endpoints) {
         var ep = z.Server.Endpoints["/zotxt/" + e] = function() {};
         ep.prototype = endpoints[e];
