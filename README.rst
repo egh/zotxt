@@ -7,6 +7,29 @@ plain text files (e.g., markdown, reStructuredText, latex, etc.)
 
 zotxt is still in development, and is primarily for developers to use.
 
-You can build yourself from the files in ``extension``::
+You can build yourself using ``make``.
 
-  zip zotxt.xpi bootstrap.js install.rdf
+Writing with pandoc
+-------------------
+
+If you use pandoc, zotxt can help you deal with citations stored in
+Zotero. After installing the extension, modify your Zotero preferences
+to make the “easykey” exporter your default for “quick copy”.
+
+Now, when editing a markdown document in your text editor, use either
+the drag and drop or quick copy shortcut key (Ctrl-Alt-C) to copy a
+pandoc-compatible “easykey” citation into your document. You can also
+generate your own easykey using the author’s last name, a word from
+the title, and the date.
+
+When you are finished writing, you can use the python script
+``extractcites.py``, located in the ``scripts`` directory, to retrieve
+a citeproc-json version of your citations. This script should run
+under any python. It is invoked as follows::
+
+  python extractcites.py document.md > document.json
+
+This will generate the ``document.json`` file. pandoc may then be used
+as usual::
+
+  pandoc document.md --bibliography=document.json
