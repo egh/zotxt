@@ -1,17 +1,3 @@
-{
-    "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
-    "label": "EasyKey",
-    "creator": "Erik Hetzner",
-    "target": "txt",
-    "minVersion": "2.1.9",
-    "maxVersion": "",
-    "priority": 200,
-    "inRepository": false,
-    "translatorType": 2,
-    "browserSupport": "gcs",
-    "lastUpdated":"2013-06-10 12:02:17"
-}
-
 function determineYear (item) {
     var year = "";
     var rawdate = item['date'];
@@ -30,7 +16,7 @@ function determineAuthor (item) {
     if (creator && creator['lastName']) {
         author = creator['lastName'];
     }
-    return ZU.capitalizeTitle(author);
+    return ZU.capitalizeTitle(author, true);
 }
 
 function determineTitleWord(item) {
