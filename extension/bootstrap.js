@@ -248,8 +248,6 @@ function uninstall(data, reason) {
 
 function installTranslator(metadata, filename) {
     loadZotero(); 
-    Components.utils.import("resource://gre/modules/FileUtils.jsm");
-    Components.utils.import("resource://gre/modules/NetUtil.jsm");
     var file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
                                            'resource', 'translators', filename]);
     NetUtil.asyncFetch(file, function(inputStream, status) {
@@ -265,7 +263,10 @@ function installTranslator(metadata, filename) {
 }
 
 function install(data, reason) {
-    /* turn on http server if it is not on */
+    Components.utils.import("resource://gre/modules/FileUtils.jsm");
+    Components.utils.import("resource://gre/modules/NetUtil.jsm");
+
+   /* turn on http server if it is not on */
     /* TODO turn this off when uninstalled? */
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
