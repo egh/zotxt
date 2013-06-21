@@ -100,7 +100,7 @@ function processCitationsGroup (citationGroup) {
 }
 
 /**
- *Extract the ids from an array of citationGroups.
+ * Extract the ids from an array of citationGroups.
  */
 function extractIds (citationGroups) {
     var ids = [];
@@ -230,6 +230,7 @@ function shutdown (data, reason) {
 function uninstall(data, reason) {
     /* TODO uninstall exporters? */
 }
+
 
 function installTranslator(metadata, filename) {
     loadZotero(); 
