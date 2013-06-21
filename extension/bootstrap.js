@@ -2,6 +2,20 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
 
+var easyKeyExporterMetadata = {
+    "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
+    "label": "EasyKey",
+    "creator": "Erik Hetzner",
+    "target": "txt",
+    "minVersion": "2.1.9",
+    "maxVersion": "",
+    "priority": 200,
+    "inRepository": false,
+    "translatorType": 2,
+    "browserSupport": "gcs",
+    "lastUpdated":"2013-06-10 12:02:17"
+};
+
 function loadZotero () {
     if (!z) {
         z = Components.classes["@zotero.org/Zotero;1"].
@@ -259,17 +273,5 @@ function install(data, reason) {
     loadEndpoints(); 
 
     /* load exporters */
-    installTranslator({
-        "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
-        "label": "EasyKey",
-        "creator": "Erik Hetzner",
-        "target": "txt",
-        "minVersion": "2.1.9",
-        "maxVersion": "",
-        "priority": 200,
-        "inRepository": false,
-        "translatorType": 2,
-        "browserSupport": "gcs",
-        "lastUpdated":"2013-06-10 12:02:17"
-    }, "EasyKeyExporter.js");
+    installTranslator(easyKeyExporterMetadata, "EasyKeyExporter.js");
 }
