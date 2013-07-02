@@ -2,7 +2,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
 
-var easyKeyExporterMetadata = {
+let easyKeyExporterMetadata = {
     "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
     "label": "EasyKey",
     "creator": "Erik Hetzner",
@@ -27,7 +27,7 @@ function loadZotero () {
  * Proxy sys item for passing in to citeproc. Wraps the
  * zotero.Cite.System object, but allows for locally registered items.
  */
-var mySys = {
+let mySys = {
     retrieveLocale : function (lang) {
         return z.Cite.System.retrieveLocale(lang);
     },
@@ -44,7 +44,7 @@ function makeCslEngine (styleId) {
     if (!styleId.match(/^http:/)) {
 	styleId = 'http://www.zotero.org/styles/' + styleId;
     }
-    var style = z.Styles.get(styleId);
+    let style = z.Styles.get(styleId);
     if (!style) {
         return null;
     } else {
@@ -52,17 +52,17 @@ function makeCslEngine (styleId) {
     }
 }
 
-var knownEasyKeys = {};
+let knownEasyKeys = {};
 
-var easyKeyRe = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
-var alternateEasyKeyRe = new RegExp("^([a-z]+):([0-9]+)?([a-z]+)?");
+let easyKeyRe = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
+let alternateEasyKeyRe = new RegExp("^([a-z]+):([0-9]+)?([a-z]+)?");
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
  * did not parse correctly.
  */
 function parseEasyKey(key) {
-    var result = easyKeyRe.exec(key);
+    let result = easyKeyRe.exec(key);
     if (result) {
         return {creator: result[1], title: result[2], date: result[3]};
     } else {
@@ -79,7 +79,7 @@ function parseEasyKey(key) {
  * Find many items by a (possibly incomplete) parsed easy key.
  */
 function easyKeySearch(parsedKey) {
-    var s = new z.Search();
+    let s = new z.Search();
     s.addCondition("creator", "contains", parsedKey.creator);
     if (parsedKey.title != null) {
         s.addCondition("title", "contains", parsedKey.title);
@@ -87,7 +87,7 @@ function easyKeySearch(parsedKey) {
     if (parsedKey.date != null) {
         s.addCondition("date", "is", parsedKey.date);
     }
-    var i = s.search();
+    let i = s.search();
     if (!i) {
         return [];
     } else if (i.length == 0) {
@@ -104,7 +104,7 @@ function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
         return knownEasyKeys[key];
     } else {
-        var parsedKey = parseEasyKey(key);
+        let parsedKey = parseEasyKey(key);
         if (!parsedKey) {
             throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000 or doe:2000title"};
         } else {
@@ -126,8 +126,8 @@ function findByEasyKey(key) {
  */
 function processCitationsGroup (citationGroup) {
     function processCitationItem (citation) {
-        var retval = {};
-        for (var x in citation) {
+        let retval = {};
+        for (let x in citation) {
             if (x == "easyKey") {
                 retval.id = findByEasyKey(citation[x]).id;
             } else {
@@ -136,7 +136,7 @@ function processCitationsGroup (citationGroup) {
         }
         return retval;
     }
-    var citationItems = citationGroup.citationItems.map(processCitationItem);
+    let citationItems = citationGroup.citationItems.map(processCitationItem);
     return { 
         "properties" : citationGroup.properties,
         "citationItems" : citationItems
@@ -147,7 +147,7 @@ function processCitationsGroup (citationGroup) {
  * Extract the ids from an array of citationGroups.
  */
 function extractIds (citationGroups) {
-    var ids = [];
+    let ids = [];
     citationGroups.map (function(group) {
         group.citationItems.map (function(citationItem) {
             ids.push(citationItem.id);
@@ -157,7 +157,7 @@ function extractIds (citationGroups) {
 }
 
 function makeEasyKeys (items, successCallback, failureCallback) {
-    var translation = new z.Translate.Export;
+    let translation = new z.Translate.Export;
     translation.setItems(items);
     translation.setTranslator(easyKeyExporterMetadata.translatorID);
     translation.setHandler("done", function (obj, worked) {
@@ -171,7 +171,7 @@ function makeEasyKeys (items, successCallback, failureCallback) {
     return;
 }
 
-var completeEndpoint = function (url, data, sendResponseCallback) {
+let completeEndpoint = function (url, data, sendResponseCallback) {
     let q = url.query;
     if (q.easykey) {
         let items = easyKeySearch(parseEasyKey(q.easykey));
@@ -194,12 +194,12 @@ var completeEndpoint = function (url, data, sendResponseCallback) {
     }
 };
     
-var endpoints = {
+let endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
         "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
-            var cslEngine = makeCslEngine(data.styleId);
+            let cslEngine = makeCslEngine(data.styleId);
             if (!cslEngine) {
                 sendResponseCallback(400, "text/plain", "No style found.");
                 return;
@@ -207,9 +207,9 @@ var endpoints = {
                 //zotero.localItems = {};
                 cslEngine.setOutputFormat("html");
                 try {
-                    var citationGroups = data.citationGroups.map(processCitationsGroup);
+                    let citationGroups = data.citationGroups.map(processCitationsGroup);
                     cslEngine.updateItems(extractIds(citationGroups));
-                    var retval = {};
+                    let retval = {};
                     retval.bibliography = cslEngine.makeBibliography();
                     retval.citationClusters = [];
                     citationGroups.map (function (citationGroup) {
@@ -232,16 +232,16 @@ var endpoints = {
 	"supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
-            var q = url['query'];
-            var items = [];
+            let q = url['query'];
+            let items = [];
             if (q.selected) {
-                var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+                let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
                   getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
                 items = ZoteroPane.getSelectedItems();
                 if (!items) { items = []; }
             } else if (q.key) {
                 items = q.key.split(",").map(function (key) {
-                    var lkh = z.Items.parseLibraryKeyHash(key);
+                    let lkh = z.Items.parseLibraryKeyHash(key);
                     return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
                 });
             } else if (q.easykey) {
@@ -267,14 +267,14 @@ var endpoints = {
             } else if (q['format'] == 'bibliography') {
                 let responseData = items.map (function (item) {
                     // TODO - make the default style correct
-                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography";
+                    let style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography";
                     return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8",
                                      JSON.stringify(responseData));
                 return;
             } else {
-                var responseData = items.map (function (item) {
+                let responseData = items.map (function (item) {
                     return z.Utilities.itemToCSLJSON(item);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8", 
@@ -291,14 +291,14 @@ var endpoints = {
 function loadEndpoints () {
     loadZotero();
     for (let e in endpoints) {
-        var ep = z.Server.Endpoints["/zotxt/" + e] = function() {};
+        let ep = z.Server.Endpoints["/zotxt/" + e] = function() {};
         ep.prototype = endpoints[e];
     }
 }
     
 function startup(data, reason) {
     /* wait until after zotero is loaded */
-    var observerService = Components.classes["@mozilla.org/observer-service;1"].
+    let observerService = Components.classes["@mozilla.org/observer-service;1"].
         getService(Components.interfaces.nsIObserverService);
     observerService.addObserver(
         { 
@@ -321,7 +321,7 @@ function uninstall(data, reason) {
 
 function installTranslator(metadata, filename) {
     loadZotero(); 
-    var file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
+    let file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
                                            'resource', 'translators', filename]);
     NetUtil.asyncFetch(file, function(inputStream, status) {
         if (!Components.isSuccessCode(status)) {
@@ -329,7 +329,7 @@ function installTranslator(metadata, filename) {
             return;
         }
 
-        var data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+        let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
         z.Translators.save(metadata, data);
         z.Translators.init();
     });
@@ -341,7 +341,7 @@ function install(data, reason) {
 
    /* turn on http server if it is not on */
     /* TODO turn this off when uninstalled? */
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+    let prefs = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
     prefs.setBoolPref("httpServer.enabled", true);
     loadEndpoints(); 
