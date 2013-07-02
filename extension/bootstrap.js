@@ -215,14 +215,14 @@ var endpoints = {
                 return;
             }
             if (q['format'] == 'key') {
-                var responseData = items.map (function (item) {
+                let responseData = items.map (function (item) {
                     return ((item.libraryID || "0") + "_" + item.key);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8", 
                                      JSON.stringify(responseData));
                 return;
             } else if (q['format'] == 'bibliography') {
-                var responseData = items.map (function (item) {
+                let responseData = items.map (function (item) {
                     // TODO - make the default style correct
                     var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
                     return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
