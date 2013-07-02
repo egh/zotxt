@@ -57,45 +57,52 @@ var knownEasyKeys = {};
 var easyKeyRe = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
 var alternateEasyKeyRe = new RegExp("^([a-z]+):([0-9]+)?([a-z]+)?");
 
+/**
+ * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
+ * did not parse correctly.
+ */
+function parseEasyKey(key) {
+    var result = easyKeyRe.exec(key);
+    if (result) {
+        return {creator: result[1], title: result[2], date: result[3]};
+    } else {
+        result = alternateEasyKeyRe.exec(key);
+        if (result) {
+            return {creator: result[1], title: result[3], date: result[2]};
+        } else {
+            return null;
+        }
+    }
+}
+
 function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
         return knownEasyKeys[key];
     } else {
-        var result = easyKeyRe.exec(key);
-        var creator, title, date;
-        if (!result) {
-            result = alternateEasyKeyRe.exec(key);
-            if (!result) {
-                throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000"};
-            } else {
-                creator = result[1];
-                date = result[2];
-                title = result[3];
+        var parsedKey = parseEasyKey(key);
+        if (!parsedKey) {
+            throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000 or doe:2000title"};
+        } else {
+            var s = new z.Search();
+            s.addCondition("creator", "contains", parsedKey.creator);
+            if (parsedKey.title != null) {
+                s.addCondition("title", "contains", parsedKey.title);
             }
-        } else {
-            creator = result[1];
-            title = result[2];
-            date = result[3];
-        }
-        var s = new z.Search();
-        s.addCondition("creator", "contains", creator);
-        if (title != null) {
-            s.addCondition("title", "contains", title);
-        }
-        if (date != null) {
-            s.addCondition("date", "is", date);
-        }
-        var i = s.search();
-        if (!i) {
-            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-        } else if (i.length == 0) {
-            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-        } else if (i.length > 1) {
-            throw {'name': "EasyKeyError", "message": "search return multiple items"};
-        } else {
-            var retval = z.Items.get(i[0]);
-            knownEasyKeys[key] = retval;
-            return retval;
+            if (parsedKey.date != null) {
+                s.addCondition("date", "is", parsedKey.date);
+            }
+            var i = s.search();
+            if (!i) {
+                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
+            } else if (i.length == 0) {
+                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
+            } else if (i.length > 1) {
+                throw {'name': "EasyKeyError", "message": "search return multiple items"};
+            } else {
+                var retval = z.Items.get(i[0]);
+                knownEasyKeys[key] = retval;
+                return retval;
+            }
         }
     }
 }
