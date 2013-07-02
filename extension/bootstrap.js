@@ -115,16 +115,16 @@ function processCitationsGroup (citationGroup) {
         var retval = {};
         for (var x in citation) {
             if (x == "easyKey") {
-                retval["id"] = findByEasyKey(citation[x]).id;
+                retval.id = findByEasyKey(citation[x]).id;
             } else {
                 retval[x] = citation[x];
             }
         }
         return retval;
     }
-    var citationItems = citationGroup["citationItems"].map(processCitationItem);
+    var citationItems = citationGroup.citationItems.map(processCitationItem);
     return { 
-        "properties" : citationGroup["properties"],
+        "properties" : citationGroup.properties,
         "citationItems" : citationItems
     };
 }
@@ -135,8 +135,8 @@ function processCitationsGroup (citationGroup) {
 function extractIds (citationGroups) {
     var ids = [];
     citationGroups.map (function(group) {
-        group["citationItems"].map (function(citationItem) {
-            ids.push(citationItem["id"]);
+        group.citationItems.map (function(citationItem) {
+            ids.push(citationItem.id);
         });
     });
     return ids;
@@ -147,7 +147,7 @@ var endpoints = {
         "supportedMethods":  ["POST"],
         "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
-            var cslEngine = makeCslEngine(data["styleId"]);
+            var cslEngine = makeCslEngine(data.styleId);
             if (!cslEngine) {
                 sendResponseCallback(400, "text/plain", "No style found.");
                 return;
@@ -155,13 +155,13 @@ var endpoints = {
                 //zotero.localItems = {};
                 cslEngine.setOutputFormat("html");
                 try {
-                    var citationGroups = data["citationGroups"].map(processCitationsGroup);
+                    var citationGroups = data.citationGroups.map(processCitationsGroup);
                     cslEngine.updateItems(extractIds(citationGroups));
                     var retval = {};
-                    retval["bibliography"] = cslEngine.makeBibliography();
-                    retval["citationClusters"] = [];
+                    retval.bibliography = cslEngine.makeBibliography();
+                    retval.citationClusters = [];
                     citationGroups.map (function (citationGroup) {
-                        retval["citationClusters"].push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
+                        retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
                     });
                     sendResponseCallback(200, "application/json", JSON.stringify(retval));
                     return;
@@ -177,19 +177,19 @@ var endpoints = {
         "init" : function (url, data, sendResponseCallback) {
             var q = url['query'];
             var items = [];
-            if (q["selected"]) {
+            if (q.selected) {
                 var ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
                   getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
                 items = ZoteroPane.getSelectedItems();
                 if (!items) { items = []; }
-            } else if (q["key"]) {
-                items = q["key"].split(",").map(function (key) {
+            } else if (q.key) {
+                items = q.key.split(",").map(function (key) {
                     var lkh = z.Items.parseLibraryKeyHash(key);
                     return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
                 });
-            } else if (q["easykey"]) {
+            } else if (q.easykey) {
                 try {
-                    items = q["easykey"].split(",").map(function (key) {
+                    items = q.easykey.split(",").map(function (key) {
                         return findByEasyKey(key);
                     });
                 } catch (ex if (ex.name === "EasyKeyError")) {
