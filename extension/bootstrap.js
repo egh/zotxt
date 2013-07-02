@@ -75,6 +75,31 @@ function parseEasyKey(key) {
     }
 }
 
+/**
+ * Find many items by a (possibly incomplete) parsed easy key.
+ */
+function easyKeySearch(parsedKey) {
+    var s = new z.Search();
+    s.addCondition("creator", "contains", parsedKey.creator);
+    if (parsedKey.title != null) {
+        s.addCondition("title", "contains", parsedKey.title);
+    }
+    if (parsedKey.date != null) {
+        s.addCondition("date", "is", parsedKey.date);
+    }
+    var i = s.search();
+    if (!i) {
+        return [];
+    } else if (i.length == 0) {
+        return [];
+    } else {
+        return i.map(function(id) { return z.Items.get(id); });
+    }
+}
+
+/**
+ * Find a single item by its easy key, caching the result.
+ */
 function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
         return knownEasyKeys[key];
@@ -83,25 +108,14 @@ function findByEasyKey(key) {
         if (!parsedKey) {
             throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000 or doe:2000title"};
         } else {
-            var s = new z.Search();
-            s.addCondition("creator", "contains", parsedKey.creator);
-            if (parsedKey.title != null) {
-                s.addCondition("title", "contains", parsedKey.title);
-            }
-            if (parsedKey.date != null) {
-                s.addCondition("date", "is", parsedKey.date);
-            }
-            var i = s.search();
-            if (!i) {
+            let results = easyKeySearch(parsedKey);
+            if (results.length == 0 ) {
                 throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-            } else if (i.length == 0) {
-                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-            } else if (i.length > 1) {
+            } else if (results.length > 1) {
                 throw {'name': "EasyKeyError", "message": "search return multiple items"};
             } else {
-                var retval = z.Items.get(i[0]);
-                knownEasyKeys[key] = retval;
-                return retval;
+                knownEasyKeys[key] = results[0];
+                return results[0];
             }
         }
     }
