@@ -29,13 +29,13 @@ function loadZotero () {
  */
 var mySys = {
     retrieveLocale : function (lang) {
-        return zotero.Cite.System.retrieveLocale(lang);
+        return z.Cite.System.retrieveLocale(lang);
     },
     retrieveItem : function(id) { 
-        if (zotero.localItems[id] != undefined) {
-            return zotero.localItems[id];
+        if (z.localItems[id] != undefined) {
+            return z.localItems[id];
         } else { 
-            return zotero.Cite.System.retrieveItem(id);
+            return z.Cite.System.retrieveItem(id);
         }
     }
 };
