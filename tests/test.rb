@@ -7,6 +7,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
     @client = HTTPClient.new
     @base_url = "http://localhost:23119/zotxt"
     @item_url = "#{@base_url}/items"
+    @complete_url = "#{@base_url}/complete"
     @bibliography_url = "#{@base_url}/bibliography"
   end
 
@@ -113,5 +114,15 @@ class ZotxtTest < MiniTest::Unit::TestCase
   def test_bad_easykey
     resp = @client.get(@item_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status
+  end
+
+  def test_completion
+    resp = @client.get(@complete_url, {"easykey" => "Doe"})
+    results = JSON.parse(resp.body)
+    assert (results.size > 1)
+    
+    resp = @client.get(@complete_url, {"easykey" => "DoeArticle2006"})
+    results = JSON.parse(resp.body)
+    assert_equal 1, results.size
   end
 end

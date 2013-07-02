@@ -156,6 +156,41 @@ function extractIds (citationGroups) {
     return ids;
 }
 
+function makeEasyKeys (items, successCallback, failureCallback) {
+    var translation = new z.Translate.Export;
+    translation.setItems(items);
+    translation.setTranslator(easyKeyExporterMetadata.translatorID);
+    translation.setHandler("done", function (obj, worked) {
+        if (worked) {
+            successCallback(obj.string);
+        } else {
+            failureCallback();
+        }
+    });
+    translation.translate();
+    return;
+}
+
+var completeEndpoint = function (url, data, sendResponseCallback) {
+    let q = url.query;
+    if (q.easykey) {
+        let items = easyKeySearch(parseEasyKey(q.easykey));
+        if (!items) {
+            sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000 or doe:2000title");
+        } else {
+            makeEasyKeys(items, 
+                         /* success */
+                         function (keys) {
+                             sendResponseCallback(200, "application/json", JSON.stringify(keys.split(/\s+/)));
+                         }, 
+                         /* failure */
+                         function () {
+                             sendResponseCallback(400);
+                         });
+        }
+    }
+};
+    
 var endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
@@ -184,6 +219,11 @@ var endpoints = {
                 }
             }
         }
+    },
+    complete : {
+        supportedMethods: ["GET"],
+        supportedDataType : ["application/x-www-form-urlencoded"],
+        init : completeEndpoint
     },
     "items" : {
 	"supportedMethods":["GET"],
