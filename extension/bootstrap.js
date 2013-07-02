@@ -224,7 +224,7 @@ var endpoints = {
             } else if (q['format'] == 'bibliography') {
                 let responseData = items.map (function (item) {
                     // TODO - make the default style correct
-                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography"
+                    var style = q['style'] || "http://www.zotero.org/styles/chicago-note-bibliography";
                     return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8",
