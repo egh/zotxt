@@ -54,39 +54,48 @@ function makeCslEngine (styleId) {
 
 var knownEasyKeys = {};
 
+var easyKeyRe = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
+var alternateEasyKeyRe = new RegExp("^([a-z]+):([0-9]+)?([a-z]+)?");
+
 function findByEasyKey(key) {
-    var re = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
     if (knownEasyKeys[key]) {
         return knownEasyKeys[key];
     } else {
-        var result = re.exec(key);
+        var result = easyKeyRe.exec(key);
+        var creator, title, date;
         if (!result) {
-            throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000"};
-        } else {
-            var creator = result[1];
-            var title = result[2];
-            var date = result[3];
-            
-            var s = new z.Search();
-            s.addCondition("creator", "contains", creator);
-            if (title != null) {
-                s.addCondition("title", "contains", title);
-            }
-            if (date != null) {
-                s.addCondition("date", "is", date);
-            }
-            var i = s.search();
-            if (!i) {
-                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-            } else if (i.length == 0) {
-                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-            } else if (i.length > 1) {
-                throw {'name': "EasyKeyError", "message": "search return multiple items"};
+            result = alternateEasyKeyRe.exec(key);
+            if (!result) {
+                throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000"};
             } else {
-                var retval = z.Items.get(i[0]);
-                knownEasyKeys[key] = retval;
-                return retval;
+                creator = result[1];
+                date = result[2];
+                title = result[3];
             }
+        } else {
+            creator = result[1];
+            title = result[2];
+            date = result[3];
+        }
+        var s = new z.Search();
+        s.addCondition("creator", "contains", creator);
+        if (title != null) {
+            s.addCondition("title", "contains", title);
+        }
+        if (date != null) {
+            s.addCondition("date", "is", date);
+        }
+        var i = s.search();
+        if (!i) {
+            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
+        } else if (i.length == 0) {
+            throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
+        } else if (i.length > 1) {
+            throw {'name': "EasyKeyError", "message": "search return multiple items"};
+        } else {
+            var retval = z.Items.get(i[0]);
+            knownEasyKeys[key] = retval;
+            return retval;
         }
     }
 }
