@@ -240,7 +240,7 @@ var endpoints = {
             }
         }
     }
-}
+};
 
 /**
  * Function to load our endpoints into the Zotero connector server.
