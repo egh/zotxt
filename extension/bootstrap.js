@@ -122,7 +122,7 @@ function findByEasyKey(key) {
 }
 
 /**
- * Map the easyeys in the citations to ids.
+ * Map the easykeys in the citations to ids.
  */
 function processCitationsGroup (citationGroup) {
     function processCitationItem (citation) {
