@@ -247,7 +247,7 @@ var endpoints = {
  */
 function loadEndpoints () {
     loadZotero();
-    for (e in endpoints) {
+    for (let e in endpoints) {
         var ep = z.Server.Endpoints["/zotxt/" + e] = function() {};
         ep.prototype = endpoints[e];
     }
