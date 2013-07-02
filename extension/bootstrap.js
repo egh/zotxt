@@ -180,8 +180,11 @@ var completeEndpoint = function (url, data, sendResponseCallback) {
         } else {
             makeEasyKeys(items, 
                          /* success */
-                         function (keys) {
-                             sendResponseCallback(200, "application/json", JSON.stringify(keys.split(/\s+/)));
+                         function (rawKeys) {
+                             let keys = rawKeys.split(" ");
+                             // remove leading @
+                             let keys2 = keys.map(function(key) { return key.substring(1); });
+                             sendResponseCallback(200, "application/json", JSON.stringify(keys2));
                          }, 
                          /* failure */
                          function () {
