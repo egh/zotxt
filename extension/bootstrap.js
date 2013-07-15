@@ -4,7 +4,7 @@ var console = Services.console;
 
 let easyKeyExporterMetadata = {
     "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
-    "label": "EasyKey",
+    "label": "EasyKeyExporter",
     "creator": "Erik Hetzner",
     "target": "txt",
     "minVersion": "2.1.9",
@@ -13,7 +13,7 @@ let easyKeyExporterMetadata = {
     "inRepository": false,
     "translatorType": 2,
     "browserSupport": "gcs",
-    "lastUpdated":"2013-06-10 12:02:17"
+    "lastUpdated":"2013-07-15 07:03:17"
 };
 
 function loadZotero () {

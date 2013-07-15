@@ -6,6 +6,8 @@
     <em:version>0.1.4</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
+    <em:unpack>true</em:unpack>
+
     <em:name>zotxt</em:name>
     <em:description>Plain text extensions for Zotero</em:description>
     <em:creator>Erik Hetzner</em:creator>
