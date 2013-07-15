@@ -295,23 +295,24 @@ function loadEndpoints () {
         ep.prototype = endpoints[e];
     }
 }
-    
+
+let observerService = Components.classes["@mozilla.org/observer-service;1"].
+    getService(Components.interfaces.nsIObserverService);
+
+let observer = {
+    "observe": function(subject, topic, data) { 
+        loadEndpoints(); 
+    }
+};
+
 function startup(data, reason) {
     /* wait until after zotero is loaded */
-    let observerService = Components.classes["@mozilla.org/observer-service;1"].
-        getService(Components.interfaces.nsIObserverService);
-    observerService.addObserver(
-        { 
-            "observe": function(subject, topic, data) { 
-                loadEndpoints(); 
-            }
-        },
-        "final-ui-startup", false);
+    observerService.addObserver(observer, "final-ui-startup", false);
 }
 
 
 function shutdown (data, reason) {
-    /* pass */
+    observerService.removeObserver(observer, "final-ui-startup");
 }
 
 function uninstall(data, reason) {
