@@ -2,10 +2,10 @@
 import json
 import re
 import sys
-import urllib2
+import urllib, urllib2
 
 f = open(sys.argv[1], 'r')
-cite_re = re.compile(r'(?:@)[\w:\.#$%&_+?<>~/-]+')
+cite_re = re.compile(r'(?:@)[\w:\.#$%&_+?<>~/-]+', re.U)
 known_keys = set([])
 for line in f:
     citekeys = re.findall(cite_re, line)
@@ -16,7 +16,9 @@ for line in f:
 cites = []
 for key in known_keys:
     try:
-        cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?easykey=%s"%key))[0]
+        q = {'easykey' : key}
+        encq = urllib.urlencode(q)
+        cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
         cite["id"] = key
         cites.append(cite)
     except urllib2.HTTPError:
