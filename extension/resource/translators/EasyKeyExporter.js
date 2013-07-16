@@ -31,7 +31,7 @@ function determineTitleWord(item) {
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[0-9]+$')));
     });
     if (filteredWords[0]) {
-        return ZU.capitalizeTitle(ZU.XRegExp.replace(filteredWords[0], ZU.XRegExp('[^\\w]'), ''));
+        return ZU.capitalizeTitle(ZU.XRegExp.replace(filteredWords[0], ZU.XRegExp('[^\\w]'), ''), true);
     } else {
         return "Unknown";
     }
