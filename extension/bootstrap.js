@@ -1,6 +1,8 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 var z;
 var console = Services.console;
+var easyKeyRe;
+var alternateEasyKeyRe;
 
 let easyKeyExporterMetadata = {
     "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
@@ -20,6 +22,10 @@ function loadZotero () {
     if (!z) {
         z = Components.classes["@zotero.org/Zotero;1"].
             getService(Components.interfaces.nsISupports).wrappedJSObject;
+
+        /* these must be initialized AFTER zotero is loaded */
+        easyKeyRe = z.Utilities.XRegExp("^(\\p{Lu}\\p{Ll}+)(\\p{Lu}\\p{Ll}+)?([0-9]+)?");
+        alternateEasyKeyRe = z.Utilities.XRegExp("^(\\p{Ll}+):([0-9]+)?(\\p{Ll}+)?");
     }
 }
 
@@ -53,9 +59,6 @@ function makeCslEngine (styleId) {
 }
 
 let knownEasyKeys = {};
-
-let easyKeyRe = new RegExp("^([A-Z][a-z]+)([A-Z][a-z]+)?([0-9]+)?");
-let alternateEasyKeyRe = new RegExp("^([a-z]+):([0-9]+)?([a-z]+)?");
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it

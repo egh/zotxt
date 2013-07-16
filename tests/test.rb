@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'minitest/autorun'
 require 'httpclient'
 require 'json'
@@ -109,6 +110,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
   def test_bad_easykey
     resp = @client.get(@item_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status
+  end
+
+  def test_unicode_easykey
+    resp = @client.get(@item_url, {"easykey" => "HüningRelatie2012"})
+    assert_equal 200, resp.status
   end
 
   def test_bad_easykey
