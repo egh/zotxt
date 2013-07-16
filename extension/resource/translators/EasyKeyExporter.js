@@ -19,10 +19,14 @@ function determineAuthor (item) {
     return ZU.capitalizeTitle(author, true);
 }
 
+var stopwords = ["the", "an",
+                 "de",
+                 "dem", "den", "der", "des", "die"];
+                 
 function determineTitleWord(item) {
     var words = item['title'].split(/\s+/);
     var filteredWords = words.filter(function (word) {
-        return (!word.match(/^([Tt]he|[Aa]n?)$/) &&
+        return (stopwords.indexOf(word.toLowerCase()) == -1 &&
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[^\\w]+$')) &&
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[0-9]+$')));
     });
