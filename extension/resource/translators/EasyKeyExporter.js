@@ -19,7 +19,7 @@ function determineAuthor (item) {
     return author;
 }
 
-var stopwords = ["the", "an", "a",
+var stopwords = ["the", "an", "a", "at", "in", "on",
                  "el", "los", "la", "las",
                  "de",
                  "dem", "den", "der", "des", "die"];
