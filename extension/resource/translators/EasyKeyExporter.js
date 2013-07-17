@@ -25,10 +25,12 @@ var stopwords = ["the", "an", "a", "at", "in", "on",
                  "dem", "den", "der", "des", "die"];
 
 function determineTitleWord(item) {
-    var cleanTitle = ZU.XRegExp.replace(item['title'].toLowerCase(), ZU.XRegExp('\\p{P}'), '');
-    var words = ZU.XRegExp.split(cleanTitle, ZU.XRegExp("\\s+"));
+    var cleanTitle = item['title'].toLowerCase();
+    var words = ZU.XRegExp.split(cleanTitle, ZU.XRegExp("\\s+|\\p{P}"));
     var filteredWords = words.filter(function (word) {
         return (stopwords.indexOf(word) == -1 &&
+                word.length > 1 &&
+                !ZU.XRegExp.test(word, ZU.XRegExp('^\\p{P}+$')) &&
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[0-9]+$')));
     });
     return filteredWords[0] || "unknown";
