@@ -16,7 +16,7 @@ function determineAuthor (item) {
     if (creator && creator['lastName']) {
         author = creator['lastName'];
     }
-    return ZU.capitalizeTitle(author, true);
+    return author;
 }
 
 var stopwords = ["the", "an",
@@ -24,17 +24,13 @@ var stopwords = ["the", "an",
                  "dem", "den", "der", "des", "die"];
                  
 function determineTitleWord(item) {
-    var words = item['title'].split(/\s+/);
+    var cleanTitle = ZU.XRegExp.replace(item['title'].toLowerCase(), ZU.XRegExp('\\p{P}'), '');
+    var words = ZU.XRegExp.split(cleanTitle, ZU.XRegExp("\\s+"));
     var filteredWords = words.filter(function (word) {
-        return (stopwords.indexOf(word.toLowerCase()) == -1 &&
-                !ZU.XRegExp.test(word, ZU.XRegExp('^[^\\w]+$')) &&
+        return (stopwords.indexOf(word) == -1 &&
                 !ZU.XRegExp.test(word, ZU.XRegExp('^[0-9]+$')));
     });
-    if (filteredWords[0]) {
-        return ZU.capitalizeTitle(ZU.XRegExp.replace(filteredWords[0], ZU.XRegExp('[^\\w]'), ''), true);
-    } else {
-        return "Unknown";
-    }
+    return filteredWords[0] || "unknown";
 }
 
 function doExport () {
@@ -50,6 +46,10 @@ function doExport () {
         var year = determineYear(item);
         var author = determineAuthor(item);
         var titleword = determineTitleWord(item);
-        Zotero.write("@" + author + titleword + year);
+        if (Zotero.getOption("alternate")) {
+            Zotero.write("@" + ZU.capitalizeTitle(author, true) + ZU.capitalizeTitle(titleword, true) + year);
+        } else {
+            Zotero.write("@" + author.toLowerCase() + ":" + year + titleword.toLowerCase());
+        }            
     }
 }

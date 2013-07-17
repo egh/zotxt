@@ -15,6 +15,9 @@ let easyKeyExporterMetadata = {
     "inRepository": false,
     "translatorType": 2,
     "browserSupport": "gcs",
+    "displayOptions": {
+	"Alternate (@DoeTitle2000)": false
+    },
     "lastUpdated":"2013-07-15 07:03:17"
 };
 
