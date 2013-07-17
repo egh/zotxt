@@ -6,7 +6,7 @@ var alternateEasyKeyRe;
 
 let easyKeyExporterMetadata = {
     "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
-    "label": "EasyKeyExporter",
+    "label": "Easy Citekey",
     "creator": "Erik Hetzner",
     "target": "txt",
     "minVersion": "2.1.9",
