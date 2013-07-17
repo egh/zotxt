@@ -19,10 +19,11 @@ function determineAuthor (item) {
     return author;
 }
 
-var stopwords = ["the", "an",
+var stopwords = ["the", "an", "a",
+                 "el", "los", "la", "las",
                  "de",
                  "dem", "den", "der", "des", "die"];
-                 
+
 function determineTitleWord(item) {
     var cleanTitle = ZU.XRegExp.replace(item['title'].toLowerCase(), ZU.XRegExp('\\p{P}'), '');
     var words = ZU.XRegExp.split(cleanTitle, ZU.XRegExp("\\s+"));
