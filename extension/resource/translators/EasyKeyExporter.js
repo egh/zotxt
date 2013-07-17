@@ -16,7 +16,7 @@ function determineAuthor (item) {
     if (creator && creator['lastName']) {
         author = creator['lastName'];
     }
-    return author;
+    return ZU.XRegExp.split(author, ZU.XRegExp("\\s+|\\p{P}")).pop();
 }
 
 var stopwords = ["the", "an", "a", "at", "in", "on",
