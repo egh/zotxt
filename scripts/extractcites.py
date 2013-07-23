@@ -22,6 +22,6 @@ for key in known_keys:
         cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
         cite["id"] = key
         cites.append(cite)
-    except urllib2.HTTPError:
-        sys.stderr.write("%s not found!\n"%(key))
+    except urllib2.HTTPError, e:
+        sys.stderr.write("error with %s : %s \n"%(key, e.read()))
 print json.dumps(cites, indent=2)
