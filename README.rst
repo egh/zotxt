@@ -5,9 +5,10 @@
 zotxt is a Zotero extension for supporting utilities that deal with
 plain text files (e.g., markdown, reStructuredText, latex, etc.)
 
-zotxt is still in development, and is primarily for developers to use.
+You can build yourself using ``make``, or you can download from the
+Mozilla addons site:
 
-You can build yourself using ``make``.
+  https://addons.mozilla.org/en-US/firefox/addon/zotxt/
 
 Writing with pandoc
 -------------------
