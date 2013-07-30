@@ -16,7 +16,7 @@ let easyKeyExporterMetadata = {
     "translatorType": 2,
     "browserSupport": "gcs",
     "displayOptions": {
-	"Alternate (@DoeTitle2000)": false
+        "Alternate (@DoeTitle2000)": false
     },
     "lastUpdated":"2013-07-15 07:03:17"
 };
@@ -51,7 +51,7 @@ let mySys = {
 
 function makeCslEngine (styleId) {
     if (!styleId.match(/^http:/)) {
-	styleId = 'http://www.zotero.org/styles/' + styleId;
+        styleId = 'http://www.zotero.org/styles/' + styleId;
     }
     let style = z.Styles.get(styleId);
     if (!style) {
@@ -235,7 +235,7 @@ let endpoints = {
         init : completeEndpoint
     },
     "items" : {
-	"supportedMethods":["GET"],
+        "supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
             let q = url['query'];
