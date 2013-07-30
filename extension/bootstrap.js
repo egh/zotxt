@@ -280,9 +280,12 @@ let endpoints = {
                                      JSON.stringify(responseData));
                 return;
             } else {
-                let responseData = items.map (function (item) {
-                    return z.Utilities.itemToCSLJSON(item);
-                });
+                let itemGetter = new z.Translate.ItemGetter();
+                itemGetter.setItems(items);
+                let responseData = [];
+                while(item = itemGetter.nextItem()) {
+                    responseData.push(z.Utilities.itemToCSLJSON(item));
+                }
                 sendResponseCallback(200, "application/json; charset=UTF-8", 
                                      JSON.stringify(responseData));
                 return;
