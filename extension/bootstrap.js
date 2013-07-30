@@ -190,7 +190,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
                              let keys = rawKeys.split(" ");
                              // remove leading @
                              let keys2 = keys.map(function(key) { return key.substring(1); });
-                             sendResponseCallback(200, "application/json", JSON.stringify(keys2));
+                             sendResponseCallback(200, "application/json", JSON.stringify(keys2, null, "  "));
                          }, 
                          /* failure */
                          function () {
@@ -221,7 +221,7 @@ let endpoints = {
                     citationGroups.map (function (citationGroup) {
                         retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
                     });
-                    sendResponseCallback(200, "application/json", JSON.stringify(retval));
+                    sendResponseCallback(200, "application/json", JSON.stringify(retval, null, "  "));
                     return;
                 } catch (ex if (ex.name === "EasyKeyError")) {
                     sendResponseCallback(400, "text/plain", ex.message);
@@ -268,7 +268,7 @@ let endpoints = {
                     return ((item.libraryID || "0") + "_" + item.key);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                     JSON.stringify(responseData));
+                                     JSON.stringify(responseData, null, "  "));
                 return;
             } else if (q['format'] == 'bibliography') {
                 let responseData = items.map (function (item) {
@@ -277,7 +277,7 @@ let endpoints = {
                     return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
                 });
                 sendResponseCallback(200, "application/json; charset=UTF-8",
-                                     JSON.stringify(responseData));
+                                     JSON.stringify(responseData, null, "  "));
                 return;
             } else {
                 let itemGetter = new z.Translate.ItemGetter();
@@ -287,7 +287,7 @@ let endpoints = {
                     responseData.push(z.Utilities.itemToCSLJSON(item));
                 }
                 sendResponseCallback(200, "application/json; charset=UTF-8", 
-                                     JSON.stringify(responseData));
+                                     JSON.stringify(responseData, null, "  "));
                 return;
             }
         }
