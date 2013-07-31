@@ -81,6 +81,23 @@ function parseEasyKey(key) {
     }
 }
 
+function runSearch(s) {
+    let i = s.search();
+    if (!i) {
+        return [];
+    } else if (i.length == 0) {
+        return [];
+    } else {
+        return i.map(function(id) { return z.Items.get(id); });
+    }
+}
+
+function rawSearch(key) {
+    let s = new z.Search();
+    s.addCondition("tag", "is", "@" + key);
+    return runSearch(s);
+}
+
 /**
  * Find many items by a (possibly incomplete) parsed easy key.
  */
@@ -93,14 +110,7 @@ function easyKeySearch(parsedKey) {
     if (parsedKey.date != null) {
         s.addCondition("date", "is", parsedKey.date);
     }
-    let i = s.search();
-    if (!i) {
-        return [];
-    } else if (i.length == 0) {
-        return [];
-    } else {
-        return i.map(function(id) { return z.Items.get(id); });
-    }
+    return runSearch(s);
 }
 
 /**
@@ -114,14 +124,20 @@ function findByEasyKey(key) {
         if (!parsedKey) {
             throw {'name': "EasyKeyError", "message": "EasyKey must be of the form DoeTitle2000 or doe:2000title"};
         } else {
-            let results = easyKeySearch(parsedKey);
-            if (results.length == 0 ) {
-                throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
-            } else if (results.length > 1) {
-                throw {'name': "EasyKeyError", "message": "search return multiple items"};
+            /* first try raw search */
+            let rawResults = rawSearch(key);
+            if (rawResults.length > 0) {
+                return rawResults[0];
             } else {
-                knownEasyKeys[key] = results[0];
-                return results[0];
+                let results = easyKeySearch(parsedKey);
+                if (results.length == 0) {
+                    throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
+                } else if (results.length > 1) {
+                    throw {'name': "EasyKeyError", "message": "search return multiple items"};
+                } else {
+                    knownEasyKeys[key] = results[0];
+                    return results[0];
+                }
             }
         }
     }

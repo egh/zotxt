@@ -122,6 +122,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal 400, resp.status
   end
 
+  def test_custom_key
+    resp = @client.get(@item_url, {"easykey" => "hüning:2012foo"})
+    assert_equal 200, resp.status
+  end
+
   def test_completion
     resp = @client.get(@complete_url, {"easykey" => "Doe"})
     results = JSON.parse(resp.body)
