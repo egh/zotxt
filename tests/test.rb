@@ -127,6 +127,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal 200, resp.status
   end
 
+  def test_collection_search
+    resp = @client.get(@item_url, {"collection" => "My%20citations"})
+    assert_equal 200, resp.status
+  end
+
   def test_completion
     resp = @client.get(@complete_url, {"easykey" => "Doe"})
     results = JSON.parse(resp.body)

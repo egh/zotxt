@@ -98,6 +98,33 @@ function rawSearch(key) {
     return runSearch(s);
 }
 
+function getCollectionByName(name, collections) {
+    if (!collections) {
+        return getCollectionByName(name, z.getCollections(null));
+    } else {
+        for (let c in collections) {
+            if (collections[c].name === name) {
+                return collections[c];
+            } else {
+                if (collections[c].hasChildCollections) {
+                    let retval = getCollectionByName(name, z.getCollections(collections[c].id));
+                    if (retval) return retval;
+                }
+            }
+        }
+        return null;
+    }
+}
+                    
+function collectionSearch(name) {
+    let collection = getCollectionByName(name);
+    if (!collection) { 
+        return [];
+    } else {
+        return collection.getChildItems();
+    }
+}
+
 /**
  * Find many items by a (possibly incomplete) parsed easy key.
  */
@@ -261,6 +288,8 @@ let endpoints = {
                   getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
                 items = ZoteroPane.getSelectedItems();
                 if (!items) { items = []; }
+            } else if (q.collection) {
+                items = collectionSearch(q.collection);
             } else if (q.key) {
                 items = q.key.split(",").map(function (key) {
                     let lkh = z.Items.parseLibraryKeyHash(key);
