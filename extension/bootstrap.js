@@ -328,6 +328,14 @@ let endpoints = {
                 sendResponseCallback(200, "application/json; charset=UTF-8",
                                      JSON.stringify(responseData, null, "  "));
                 return;
+            } else if (q['format'] == 'bibtex') {
+                myExport(items, "9cb70025-a888-4a29-a210-93ec52da40d4",
+                         function (output) {
+                             sendResponseCallback(200, "text/plain; charset=UTF-8", output);
+                         },
+                         function () {
+                             sendResponseCallback(400);
+                         });
             } else {
                 let itemGetter = new z.Translate.ItemGetter();
                 itemGetter.setItems(items);
