@@ -205,10 +205,10 @@ function extractIds (citationGroups) {
     return ids;
 }
 
-function makeEasyKeys (items, successCallback, failureCallback) {
+function myExport (items, translatorId, successCallback, failureCallback) {
     let translation = new z.Translate.Export;
     translation.setItems(items);
-    translation.setTranslator(easyKeyExporterMetadata.translatorID);
+    translation.setTranslator(translatorId);
     translation.setHandler("done", function (obj, worked) {
         if (worked) {
             successCallback(obj.string);
@@ -218,6 +218,10 @@ function makeEasyKeys (items, successCallback, failureCallback) {
     });
     translation.translate();
     return;
+}
+
+function makeEasyKeys (items, successCallback, failureCallback) {
+    return myExport(items, easyKeyExporterMetadata.translatorID, successCallback, failureCallback);
 }
 
 let completeEndpoint = function (url, data, sendResponseCallback) {
