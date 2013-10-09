@@ -286,6 +286,9 @@ let endpoints = {
         "supportedDataType" : ["application/x-www-form-urlencoded"],
         "init" : function (url, data, sendResponseCallback) {
             let q = url['query'];
+            for (let key in q) {
+                q[key] = q[key].replace("+", " ");
+            }
             let items = [];
             if (q.selected) {
                 let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
