@@ -98,16 +98,16 @@ function rawSearch(key) {
     return runSearch(s);
 }
 
-function getCollectionByName(name, collections) {
+function getCollection(name, collections) {
     if (!collections) {
-        return getCollectionByName(name, z.getCollections(null));
+        return getCollection(name, z.getCollections(null));
     } else {
         for (let c in collections) {
             if (collections[c].name === name) {
                 return collections[c];
             } else {
                 if (collections[c].hasChildCollections) {
-                    let retval = getCollectionByName(name, z.getCollections(collections[c].id));
+                    let retval = getCollection(name, z.getCollections(collections[c].id));
                     if (retval) return retval;
                 }
             }
@@ -117,7 +117,7 @@ function getCollectionByName(name, collections) {
 }
                     
 function collectionSearch(name) {
-    let collection = getCollectionByName(name);
+    let collection = getCollection(name);
     if (!collection) { 
         return [];
     } else {
