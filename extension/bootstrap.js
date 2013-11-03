@@ -300,7 +300,12 @@ let endpoints = {
             } else if (q.key) {
                 items = q.key.split(",").map(function (key) {
                     let lkh = z.Items.parseLibraryKeyHash(key);
-                    return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+                    var retval = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+                    if (retval == false) {
+                        sendResponseCallback(400, "text/plain", "item with key " + key + " not found!");
+                    } else {
+                        return retval;
+                    }
                 });
             } else if (q.easykey) {
                 try {
