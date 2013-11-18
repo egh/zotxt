@@ -1,0 +1,4 @@
+venv
+pandoc-zotxt/pandoc_zotxt.egg-info/
+pandoc-zotxt/build
+pandoc-zotxt/dist
