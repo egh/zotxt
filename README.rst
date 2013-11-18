@@ -10,8 +10,8 @@ Mozilla addons site:
 
   https://addons.mozilla.org/en-US/firefox/addon/zotxt/
 
-Writing with pandoc
--------------------
+Writing with pandoc (1.12 or later)
+-----------------------------------
 
 If you use pandoc, zotxt can help you deal with citations stored in
 Zotero. After installing the extension, modify your Zotero preferences
@@ -23,14 +23,12 @@ pandoc-compatible “Easy Citekey” citation into your document. You can
 also generate your own citekey using the author’s last name, a word
 from the title, and the date, e.g., ``@doe:2000title``
 
-When you are finished writing, you can use the python script
-``extractcites.py``, located in the ``scripts`` directory, to retrieve
-a citeproc-json version of your citations. This script should run
-under any python. It is invoked as follows::
+You will need to copy or symlink the ``pandoc-zotxt`` script to
+somewhere in your ``$PATH``.
 
-  python extractcites.py document.md > document.json
+Pandoc can now be invoked using its filter feature:
 
-This will generate the ``document.json`` file. pandoc may then be used
-as usual::
+  pandoc -F pandoc-zotxt -F pandoc-citeproc document.md
 
-  pandoc document.md --bibliography=document.json
+This will generate a JSON file in temporary storage and load your
+citations into it. The citations will be passed on to pandoc.
