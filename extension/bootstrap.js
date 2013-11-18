@@ -346,6 +346,35 @@ let endpoints = {
                          function () {
                              sendResponseCallback(400);
                          });
+            } else if (q['format'] == 'recoll') {
+                let responseData = [];
+                for (let i in items) {
+                    let item = items[i];
+                    if (item.isRegularItem()) {
+                        let attachments = item.getAttachments(false);
+                        let attachmentPaths = [];
+                        for (let a in attachments) {
+                            let attachment = z.Items.get(attachments[a]);
+                            if (attachment.isAttachment()) {
+                                let path = attachment.getFile().path;
+                                if (path) {
+                                    attachmentPaths.push(path);
+                                }
+                            }
+                        }
+                        let creators = item.getCreators().map (function (c) {
+                            return c.ref.firstName + " " + c.ref.lastName;
+                        });
+                        responseData.push({"key": ((item.libraryID || "0") + "_" + item.key),
+                                           "creators": creators,
+                                           "modified": item.dateModified.dateToISO,
+                                           "title": item.getField('title'),
+                                           "paths": attachmentPaths});
+                    }
+                }
+                sendResponseCallback(200, "application/json; charset=UTF-8",
+                                     JSON.stringify(responseData, null, "  "));
+                return;
             } else {
                 let itemGetter = new z.Translate.ItemGetter();
                 itemGetter.setItems(items);
