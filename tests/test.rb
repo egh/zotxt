@@ -107,6 +107,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal 400, resp.status
   end
 
+  def test_all
+    resp = @client.get(@item_url, {"all" => "all", "format" => "key"})
+    assert_equal 200, resp.status
+  end
+
   def test_bad_easykey
     resp = @client.get(@item_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status

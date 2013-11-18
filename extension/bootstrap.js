@@ -316,6 +316,8 @@ let endpoints = {
                     sendResponseCallback(400, "text/plain", ex.message);
                     return;
                 }
+            } else if (q.all) {
+                var items = z.Items.getAll();
             } else {
                 sendResponseCallback(400, "text/plain", "No param supplied!");
                 return;
