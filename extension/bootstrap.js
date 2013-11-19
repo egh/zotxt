@@ -367,7 +367,7 @@ let endpoints = {
                         });
                         responseData.push({"key": ((item.libraryID || "0") + "_" + item.key),
                                            "creators": creators,
-                                           "modified": item.dateModified.dateToISO,
+                                           "modified": z.Date.dateToISO(z.Date.sqlToDate(item.dateModified)),
                                            "title": item.getField('title'),
                                            "paths": attachmentPaths});
                     }
