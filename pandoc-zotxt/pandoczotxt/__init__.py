@@ -46,5 +46,5 @@ def alterMetadata(meta):
   tmpfile.close()
   meta['bibliography'] = MetaInlines([Str(tmpfile.name)])
 
-if __name__ == "__main__":
+def run():
     toJSONFilter(filters=[extractCites], metafilters=[alterMetadata])
