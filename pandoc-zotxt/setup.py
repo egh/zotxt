@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='pandoc-zotxt',
-      version="0.1.",
+      version="0.1.9",
       description="Pandoc filter for interacting with Zotero via zotxt.",
       classifiers=[
           "Operating System :: OS Independent",
