@@ -23,10 +23,14 @@ pandoc-compatible “Easy Citekey” citation into your document. You can
 also generate your own citekey using the author’s last name, a word
 from the title, and the date, e.g., ``@doe:2000title``
 
-You will need to copy or symlink the ``pandoc-zotxt`` script to
-somewhere in your ``$PATH``.
+You will need to install the ``pandoc-zotxt`` script. This can be done
+with pip::
 
-Pandoc can now be invoked using its filter feature:
+  sudo pip install pandoc-zotxt
+
+or you can install from source using the ``setup.py`` file.
+
+Pandoc can now be invoked using its filter feature::
 
   pandoc -F pandoc-zotxt -F pandoc-citeproc document.md
 
