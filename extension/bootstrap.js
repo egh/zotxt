@@ -27,8 +27,8 @@ function loadZotero () {
             getService(Components.interfaces.nsISupports).wrappedJSObject;
 
         /* these must be initialized AFTER zotero is loaded */
-        easyKeyRe = z.Utilities.XRegExp("^(\\p{Lu}\\p{Ll}+)(\\p{Lu}\\p{Ll}+)?([0-9]+)?");
-        alternateEasyKeyRe = z.Utilities.XRegExp("^(\\p{Ll}+):([0-9]+)?(\\p{Ll}+)?");
+        easyKeyRe = z.Utilities.XRegExp("^(\\p{Lu}\\p{Ll}+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?");
+        alternateEasyKeyRe = z.Utilities.XRegExp("^(\\p{Ll}+)(:[0-9]{4})?(\\p{Ll}+)?");
     }
 }
 
