@@ -126,7 +126,7 @@ function getCollection(name, collections) {
         return null;
     }
 }
-                    
+
 function collectionSearch(name) {
     let collection = getCollection(name);
     if (!collection) { 
@@ -332,7 +332,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
         }
     }
 };
-    
+
 let searchEndpoint = function (url, data, sendResponseCallback) {
     let q = cleanQuery(url['query']);
     if (q.q) {
@@ -483,7 +483,7 @@ function install(data, reason) {
     Components.utils.import("resource://gre/modules/FileUtils.jsm");
     Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
-   /* turn on http server if it is not on */
+    /* turn on http server if it is not on */
     /* TODO turn this off when uninstalled? */
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
