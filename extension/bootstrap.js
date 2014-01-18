@@ -98,6 +98,17 @@ function rawSearch(key) {
     return runSearch(s);
 }
 
+/**
+ * Prepare query values for us.
+ */
+function cleanQuery(q) {
+    let retval = [];
+    for (let key in q) {
+        retval[key] = q[key].replace("+", " ");
+    }
+    return retval;
+}
+
 function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, z.getCollections(null));
@@ -300,7 +311,7 @@ function handleResponseFormat(q, items, sendResponseCallback) {
 }
 
 let completeEndpoint = function (url, data, sendResponseCallback) {
-    let q = url.query;
+    let q = cleanQuery(url['query']);
     if (q.easykey) {
         let items = easyKeySearch(parseEasyKey(q.easykey));
         if (!items) {
@@ -323,7 +334,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
 };
     
 let searchEndpoint = function (url, data, sendResponseCallback) {
-    let q = url.query;
+    let q = cleanQuery(url['query']);
     if (q.q) {
         let results = search(q.q);
         handleResponseFormat(q, results, sendResponseCallback);
@@ -333,10 +344,7 @@ let searchEndpoint = function (url, data, sendResponseCallback) {
 };
 
 let itemsEndpoint = function (url, data, sendResponseCallback) {
-    let q = url['query'];
-    for (let key in q) {
-        q[key] = q[key].replace("+", " ");
-    }
+    let q = cleanQuery(url['query']);
     let items = [];
     if (q.selected) {
         let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
@@ -378,6 +386,7 @@ let endpoints = {
         "supportedMethods":  ["POST"],
         "supportedDataTypes": ["application/json"],
         "init": function (url, data, sendResponseCallback) {
+            let q = cleanQuery(url['query']);
             let cslEngine = makeCslEngine(data.styleId);
             if (!cslEngine) {
                 sendResponseCallback(400, "text/plain", "No style found.");
