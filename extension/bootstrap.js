@@ -242,17 +242,17 @@ function search (query) {
     return runSearch(s);
 }
 
-function handleResponseFormat(q, items, sendResponseCallback) {
-    if (q.format == 'key') {
+function handleResponseFormat(format, style, items, sendResponseCallback) {
+    if (format == 'key') {
         let responseData = items.map (function (item) {
             return ((item.libraryID || "0") + "_" + item.key);
         });
         sendResponseCallback(200, "application/json; charset=UTF-8", 
                              JSON.stringify(responseData, null, "  "));
-    } else if (q.format == 'bibliography') {
+    } else if (format == 'bibliography') {
         let responseData = items.map (function (item) {
             // TODO - make the default style correct
-            let style = q.style || "http://www.zotero.org/styles/chicago-note-bibliography";
+            style = style || "http://www.zotero.org/styles/chicago-note-bibliography";
             let data = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
             // attach key to bibliography
             data['key'] = ((item.libraryID || "0") + "_" + item.key);
@@ -262,7 +262,7 @@ function handleResponseFormat(q, items, sendResponseCallback) {
         });
         sendResponseCallback(200, "application/json; charset=UTF-8",
                              JSON.stringify(responseData, null, "  "));
-    } else if (q.format == 'bibtex') {
+    } else if (format == 'bibtex') {
         myExport(items, "9cb70025-a888-4a29-a210-93ec52da40d4",
                  function (output) {
                      sendResponseCallback(200, "text/plain; charset=UTF-8", output);
@@ -270,7 +270,7 @@ function handleResponseFormat(q, items, sendResponseCallback) {
                  function () {
                      sendResponseCallback(400);
                  });
-    } else if (q.format == 'recoll') {
+    } else if (format == 'recoll') {
         let responseData = [];
         for (let i in items) {
             let item = items[i];
@@ -298,7 +298,7 @@ function handleResponseFormat(q, items, sendResponseCallback) {
         }
         sendResponseCallback(200, "application/json; charset=UTF-8",
                              JSON.stringify(responseData, null, "  "));
-    } else if (q.format == "easykey") {
+    } else if (format == "easykey") {
         makeEasyKeys(items, 
                      /* success */
                      function (rawKeys) {
@@ -376,7 +376,7 @@ let searchEndpoint = function (url, data, sendResponseCallback) {
     let q = cleanQuery(url['query']);
     if (q.q) {
         let results = search(q.q);
-        handleResponseFormat(q, results, sendResponseCallback);
+        handleResponseFormat(q.format, q.style, results, sendResponseCallback);
     } else {
         sendResponseCallback(400, "text/plain", "q param required.");
     }
@@ -416,7 +416,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     } else {
         sendResponseCallback(400, "text/plain", "No param supplied!");
     }
-    handleResponseFormat(q, items, sendResponseCallback);
+    handleResponseFormat(q.format, q.style, items, sendResponseCallback);
     return;
 };
 
