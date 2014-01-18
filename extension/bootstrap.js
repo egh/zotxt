@@ -332,6 +332,47 @@ let searchEndpoint = function (url, data, sendResponseCallback) {
     }
 };
 
+let itemsEndpoint = function (url, data, sendResponseCallback) {
+    let q = url['query'];
+    for (let key in q) {
+        q[key] = q[key].replace("+", " ");
+    }
+    let items = [];
+    if (q.selected) {
+        let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+            getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
+        items = ZoteroPane.getSelectedItems();
+        if (!items) { items = []; }
+    } else if (q.collection) {
+        items = collectionSearch(q.collection);
+    } else if (q.key) {
+        items = q.key.split(",").map(function (key) {
+            let lkh = z.Items.parseLibraryKeyHash(key);
+            var retval = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+            if (retval == false) {
+                return sendResponseCallback(400, "text/plain", "item with key " + key + " not found!");
+            } else {
+                return retval;
+            }
+        });
+    } else if (q.easykey) {
+        try {
+            items = q.easykey.split(",").map(function (key) {
+                return findByEasyKey(key);
+            });
+        } catch (ex if (ex.name === "EasyKeyError")) {
+            sendResponseCallback(400, "text/plain", ex.message);
+            return;
+        }
+    } else if (q.all) {
+        var items = z.Items.getAll();
+    } else {
+        sendResponseCallback(400, "text/plain", "No param supplied!");
+    }
+    handleResponseFormat(q, items, sendResponseCallback);
+    return;
+}
+
 let endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
@@ -374,46 +415,7 @@ let endpoints = {
     "items" : {
         "supportedMethods":["GET"],
         "supportedDataType" : ["application/x-www-form-urlencoded"],
-        "init" : function (url, data, sendResponseCallback) {
-            let q = url['query'];
-            for (let key in q) {
-                q[key] = q[key].replace("+", " ");
-            }
-            let items = [];
-            if (q.selected) {
-                let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
-                  getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
-                items = ZoteroPane.getSelectedItems();
-                if (!items) { items = []; }
-            } else if (q.collection) {
-                items = collectionSearch(q.collection);
-            } else if (q.key) {
-                items = q.key.split(",").map(function (key) {
-                    let lkh = z.Items.parseLibraryKeyHash(key);
-                    var retval = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
-                    if (retval == false) {
-                        return sendResponseCallback(400, "text/plain", "item with key " + key + " not found!");
-                    } else {
-                        return retval;
-                    }
-                });
-            } else if (q.easykey) {
-                try {
-                    items = q.easykey.split(",").map(function (key) {
-                        return findByEasyKey(key);
-                    });
-                } catch (ex if (ex.name === "EasyKeyError")) {
-                    sendResponseCallback(400, "text/plain", ex.message);
-                    return;
-                }
-            } else if (q.all) {
-                var items = z.Items.getAll();
-            } else {
-                sendResponseCallback(400, "text/plain", "No param supplied!");
-            }
-            handleResponseFormat(q, items, sendResponseCallback);
-            return;
-        }
+        "init" : itemsEndpoint
     }
 };
 
