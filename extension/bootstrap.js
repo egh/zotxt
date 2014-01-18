@@ -298,6 +298,19 @@ function handleResponseFormat(q, items, sendResponseCallback) {
         }
         sendResponseCallback(200, "application/json; charset=UTF-8",
                              JSON.stringify(responseData, null, "  "));
+    } else if (q.format == "easykey") {
+        makeEasyKeys(items, 
+                     /* success */
+                     function (rawKeys) {
+                         let keys = rawKeys.split(" ");
+                         // remove leading @
+                         let keys2 = keys.map(function(key) { return key.substring(1); });
+                         sendResponseCallback(200, "application/json", JSON.stringify(keys2, null, "  "));
+                     }, 
+                     /* failure */
+                     function () {
+                         sendResponseCallback(400);
+                     });
     } else {
         let itemGetter = new z.Translate.ItemGetter();
         itemGetter.setItems(items);
