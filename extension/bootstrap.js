@@ -224,6 +224,13 @@ function makeEasyKeys (items, successCallback, failureCallback) {
     return myExport(items, easyKeyExporterMetadata.translatorID, successCallback, failureCallback);
 }
 
+function search (query) {
+    let s = new z.Search();
+    s.addCondition('joinMode', 'any');
+    s.addCondition("quicksearch-titleCreatorYear", "contains", query);
+    return runSearch(s);
+}
+
 function handleResponseFormat(q, items, sendResponseCallback) {
     if (q.format == 'key') {
         let responseData = items.map (function (item) {
@@ -310,6 +317,16 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
     }
 };
     
+let searchEndpoint = function (url, data, sendResponseCallback) {
+    let q = url.query;
+    if (q.q) {
+        let results = search(q.q);
+        handleResponseFormat(q, results, sendResponseCallback);
+    } else {
+        sendResponseCallback(400, "text/plain", "q param required.");
+    }
+};
+
 let endpoints = {
     "bibliography" : {
         "supportedMethods":  ["POST"],
@@ -343,6 +360,11 @@ let endpoints = {
         supportedMethods: ["GET"],
         supportedDataType : ["application/x-www-form-urlencoded"],
         init : completeEndpoint
+    },
+    "search" : {
+        supportedMethods: ["GET"],
+        supportedDataType : ["application/x-www-form-urlencoded"],
+        init : searchEndpoint
     },
     "items" : {
         "supportedMethods":["GET"],
