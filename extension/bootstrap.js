@@ -242,7 +242,12 @@ function handleResponseFormat(q, items, sendResponseCallback) {
         let responseData = items.map (function (item) {
             // TODO - make the default style correct
             let style = q.style || "http://www.zotero.org/styles/chicago-note-bibliography";
-            return z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+            let data = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+            // attach key to bibliography
+            data['key'] = ((item.libraryID || "0") + "_" + item.key);
+            // strip newlines
+            data['text'] = data['text'].replace(/(\r\n|\n|\r)/gm,"");
+            return data;
         });
         sendResponseCallback(200, "application/json; charset=UTF-8",
                              JSON.stringify(responseData, null, "  "));
