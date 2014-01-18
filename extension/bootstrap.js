@@ -356,18 +356,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
         if (!items) {
             sendResponseCallback(400, "text/plain", "EasyKey must be of the form DoeTitle2000 or doe:2000title");
         } else {
-            makeEasyKeys(items, 
-                         /* success */
-                         function (rawKeys) {
-                             let keys = rawKeys.split(" ");
-                             // remove leading @
-                             let keys2 = keys.map(function(key) { return key.substring(1); });
-                             sendResponseCallback(200, "application/json", JSON.stringify(keys2, null, "  "));
-                         }, 
-                         /* failure */
-                         function () {
-                             sendResponseCallback(400);
-                         });
+            handleResponseFormat("easykey", null, items, sendResponseCallback);
         }
     }
 };
