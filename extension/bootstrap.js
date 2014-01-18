@@ -310,6 +310,32 @@ function handleResponseFormat(q, items, sendResponseCallback) {
     }
 }
 
+let bibliographyEndpoint = function (url, data, sendResponseCallback) {
+    let q = cleanQuery(url['query']);
+    let cslEngine = makeCslEngine(data.styleId);
+    if (!cslEngine) {
+        sendResponseCallback(400, "text/plain", "No style found.");
+        return;
+    } else {
+        //zotero.localItems = {};
+        cslEngine.setOutputFormat("html");
+        try {
+            let citationGroups = data.citationGroups.map(processCitationsGroup);
+            cslEngine.updateItems(extractIds(citationGroups));
+            let retval = {};
+            retval.bibliography = cslEngine.makeBibliography();
+            retval.citationClusters = [];
+            citationGroups.map (function (citationGroup) {
+                retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
+            });
+            sendResponseCallback(200, "application/json", JSON.stringify(retval, null, "  "));
+            return;
+        } catch (ex if (ex.name === "EasyKeyError")) {
+            sendResponseCallback(400, "text/plain", ex.message);
+        }
+    }
+};
+
 let completeEndpoint = function (url, data, sendResponseCallback) {
     let q = cleanQuery(url['query']);
     if (q.easykey) {
@@ -383,33 +409,9 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
 
 let endpoints = {
     "bibliography" : {
-        "supportedMethods":  ["POST"],
-        "supportedDataTypes": ["application/json"],
-        "init": function (url, data, sendResponseCallback) {
-            let q = cleanQuery(url['query']);
-            let cslEngine = makeCslEngine(data.styleId);
-            if (!cslEngine) {
-                sendResponseCallback(400, "text/plain", "No style found.");
-                return;
-            } else {
-                //zotero.localItems = {};
-                cslEngine.setOutputFormat("html");
-                try {
-                    let citationGroups = data.citationGroups.map(processCitationsGroup);
-                    cslEngine.updateItems(extractIds(citationGroups));
-                    let retval = {};
-                    retval.bibliography = cslEngine.makeBibliography();
-                    retval.citationClusters = [];
-                    citationGroups.map (function (citationGroup) {
-                        retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
-                    });
-                    sendResponseCallback(200, "application/json", JSON.stringify(retval, null, "  "));
-                    return;
-                } catch (ex if (ex.name === "EasyKeyError")) {
-                    sendResponseCallback(400, "text/plain", ex.message);
-                }
-            }
-        }
+        supportedMethods:  ["POST"],
+        supportedDataTypes: ["application/json"],
+        init : bibliographyEndpoint
     },
     complete : {
         supportedMethods: ["GET"],
