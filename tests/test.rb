@@ -10,6 +10,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
     @item_url = "#{@base_url}/items"
     @complete_url = "#{@base_url}/complete"
     @bibliography_url = "#{@base_url}/bibliography"
+    @search_url = "#{@base_url}/search"
   end
 
   def test_items_nothing
@@ -146,4 +147,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
     results = JSON.parse(resp.body)
     assert_equal 1, results.size
   end
+  
+  def test_search
+    resp = @client.get(@search_url, {"q" => "doe article", "format" => "key"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "0_4T8MCITQ", results[0]
+  end    
 end
