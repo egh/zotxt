@@ -194,13 +194,25 @@ class ZotxtTest < MiniTest::Unit::TestCase
   end
 
   def test_completion
-    resp = @client.get(@complete_url, {"easykey" => "Doe"})
+    resp = @client.get(@complete_url, {"easykey" => "doe"})
     results = JSON.parse(resp.body)
-    assert (results.size > 1)
+    assert (results.size > 4)
+
+    resp = @client.get(@complete_url, {"easykey" => "doe:"})
+    results = JSON.parse(resp.body)
+    assert (results.size > 4)
+
+    resp = @client.get(@complete_url, {"easykey" => "doe:20"})
+    results = JSON.parse(resp.body)
+    assert (results.size > 4)
     
-    resp = @client.get(@complete_url, {"easykey" => "DoeArticle2006"})
+    resp = @client.get(@complete_url, {"easykey" => "doe:2006"})
     results = JSON.parse(resp.body)
-    assert_equal 1, results.size
+    assert_equal ["doe:2006article"], results
+
+    resp = @client.get(@complete_url, {"easykey" => "doe:2006art"})
+    results = JSON.parse(resp.body)
+    assert_equal ["doe:2006article"], results
   end
   
   def test_search
