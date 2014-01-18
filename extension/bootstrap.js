@@ -413,7 +413,7 @@ let endpoints = {
         supportedDataTypes: ["application/json"],
         init : bibliographyEndpoint
     },
-    complete : {
+    "complete" : {
         supportedMethods: ["GET"],
         supportedDataType : ["application/x-www-form-urlencoded"],
         init : completeEndpoint
@@ -424,9 +424,9 @@ let endpoints = {
         init : searchEndpoint
     },
     "items" : {
-        "supportedMethods":["GET"],
-        "supportedDataType" : ["application/x-www-form-urlencoded"],
-        "init" : itemsEndpoint
+        supportedMethods:["GET"],
+        supportedDataType : ["application/x-www-form-urlencoded"],
+        init : itemsEndpoint
     }
 };
 
