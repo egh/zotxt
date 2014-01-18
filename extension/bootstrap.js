@@ -379,7 +379,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     }
     handleResponseFormat(q, items, sendResponseCallback);
     return;
-}
+};
 
 let endpoints = {
     "bibliography" : {
