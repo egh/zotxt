@@ -40,7 +40,7 @@ def alterMetadata(meta):
       cite["id"] = citekey
       cites.append(cite)
     except urllib2.HTTPError, e:
-      sys.stderr.write("error with %s : %s \n"%(citekey, e.read()))
+      sys.stderr.write("error with %s : %s \n"%(citekey.encode('utf8'), e.read()))
   tmpfile = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
   json.dump(cites, tmpfile, indent=2)
   tmpfile.close()

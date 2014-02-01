@@ -2,6 +2,7 @@
 require 'minitest/autorun'
 require 'httpclient'
 require 'json'
+require 'open3'
 
 class ZotxtTest < MiniTest::Unit::TestCase
   def setup
@@ -222,7 +223,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "0_4T8MCITQ", results[0]
   end
   
-  def test_pandoc
+  def test_pandoc_accent
     out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt -F pandoc-citeproc`
     html = <<EOF
 <p><span class="citation">Matthias Hüning (2012)</span></p>
@@ -231,5 +232,12 @@ class ZotxtTest < MiniTest::Unit::TestCase
 </div>
 EOF
     assert_equal(out, html)
+  end
+
+  def test_pandoc_missing_accent
+    o, e, s = Open3.capture3("pandoc -F pandoc-zotxt -F pandoc-citeproc", :stdin_data=>"@hüning:1900bar")
+    assert_equal(e, "error with hüning:1900bar : search failed to return a single item 
+pandoc-citeproc: reference hüning:1900bar not found
+")
   end
 end
