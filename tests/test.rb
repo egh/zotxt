@@ -220,5 +220,16 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "0_4T8MCITQ", results[0]
-  end    
+  end
+  
+  def test_pandoc
+    out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt -F pandoc-citeproc`
+    html = <<EOF
+<p><span class="citation">Matthias Hüning (2012)</span></p>
+<div class="references">
+<p>Matthias Hüning. 2012. “Wortbildung im niederländisch-deutschen Sprachvergleich.” In <em>Deutsch im Sprachvergleich. Grammatische Kontraste und Konvergenzen</em>, edited by Lutz Gunkel and Gisela Zifonun, 161–186. Institut für Deutsche Sprache, Jahrbuch 2011. Berlin: De Gruyter.</p>
+</div>
+EOF
+    assert_equal(out, html)
+  end
 end
