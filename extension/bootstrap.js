@@ -36,6 +36,8 @@ let easyKeyExporterMetadata = {
     "lastUpdated":"2013-07-15 07:03:17"
 };
 
+let jsonMediaType = "application/json; charset=UTF-8";
+
 function loadZotero () {
     if (!z) {
         z = Components.classes["@zotero.org/Zotero;1"].
@@ -262,7 +264,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         let responseData = items.map (function (item) {
             return ((item.libraryID || "0") + "_" + item.key);
         });
-        sendResponseCallback(200, "application/json; charset=UTF-8", 
+        sendResponseCallback(200, jsonMediaType, 
                              JSON.stringify(responseData, null, "  "));
     } else if (format == 'bibliography') {
         let responseData = items.map (function (item) {
@@ -275,7 +277,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
             data['text'] = data['text'].replace(/(\r\n|\n|\r)/gm,"");
             return data;
         });
-        sendResponseCallback(200, "application/json; charset=UTF-8",
+        sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
     } else if (format == 'bibtex') {
         myExport(items, "9cb70025-a888-4a29-a210-93ec52da40d4",
@@ -311,7 +313,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                                    "paths": attachmentPaths});
             }
         }
-        sendResponseCallback(200, "application/json; charset=UTF-8",
+        sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
     } else if (format == "easykey") {
         makeEasyKeys(items, 
@@ -320,7 +322,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                          let keys = rawKeys.split(" ");
                          // remove leading @
                          let keys2 = keys.map(function(key) { return key.substring(1); });
-                         sendResponseCallback(200, "application/json", JSON.stringify(keys2, null, "  "));
+                         sendResponseCallback(200, jsonMediaType, JSON.stringify(keys2, null, "  "));
                      }, 
                      /* failure */
                      function () {
@@ -333,7 +335,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         while((item = itemGetter.nextItem())) {
             responseData.push(z.Utilities.itemToCSLJSON(item));
         }
-        sendResponseCallback(200, "application/json; charset=UTF-8", 
+        sendResponseCallback(200, jsonMediaType, 
                              JSON.stringify(responseData, null, "  "));
     }
 }
@@ -356,7 +358,7 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
             citationGroups.map (function (citationGroup) {
                 retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
             });
-            sendResponseCallback(200, "application/json", JSON.stringify(retval, null, "  "));
+            sendResponseCallback(200, jsonMediaType, JSON.stringify(retval, null, "  "));
             return;
         } catch (ex if (ex.name === "EasyKeyError")) {
             sendResponseCallback(400, "text/plain", ex.message);
