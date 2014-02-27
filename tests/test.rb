@@ -12,6 +12,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
     @complete_url = "#{@base_url}/complete"
     @bibliography_url = "#{@base_url}/bibliography"
     @search_url = "#{@base_url}/search"
+    @select_url = "#{@base_url}/select"
   end
 
   def test_items_nothing
@@ -227,7 +228,19 @@ class ZotxtTest < MiniTest::Unit::TestCase
     results = JSON.parse(resp.body)
     assert_equal "0_4T8MCITQ", results[0]
   end
-  
+
+  def test_select
+    resp = @client.get(@select_url, {"key" => "0_4T8MCITQ"})
+    assert_equal 200, resp.status
+    resp = @client.get(@select_url, {"easykey" => "doe:2006article"})
+    assert_equal 200, resp.status
+    # bad key
+    resp = @client.get(@select_url, {"key" => "0_4T8MCITQXXX"})
+    assert_equal 400, resp.status
+    resp = @client.get(@select_url, {"easykey" => "XXX"})
+    assert_equal 400, resp.status
+  end
+
   def test_pandoc_accent
     out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt -F pandoc-citeproc`
     html = <<EOF

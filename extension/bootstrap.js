@@ -426,6 +426,36 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     return;
 };
 
+let selectEndpoint = function (url, data, sendResponseCallback) {
+    let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+            getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
+    ZoteroPane.show();
+    let q = cleanQuery(url['query']);
+    let item = null;
+    if (q.easykey) {
+        try {
+            item = findByEasyKey(q.easykey);
+        } catch (ex if (ex.name === "EasyKeyError")) {
+            sendResponseCallback(400, "text/plain", ex.message);
+            return;
+        }
+    } else if (q.key) {
+        let lkh = z.Items.parseLibraryKeyHash(q.key);
+	item = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+        if (item == false) {
+            sendResponseCallback(400, "text/plain", "item with key " + q.key + " not found!");
+            return;
+        }
+    } else {
+        sendResponseCallback(400, "text/plain", "No param supplied!");
+        return;
+    }
+    ZoteroPane.selectItem(item.id);
+    // TODO: figure out how to wait here until the item is actually selected
+    sendResponseCallback(200, jsonMediaType,
+                         JSON.stringify("success", null, "  "));
+};
+
 let endpoints = {
     "bibliography" : {
         supportedMethods:  ["POST"],
@@ -446,6 +476,11 @@ let endpoints = {
         supportedMethods:["GET"],
         supportedDataType : ["application/x-www-form-urlencoded"],
         init : itemsEndpoint
+    },
+    "select" : {
+        supportedMethods:["GET"],
+        supportedDataType : ["application/x-www-form-urlencoded"],
+        init : selectEndpoint
     }
 };
 
