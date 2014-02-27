@@ -56,6 +56,11 @@ class ZotxtTest < MiniTest::Unit::TestCase
     assert_equal "0_ZBZQ4KMP", i[0]
   end
 
+  def test_items_bad_key
+    resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMX", "format" => "key"})
+    assert_equal 400, resp.status
+  end
+
   def test_items_multiple_easykeys
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005,DoeArticle2006", "format" => "key"})
     assert_equal 200, resp.status
