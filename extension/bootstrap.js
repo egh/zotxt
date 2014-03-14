@@ -198,6 +198,11 @@ function findByEasyKey(key) {
     }
 }
 
+function findByKey(key) {
+    let lkh = z.Items.parseLibraryKeyHash(key);
+    return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+}
+
 /**
  * Map the easykeys in the citations to ids.
  */
@@ -400,8 +405,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         items = collectionSearch(q.collection);
     } else if (q.key) {
         items = q.key.split(",").map(function (key) {
-            let lkh = z.Items.parseLibraryKeyHash(key);
-            var retval = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+            let retval = findByKey(key);
             if (retval == false) {
                 return sendResponseCallback(400, "text/plain", "item with key " + key + " not found!");
             } else {
@@ -440,8 +444,7 @@ let selectEndpoint = function (url, data, sendResponseCallback) {
             return;
         }
     } else if (q.key) {
-        let lkh = z.Items.parseLibraryKeyHash(q.key);
-	item = z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+        item = findByKey(q.key);
         if (item == false) {
             sendResponseCallback(400, "text/plain", "item with key " + q.key + " not found!");
             return;
