@@ -96,6 +96,22 @@ class ZotxtTest < MiniTest::Unit::TestCase
     i = JSON.parse(resp.body)
     assert_equal ["(Doe 2005)"], i["citationClusters"]
   end
+  
+  def test_bibliography_key
+    r = {
+      "styleId" => "chicago-author-date",
+      "citationGroups" => [
+       { "citationItems" => [ { "key" => "0_ZBZQ4KMP" } ],
+         "properties" => { "noteIndex" => 0 }
+       }
+      ]
+    }
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal ["(Doe 2005)"], i["citationClusters"]
+  end
 
   def test_bad_bibliography
     r = {

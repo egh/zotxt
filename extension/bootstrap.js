@@ -212,6 +212,8 @@ function processCitationsGroup (citationGroup) {
         for (let x in citation) {
             if (x == "easyKey") {
                 retval.id = findByEasyKey(citation[x]).id;
+            } else if (x == "key") {
+                retval.id = findByKey(citation[x]).id;
             } else {
                 retval[x] = citation[x];
             }
