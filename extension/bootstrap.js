@@ -105,13 +105,24 @@ function runSearch(s) {
     } else if (i.length == 0) {
         return [];
     } else {
-        return i.map(function(id) { return z.Items.get(id); });
+        return i.map(function(id) {
+            return z.Items.get(id);
+        }).map(function (item) {
+            if (item.isNote()) {
+                return z.Items.get(item.getSource());
+            } else {
+                return item;
+            }
+        });
     }
 }
 
 function rawSearch(key) {
     let s = new z.Search();
-    s.addCondition("tag", "is", "@" + key);
+    let str = "@" + key;
+    s.addCondition('joinMode', 'any');
+    s.addCondition("tag", "is", str);
+    s.addCondition("note", "contains", str);
     return runSearch(s);
 }
 
