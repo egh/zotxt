@@ -262,7 +262,7 @@ class ZotxtTest < MiniTest::Unit::TestCase
     html = <<EOF
 <p><span class="citation">Matthias Hüning (2012)</span></p>
 <div class="references">
-<p>Matthias Hüning. 2012. “Wortbildung im niederländisch-deutschen Sprachvergleich.” In <em>Deutsch im Sprachvergleich. Grammatische Kontraste und Konvergenzen</em>, edited by Lutz Gunkel and Gisela Zifonun, 161–186. Institut für Deutsche Sprache, Jahrbuch 2011. Berlin: De Gruyter.</p>
+<p>Matthias Hüning. 2012. “Wortbildung im niederländisch-deutschen Sprachvergleich.” In <em>Deutsch im Sprachvergleich. Grammatische Kontraste und Konvergenzen</em>, edited by Lutz Gunkel and Gisela Zifonun, 161–86. Institut für Deutsche Sprache, Jahrbuch 2011. Berlin: De Gruyter.</p>
 </div>
 EOF
     assert_equal(out, html)
