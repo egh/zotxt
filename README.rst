@@ -36,3 +36,15 @@ Pandoc can now be invoked using its filter feature::
 
 This will generate a JSON file in temporary storage and load your
 citations into it. The citations will be passed on to pandoc.
+
+Custom keys
+-----------
+
+Sometimes you may wish to set a custom key for an item; for instance,
+in the case where two items would have the same key otherwise. This
+can be done by adding a tag of the form: ``@doe:2014title`` to an item
+in Zotero, or by adding a note with the same content. Zotxt will first
+look for keys in a note or tag before resolving the item otherwise.
+
+  
+  
