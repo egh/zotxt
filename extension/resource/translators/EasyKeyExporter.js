@@ -25,6 +25,10 @@ function determineYear (item) {
     return year;
 }
 
+function stripFormatting(str) {
+    return str.replace(new RegExp("(</?i>|</?b>|</?sub>|</?sup>|</span>|<span style=[\"']font-variant:small-caps;?[\"']>)", "g"), "");
+}
+
 function determineAuthor (item) {
     var creator = item['creators'][0];
     var author = "Anonymous";
@@ -38,7 +42,7 @@ var stopwords = ["a", "aan", "abans", "aber", "acaba", "acerca", "ach", "aderton
                  // Based on http://www.ranks.nl/stopwords/
 
 function determineTitleWord(item) {
-    var cleanTitle = item['title'].toLowerCase();
+    var cleanTitle = stripFormatting(item['title'].toLowerCase());
     var words = ZU.XRegExp.split(cleanTitle, ZU.XRegExp("\\s+|\\p{P}"));
     var filteredWords = words.filter(function (word) {
         return (stopwords.indexOf(word) == -1 &&
