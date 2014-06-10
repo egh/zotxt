@@ -30,11 +30,12 @@ function stripFormatting(str) {
 }
 
 function determineAuthor (item) {
-    var creator = item['creators'][0];
-    var author = "Anonymous";
-    if (creator && creator['lastName']) {
-        author = creator['lastName'];
-    }
+    var primaryCreatorType = ZU.getCreatorsForType(item.itemType)[0];
+    var primaryCreators = item.creators.filter(function (c) {
+        return (c.creatorType === primaryCreatorType);
+    });
+    var creator = primaryCreators[0] || item.creators[0];
+    var author = (creator && creator['lastName']) || "Anonymous";
     return ZU.XRegExp.split(author, ZU.XRegExp("\\s+|\\p{P}")).pop();
 }
 
