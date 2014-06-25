@@ -42,7 +42,8 @@ known_keys = set([])
 def extractCites(key, value, format, meta):
   global known_keys
   if key == "Cite":
-    known_keys.add(value[0][0]['citationId'])
+    for cite in value[0]:
+      known_keys.add(cite['citationId'])
 
 def alterMetadata(meta):
   global known_keys
