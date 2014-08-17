@@ -47,8 +47,20 @@ class ZotxtTest < MiniTest::Unit::TestCase
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert (i[0].key? 'html')
-  end
+    assert(i[0].key? 'html')
+
+    # with style
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography", "style" => "http://www.zotero.org/styles/chicago-note-bibliography"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert(i[0].key? 'html')
+
+    # with short style
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography", "style" => "chicago-note-bibliography"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert(i[0].key? 'html')
+end
 
   def test_items_key
     resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMP", "format" => "key"})

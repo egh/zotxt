@@ -66,11 +66,18 @@ let mySys = {
     }
 };
 
-function makeCslEngine (styleId) {
-    if (!styleId.match(/^http:/)) {
-        styleId = 'http://www.zotero.org/styles/' + styleId;
+function fixStyleId(styleId) {
+    if (!styleId) {
+        return  "http://www.zotero.org/styles/chicago-note-bibliography";
+    } else if (!styleId.match(/^http:/)) {
+        return 'http://www.zotero.org/styles/' + styleId;
+    } else {
+        return styleId;
     }
-    let style = z.Styles.get(styleId);
+}
+
+function makeCslEngine (styleId) {
+    let style = z.Styles.get(fixStyleId(styleId));
     if (!style) {
         return null;
     } else {
@@ -286,9 +293,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                              JSON.stringify(responseData, null, "  "));
     } else if (format == 'bibliography') {
         let responseData = items.map (function (item) {
-            // TODO - make the default style correct
-            style = style || "http://www.zotero.org/styles/chicago-note-bibliography";
-            let data = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + style);
+            let data = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + fixStyleId(style));
             // attach key to bibliography
             data['key'] = ((item.libraryID || "0") + "_" + item.key);
             // strip newlines
