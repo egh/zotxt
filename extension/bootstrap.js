@@ -291,14 +291,17 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         });
         sendResponseCallback(200, jsonMediaType, 
                              JSON.stringify(responseData, null, "  "));
-    } else if (format == 'bibliography') {
+    } else if (format === 'bibliography') {
+	let csl = makeCslEngine(style);
         let responseData = items.map (function (item) {
-            let data = z.QuickCopy.getContentFromItems(new Array(item), "bibliography=" + fixStyleId(style));
-            // attach key to bibliography
-            data['key'] = ((item.libraryID || "0") + "_" + item.key);
-            // strip newlines
-            data['text'] = data['text'].replace(/(\r\n|\n|\r)/gm,"");
-            return data;
+	    csl.updateItems([item.id], true);
+            return {
+                'key': ((item.libraryID || "0") + "_" + item.key),
+                'html': z.Cite.makeFormattedBibliography(csl, 'html'),
+                // strip newlines
+	        'text': z.Cite.makeFormattedBibliography(csl, 'text')
+                    .replace(/(\r\n|\n|\r)/gm,"")
+            };
         });
         sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
