@@ -443,7 +443,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
             return;
         }
     } else if (q.all) {
-        var items = z.Items.getAll();
+        items = z.Items.getAll();
     } else {
         sendResponseCallback(400, "text/plain", "No param supplied!");
     }
