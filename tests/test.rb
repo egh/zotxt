@@ -42,7 +42,21 @@ class ZotxtTest < MiniTest::Unit::TestCase
     i = JSON.parse(resp.body)
     assert_equal "0_FNKERQWU", i[0]
   end
-  
+
+  def test_items_easykey_double_name
+    resp = @client.get(@item_url, {"easykey" => "roe_doe:2015double", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal "0_AUP63UAA", i[0]
+  end
+
+  def test_items_easykey_hyphenated_name
+    resp = @client.get(@item_url, {"easykey" => "roe-doe:2015hyphens", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal "0_JQEUW7AI", i[0]
+  end
+
   def test_items_easykey_alternate_key_format
     resp = @client.get(@item_url, {"easykey" => "doe:2005book", "format" => "key"})
     assert_equal 200, resp.status
