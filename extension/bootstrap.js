@@ -44,8 +44,8 @@ function loadZotero () {
             getService(Components.interfaces.nsISupports).wrappedJSObject;
 
         /* these must be initialized AFTER zotero is loaded */
-        easyKeyRe = z.Utilities.XRegExp("^(\\p{Lu}\\p{Ll}+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?");
-        alternateEasyKeyRe = z.Utilities.XRegExp("^(\\p{Ll}+)(:[0-9]{4})?(\\p{Ll}+)?");
+        easyKeyRe = z.Utilities.XRegExp("^(\\p{Lu}[\\p{Ll}_]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?");
+        alternateEasyKeyRe = z.Utilities.XRegExp("^([\\p{Ll}_]+)(:[0-9]{4})?(\\p{Ll}+)?");
     }
 }
 
@@ -176,7 +176,11 @@ function collectionSearch(name) {
  */
 function easyKeySearch(parsedKey) {
     let s = new z.Search();
-    s.addCondition("creator", "contains", parsedKey.creator);
+    /* allow multiple names separated by _ */
+    var splitName = parsedKey.creator.split("_");
+    for (let i in splitName) {
+        s.addCondition("creator", "contains", splitName[i]);
+    }
     if (parsedKey.title != null) {
         s.addCondition("title", "contains", parsedKey.title);
     }
