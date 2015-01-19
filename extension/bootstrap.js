@@ -277,10 +277,6 @@ function myExport (items, translatorId, successCallback, failureCallback) {
     return;
 }
 
-function makeEasyKeys (items, successCallback, failureCallback) {
-    return myExport(items, easyKeyExporterMetadata.translatorID, successCallback, failureCallback);
-}
-
 function search (query) {
     let s = new z.Search();
     s.addCondition('joinMode', 'any');
@@ -345,13 +341,22 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         }
         sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
-    } else if (format == "easykey") {
-        makeEasyKeys(items, 
+    } else if (format === "easykey" || format === "betterbibtexkey") {
+        let translatorId = null;
+        if (format === "easykey") {
+            translatorId = easyKeyExporterMetadata.translatorID;
+        } else {
+            translatorId = "4c52eb69-e778-4a78-8ca2-4edf024a5074";
+        }
+        if (items.length === 0) {
+            sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, "  "));
+        }
+        myExport(items, translatorId, 
                      /* success */
                      function (rawKeys) {
                          let keys = rawKeys.split(" ");
                          // remove leading @
-                         let keys2 = keys.map(function(key) { return key.substring(1); });
+                         let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
                          sendResponseCallback(200, jsonMediaType, JSON.stringify(keys2, null, "  "));
                      }, 
                      /* failure */
