@@ -46,5 +46,22 @@ can be done by adding a tag of the form: ``@doe:2014title`` to an item
 in Zotero, or by adding a note with the same content. Zotxt will first
 look for keys in a note or tag before resolving the item otherwise.
 
-  
-  
+Zotxt API
+---------
+
+The Zotxt API is exposed via ``http://localhost:23119/zotxt/``. To
+retrieve an item, you can query using the params ``easykey``, ``key``,
+``selected=t``, ``all=t``, or ``collection``. For example:
+
+  http://localhost:23119/zotxt/items?easykey=roe-doe:2015hyphens
+
+For ``collection`` or ``key``, provide the Zotero key (e.g.
+``0_VWYXZ1A1``)
+
+You can return the data in different formats by using the ``format``
+parameter, including ``easykey`` (an array of easykeys),
+``betterbibtexkey`` (an array of better bibtex keys), ``key`` (an
+array of Zotero keys), ``bibtex``, ``bibliography`` (see also the
+``style`` parameter). For example:
+
+  http://localhost:23119/zotxt/items?easykey=roe-doe:2015hyphens&format=easykey
