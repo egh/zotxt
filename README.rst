@@ -69,6 +69,6 @@ array of Zotero keys), ``bibtex``, ``bibliography`` (see also the
 
 To search, use the ``search`` endpoint with the ``q`` parameter. This
 uses the title/creator/year quick search. You can use the ``format``
-param as in the ``itmes`` endpoint. For example:
+param as in the ``items`` endpoint. For example:
 
   http://localhost:23119/zotxt/search?q=doe&format=easykey
