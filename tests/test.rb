@@ -292,6 +292,13 @@ end
     assert_equal "0_4T8MCITQ", results[0]
   end
 
+  def test_search_everything_standalone_note
+    resp = @client.get(@search_url, {"q" => "standalone", "method" => "everything", "format" => "key"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert !results.index('0_DAU3K5SU').nil?
+  end
+
   def test_select
     resp = @client.get(@select_url, {"key" => "0_4T8MCITQ"})
     assert_equal 200, resp.status

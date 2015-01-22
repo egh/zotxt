@@ -115,8 +115,9 @@ function runSearch(s) {
         return i.map(function(id) {
             return z.Items.get(id);
         }).map(function (item) {
-            if (item.isNote()) {
-                return z.Items.get(item.getSource());
+            // not Regular item or standalone note/attachment
+            if (!item.isRegularItem() && item.getSource()) {
+                  return z.Items.get(item.getSource());
             } else {
                 return item;
             }
@@ -277,10 +278,11 @@ function myExport (items, translatorId, successCallback, failureCallback) {
     return;
 }
 
-function search (query) {
+function search (query, method) {
+    if (!method) { method = 'titleCreatorYear'; }
     let s = new z.Search();
     s.addCondition('joinMode', 'any');
-    s.addCondition("quicksearch-titleCreatorYear", "contains", query);
+    s.addCondition("quicksearch-" + method, "contains", query);
     return runSearch(s);
 }
 
@@ -416,7 +418,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
 let searchEndpoint = function (url, data, sendResponseCallback) {
     let q = cleanQuery(url['query']);
     if (q.q) {
-        let results = search(q.q);
+        let results = search(q.q, q.method);
         handleResponseFormat(q.format, q.style, results, sendResponseCallback);
     } else {
         sendResponseCallback(400, "text/plain", "q param required.");

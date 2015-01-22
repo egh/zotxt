@@ -72,3 +72,7 @@ uses the title/creator/year quick search. You can use the ``format``
 param as in the ``items`` endpoint. For example:
 
   http://localhost:23119/zotxt/search?q=doe&format=easykey
+
+You can supply an argument to the ``method`` parameter to change the
+quicksearch version, either ``titleCreatorYear`` (the default),
+``everything`` or ``fields``.
