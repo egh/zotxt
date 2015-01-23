@@ -189,6 +189,13 @@ end
     assert_equal 200, resp.status
   end
 
+  def test_accent_easykey_export
+    resp = @client.get(@item_url, {"key" => "0_7N9FG62N", "format" => "easykey"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "hüáéèñ:2015acćénts", results[0]
+  end
+
   def test_collection_search
     resp = @client.get(@item_url, {"collection" => "My%20citations"})
     assert_equal 200, resp.status

@@ -14,7 +14,7 @@
 // along with zotxt. If not, see <http://www.gnu.org/licenses/>.
 
 // from bibtex exporter
-var citeKeyCleanRe = /[^a-z0-9\!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|]+/g;
+var citeKeyCleanRe = ZU.XRegExp('[^\\P{Lu}\\P{Ll}0-9\\!\\$\\&\\*\\+\\-\\.\\/\\:\\;\\<\\>\?\\[\\]\\^\\_\\`\\|]+', 'g');
 
 function determineYear (item) {
     var year = "";
@@ -33,7 +33,7 @@ function stripFormatting(str) {
 }
 
 function cleanString(string) {
-  return string.replace(/\s+/g, "_").replace(citeKeyCleanRe, "");;
+  return ZU.XRegExp.replace(string.replace(/\s+/g, "_"), citeKeyCleanRe, "");
 }
 
 function determineAuthor (item) {
