@@ -196,6 +196,20 @@ end
     assert_equal "hüáéèñ:2015acćénts", results[0]
   end
 
+  def test_accent_easykey_fetch
+    resp = @client.get(@item_url, {"easykey" => "hüáéèñ:2015acćénts", "format" => "key"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "0_7N9FG62N", results[0]
+  end
+
+  def test_duplicate_in_group_library
+    resp = @client.get(@item_url, {"easykey" => "doe:2015duplicated", "format" => "key"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "0_UCA4RC22", results[0]
+  end
+  
   def test_collection_search
     resp = @client.get(@item_url, {"collection" => "My%20citations"})
     assert_equal 200, resp.status

@@ -208,6 +208,11 @@ function findByEasyKey(key) {
                 return rawResults[0];
             } else {
                 let results = easyKeySearch(parsedKey);
+                if (results.length > 1) {
+                    // hack to ignore group library duplicates
+                    // remove all items not in the local library
+                    results = results.filter(function (item) { return item.libraryID === null; });
+                }
                 if (results.length == 0) {
                     throw {'name': "EasyKeyError", "message": "search failed to return a single item"};
                 } else if (results.length > 1) {
