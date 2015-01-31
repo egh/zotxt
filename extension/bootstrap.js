@@ -18,6 +18,7 @@ var z;
 var console = Services.console;
 var easyKeyRe;
 var alternateEasyKeyRe;
+var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
 
 let easyKeyExporterMetadata = {
     "translatorID":"9d774afe-a51d-4055-a6c7-23bc96d19fe7",
@@ -314,8 +315,15 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         });
         sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
-    } else if (format == 'bibtex') {
-        myExport(items, "9cb70025-a888-4a29-a210-93ec52da40d4",
+    } else if (format === 'bibtex' || (format && format.match(uuidRe))) {
+        /* return raw export data */
+        let translatorId = null;
+        if (format === 'bibtex') {
+            translatorId = "9cb70025-a888-4a29-a210-93ec52da40d4";
+        } else {
+            translatorId = format;
+        }
+        myExport(items, translatorId,
                  function (output) {
                      sendResponseCallback(200, "text/plain; charset=UTF-8", output);
                  },
