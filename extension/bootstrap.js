@@ -58,10 +58,10 @@ let mySys = {
     retrieveLocale : function (lang) {
         return z.Cite.System.retrieveLocale(lang);
     },
-    retrieveItem : function(id) { 
+    retrieveItem : function(id) {
         if (z.localItems[id] != undefined) {
             return z.localItems[id];
-        } else { 
+        } else {
             return z.Cite.System.retrieveItem(id);
         }
     }
@@ -120,7 +120,7 @@ function runSearch(s) {
         }).map(function (item) {
             // not Regular item or standalone note/attachment
             if (!item.isRegularItem() && item.getSource()) {
-                  return z.Items.get(item.getSource());
+                return z.Items.get(item.getSource());
             } else {
                 return item;
             }
@@ -168,7 +168,7 @@ function getCollection(name, collections) {
 
 function collectionSearch(name) {
     let collection = getCollection(name);
-    if (!collection) { 
+    if (!collection) {
         return [];
     } else {
         return collection.getChildItems();
@@ -252,7 +252,7 @@ function processCitationsGroup (citationGroup) {
         return retval;
     }
     let citationItems = citationGroup.citationItems.map(processCitationItem);
-    return { 
+    return {
         "properties" : citationGroup.properties,
         "citationItems" : citationItems
     };
@@ -299,17 +299,17 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         let responseData = items.map (function (item) {
             return ((item.libraryID || "0") + "_" + item.key);
         });
-        sendResponseCallback(200, jsonMediaType, 
+        sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
     } else if (format === 'bibliography') {
-	let csl = makeCslEngine(style);
+        let csl = makeCslEngine(style);
         let responseData = items.map (function (item) {
-	    csl.updateItems([item.id], true);
+            csl.updateItems([item.id], true);
             return {
                 'key': ((item.libraryID || "0") + "_" + item.key),
                 'html': z.Cite.makeFormattedBibliography(csl, 'html'),
                 // strip newlines
-	        'text': z.Cite.makeFormattedBibliography(csl, 'text')
+                'text': z.Cite.makeFormattedBibliography(csl, 'text')
                     .replace(/(\r\n|\n|\r)/gm,"")
             };
         });
@@ -368,14 +368,14 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         if (items.length === 0) {
             sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, "  "));
         } else {
-            myExport(items, translatorId, 
+            myExport(items, translatorId,
                      /* success */
                      function (rawKeys) {
                          let keys = rawKeys.split(" ");
                          // remove leading @
                          let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
                          sendResponseCallback(200, jsonMediaType, JSON.stringify(keys2, null, "  "));
-                     }, 
+                     },
                      /* failure */
                      function () {
                          sendResponseCallback(400);
@@ -388,7 +388,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         while((item = itemGetter.nextItem())) {
             responseData.push(z.Utilities.itemToCSLJSON(item));
         }
-        sendResponseCallback(200, jsonMediaType, 
+        sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, "  "));
     }
 }
@@ -446,7 +446,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     let items = [];
     if (q.selected) {
         let ZoteroPane = Components.classes["@mozilla.org/appshell/window-mediator;1"].
-            getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
+                getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser").ZoteroPane;
         items = ZoteroPane.getSelectedItems();
         if (!items) { items = []; }
     } else if (q.collection) {
@@ -547,11 +547,11 @@ function loadEndpoints () {
 }
 
 let observerService = Components.classes["@mozilla.org/observer-service;1"].
-    getService(Components.interfaces.nsIObserverService);
+        getService(Components.interfaces.nsIObserverService);
 
 let observer = {
-    "observe": function(subject, topic, data) { 
-        loadEndpoints(); 
+    "observe": function(subject, topic, data) {
+        loadEndpoints();
     }
 };
 
@@ -571,7 +571,7 @@ function uninstall(data, reason) {
 
 
 function installTranslator(metadata, filename) {
-    loadZotero(); 
+    loadZotero();
     let file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
                                            'resource', 'translators', filename]);
     NetUtil.asyncFetch(file, function(inputStream, status) {
@@ -593,9 +593,9 @@ function install(data, reason) {
     /* turn on http server if it is not on */
     /* TODO turn this off when uninstalled? */
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-        .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
+            .getService(Components.interfaces.nsIPrefService).getBranch("extensions.zotero.");
     prefs.setBoolPref("httpServer.enabled", true);
-    loadEndpoints(); 
+    loadEndpoints();
 
     /* load exporters */
     installTranslator(easyKeyExporterMetadata, "EasyKeyExporter.js");
