@@ -269,6 +269,11 @@ end
     assert_equal '{ | Doe, 2006 | | |zu:1254:4T8MCITQ}', resp.body
   end
 
+  def test_format_export_bad_uuid
+    resp = @client.get(@item_url, {"key" => "0_4T8MCITQ", "format" => "248bebf1-46ab-dead-beef-ec3d2960d0cd"})
+    assert_equal 400, resp.status
+  end
+
   def test_format_key
     resp = @client.get(@item_url, {"key" => "0_4T8MCITQ", "format" => "key"})
     assert_equal 200, resp.status
