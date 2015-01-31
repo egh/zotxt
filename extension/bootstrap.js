@@ -367,8 +367,8 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         }
         if (items.length === 0) {
             sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, "  "));
-        }
-        myExport(items, translatorId, 
+        } else {
+            myExport(items, translatorId, 
                      /* success */
                      function (rawKeys) {
                          let keys = rawKeys.split(" ");
@@ -380,6 +380,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                      function () {
                          sendResponseCallback(400);
                      });
+        }
     } else {
         let itemGetter = new z.Translate.ItemGetter();
         itemGetter.setItems(items);
