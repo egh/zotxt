@@ -41,6 +41,11 @@ def toJSONFilter(filters=[], metafilters=[]):
 known_keys = set([])
 
 
+def clearKnownKeys():
+    global known_keys
+    known_keys = set([])
+
+
 def extractCites(key, value, format, meta):
     global known_keys
     if key == "Cite":
