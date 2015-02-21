@@ -1,6 +1,6 @@
 .PHONY: clean
 
-zotxt.xpi: extension/install.rdf extension/bootstrap.js extension/resource/translators/EasyKeyExporter.js
+zotxt.xpi: extension/install.rdf extension/bootstrap.js extension/resource/translators/EasyKeyExporter.js test
 	cd extension && zip ../zotxt.xpi install.rdf bootstrap.js resource/translators/EasyKeyExporter.js
 
 clean:
