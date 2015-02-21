@@ -53,7 +53,7 @@ def alterMetadata(meta):
     cites = []
     for citekey in known_keys:
         try:
-            q = {'easykey': citekey.encode('utf8')}
+            q = {'easykey': citekey}
             encq = urllib.urlencode(q)
             cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
             cite["id"] = citekey
