@@ -53,18 +53,23 @@ def extractCites(key, value, format, meta):
             known_keys.add(cite['citationId'])
 
 
+def fetchItem(keytype, key):
+    encq = urllib.urlencode({keytype: key})
+    cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
+    cite["id"] = key
+    return cite
+
 def alterMetadata(meta):
     global known_keys
     cites = []
     for citekey in known_keys:
         try:
-            q = {'easykey': citekey}
-            encq = urllib.urlencode(q)
-            cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
-            cite["id"] = citekey
-            cites.append(cite)
+            cites.append(fetchItem('easykey', citekey))
         except urllib2.HTTPError, e:
-            sys.stderr.write("error with %s : %s \n" % (citekey.encode('utf8'), e.read()))
+            try:
+                cites.append(fetchItem('betterbibtexkey', citekey))
+            except urllib2.HTTPError, e:
+                sys.stderr.write("error with %s : %s \n" % (citekey.encode('utf8'), e.read()))
     tmpfile = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
     json.dump(cites, tmpfile, indent=2)
     tmpfile.close()
