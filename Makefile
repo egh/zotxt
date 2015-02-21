@@ -5,3 +5,7 @@ zotxt.xpi: extension/install.rdf extension/bootstrap.js extension/resource/trans
 
 clean:
 	rm -f zotxt.xpi
+
+test:
+	cd tests && ruby test.rb
+	cd pandoc-zotxt && nosetests
