@@ -31,7 +31,7 @@ def toJSONFilter(filters=[], metafilters=[]):
         format = sys.argv[1]
     else:
         format = ""
-        altered = doc
+    altered = doc
     for action in filters:
         altered = walk(altered, action, format, doc[0]['unMeta'])
     for action in metafilters:
