@@ -70,6 +70,29 @@ class ZotxtTest < MiniTest::Test
     i = JSON.parse(resp.body)
     assert_equal ["0_ZBZQ4KMP", "0_JQEUW7AI"], i
   end
+
+  def test_betterbibtexkey
+    resp = @client.get(@item_url, {"betterbibtexkey" => "Doe2005", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal ["0_ZBZQ4KMP"], i
+  end
+
+  def test_betterbibtexkey_two_items
+    resp = @client.get(@item_url, {"betterbibtexkey" => "Doe2005,Doe2006", "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal ["0_ZBZQ4KMP","0_4T8MCITQ"], i
+  end
+
+# doesn't work
+#  def test_betterbibtexkey_hyphen
+#    resp = @client.get(@item_url, {"betterbibtexkey" => "Roe-Doe2005", "format" => "key"})
+#    assert_equal 200, resp.status
+#    i = JSON.parse(resp.body)
+#    assert_equal ["xyz"], i
+#  end
+
   def test_items_easykey_bibliography_format
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography"})
     assert_equal 200, resp.status
@@ -231,6 +254,7 @@ end
 	journal = {Journal of Generic Studies},
 	author = {Doe, John},
 	year = {2006},
+	note = {bibtex: Doe2006},
 	pages = {33--34}
 }""", resp.body)
   end
@@ -298,6 +322,7 @@ end
       "page"=>"33-34", 
       "volume"=>"6",
       "author"=>[{"family"=>"Doe", "given"=>"John"}], 
+      "note"=>"bibtex: Doe2006",
       "issued"=>{"date-parts"=>[["2006"]]}
                    }, results[0])
   end

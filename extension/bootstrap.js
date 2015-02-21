@@ -469,6 +469,16 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
             sendResponseCallback(400, "text/plain", ex.message);
             return;
         }
+    } else if (q.betterbibtexkey) {
+        let keys = q.betterbibtexkey.split(",");
+        let vars = keys.map(function(_) { return "?"; }).join(",");
+        let sql = "select itemID from keys where citekey in (" + vars + ")";
+        let ids = z.BetterBibTeX.DB.columnQuery(sql, keys);
+        if (ids) {
+            items = ids.map(function (id) {
+                return z.Items.get(id);
+            });
+        }
     } else if (q.all) {
         items = z.Items.getAll();
     } else {
