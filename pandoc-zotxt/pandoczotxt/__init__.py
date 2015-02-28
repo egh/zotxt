@@ -26,7 +26,7 @@ MetaInlines = elt('MetaInlines', 1)
 
 
 def toJSONFilter(filters=[], metafilters=[]):
-    doc = json.loads(sys.stdin.read())
+    doc = json.loads(sys.stdin.read('utf8'))
     if len(sys.argv) > 1:
         format = sys.argv[1]
     else:
@@ -54,10 +54,12 @@ def extractCites(key, value, format, meta):
 
 
 def fetchItem(keytype, key):
-    encq = urllib.urlencode({keytype: key})
-    cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
+    keyenc = key.encode('utf8')
+    url = "http://localhost:23119/zotxt/items?%s=%s" % (keytype, urllib.quote_plus(keyenc))
+    cite = json.load(urllib2.urlopen(url))[0]
     cite["id"] = key
     return cite
+
 
 def alterMetadata(meta):
     global known_keys
@@ -69,7 +71,7 @@ def alterMetadata(meta):
             try:
                 cites.append(fetchItem('betterbibtexkey', citekey))
             except urllib2.HTTPError, e:
-                sys.stderr.write("error with %s : %s \n" % (citekey.encode('utf8'), e.read()))
+                sys.stderr.write("error with %s : %s \n" % (citekey, e.read()))
     tmpfile = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
     json.dump(cites, tmpfile, indent=2)
     tmpfile.close()
