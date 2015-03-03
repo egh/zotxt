@@ -374,4 +374,9 @@ end
     resp = @client.get(@select_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status
   end
+
+  def test_python
+    out = `echo @hüning:2012foo | pandoc -F ../pandoc-zotxt/venv/bin/pandoc-zotxt`
+    assert_equal "<p><span class=\"citation\">@hüning:2012foo</span></p>\n", out
+  end
 end

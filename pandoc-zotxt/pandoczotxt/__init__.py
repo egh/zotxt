@@ -16,6 +16,7 @@
 # along with Foobar.    If not, see <http://www.gnu.org/licenses/>.
 
 from pandocfilters import walk, Str, elt
+import codecs
 import json
 import sys
 import tempfile
@@ -26,7 +27,8 @@ MetaInlines = elt('MetaInlines', 1)
 
 
 def toJSONFilter(filters=[], metafilters=[]):
-    doc = json.loads(sys.stdin.read('utf8'))
+    reader = codecs.getreader('utf8')
+    doc = json.loads(reader(sys.stdin).read())
     if len(sys.argv) > 1:
         format = sys.argv[1]
     else:
