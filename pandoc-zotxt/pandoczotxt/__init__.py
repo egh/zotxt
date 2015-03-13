@@ -58,22 +58,28 @@ def extractCites(key, value, format, meta):
 def fetchItem(keytype, key):
     keyenc = key.encode('utf8')
     url = "http://localhost:23119/zotxt/items?%s=%s" % (keytype, urllib.quote_plus(keyenc))
-    cite = json.load(urllib2.urlopen(url))[0]
-    cite["id"] = key
-    return cite
-
+    try:
+        data = json.load(urllib2.urlopen(url))
+        if len(data) == 0:
+            return None
+        else:
+            cite = data[0]
+            cite["id"] = key
+            return cite
+    except (urllib2.HTTPError, IndexError), e:
+        return None
 
 def alterMetadata(meta):
     global known_keys
     cites = []
     for citekey in known_keys:
-        try:
-            cites.append(fetchItem('easykey', citekey))
-        except urllib2.HTTPError, e:
-            try:
-                cites.append(fetchItem('betterbibtexkey', citekey))
-            except urllib2.HTTPError, e:
-                sys.stderr.write("error with %s : %s \n" % (citekey, e.read()))
+        cite = fetchItem('easykey', citekey)
+        if cite:
+            cites.append(cite)
+        else:
+            cite = fetchItem('betterbibtexkey', citekey)
+            if cite:
+                cites.append(cite)
     tmpfile = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
     json.dump(cites, tmpfile, indent=2)
     tmpfile.close()

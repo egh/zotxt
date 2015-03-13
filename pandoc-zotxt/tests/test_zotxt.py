@@ -59,3 +59,7 @@ class ZotxtTest(TestCase):
     def test_extract_betterbibtex(self):
         clearKnownKeys()
         self.check_citekey("Doe2005", self.DOE_DATA_BIBTEX)
+
+    def test_bad_citekey(self):
+        clearKnownKeys()
+        self.check_citekey("foo:2015bar", [])
