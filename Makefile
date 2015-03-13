@@ -8,4 +8,4 @@ clean:
 
 test:
 	cd tests && ruby test.rb
-	cd pandoc-zotxt && nosetests
+	cd pandoc-zotxt && ./venv/bin/nosetests
