@@ -10,7 +10,7 @@ import subprocess
 class ZotxtTest(TestCase):
     DOE_DATA = [{u'publisher': u'Cambridge University Press', u'publisher-place': u'Cambridge', u'author': [{u'given': u'John', u'family': u'Doe'}], u'issued': {u'date-parts': [[u'2005']]}, u'title': u'First Book', u'event-place': u'Cambridge', u'type': u'book', u'id': u'doe:2005first', u'note': u'bibtex: Doe2005'}]
     DOE_DATA_BIBTEX = [{u'publisher': u'Cambridge University Press', u'publisher-place': u'Cambridge', u'author': [{u'given': u'John', u'family': u'Doe'}], u'issued': {u'date-parts': [[u'2005']]}, u'title': u'First Book', u'event-place': u'Cambridge', u'type': u'book', u'id': u'Doe2005', u'note': u'bibtex: Doe2005'}]
-    ACCENT_DATA = [{u'publisher': u'De Gruyter', u'ISBN': u'9783110283549', u'publisher-place': u'Berlin', u'language': u'German', u'title': u'Wortbildung im niederländisch-deutschen Sprachvergleich', u'issued': {u'date-parts': [[u'2012']]}, u'container-title': u'Deutsch im Sprachvergleich. Grammatische Kontraste  und Konvergenzen', u'id': u'hüning:2012foo', u'source': u'Open WorldCat', u'event-place': u'Berlin', u'collection-number': u'Institut für Deutsche Sprache, Jahrbuch 2011', u'author': [{u'literal': u'Matthias Hüning'}], u'type': u'chapter', u'page': u'161-186', u'editor': [{u'given': u'Lutz', u'family': u'Gunkel'}, {u'given': u'Gisela', u'family': u'Zifonun'}]}]
+    ACCENT_DATA = [{u'publisher': u'De Gruyter', u'ISBN': u'978-3-11-028354-9', u'publisher-place': u'Berlin', u'language': u'German', u'title': u'Wortbildung im niederländisch-deutschen Sprachvergleich', u'issued': {u'date-parts': [[u'2012']]}, u'container-title': u'Deutsch im Sprachvergleich. Grammatische Kontraste  und Konvergenzen', u'id': u'hüning:2012foo', u'source': u'Open WorldCat', u'event-place': u'Berlin', u'collection-number': u'Institut für Deutsche Sprache, Jahrbuch 2011', u'author': [{u'literal': u'Matthias Hüning'}], u'type': u'chapter', u'page': u'161-186', u'editor': [{u'given': u'Lutz', u'family': u'Gunkel'}, {u'given': u'Gisela', u'family': u'Zifonun'}]}]
     INPUT_TEMPLATE = [{"unMeta": {}},
                       [{"t": "Para",
                         "c": [{"t": "Cite",
@@ -29,7 +29,10 @@ class ZotxtTest(TestCase):
         alterMetadata(input_data[0]['unMeta'])
         jsonFile = input_data[0]['unMeta']['bibliography']['c'][0]['c']
         with open(jsonFile) as f:
-            self.assertEqual(bib_data, json.load(f))
+            test_data = json.load(f)
+            self.assertEqual(len(bib_data), len(test_data))
+            for i in range(len(bib_data)):
+                self.assertDictEqual(bib_data[i], test_data[i])
 
     def check_citekey(self, key, bib_data):
         # simple
