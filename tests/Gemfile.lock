@@ -12,3 +12,6 @@ DEPENDENCIES
   httpclient
   json
   minitest
+
+BUNDLED WITH
+   1.10.0.pre.2
