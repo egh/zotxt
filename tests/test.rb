@@ -68,7 +68,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"easykey" => "doe:2005book,roe-doe:2015hyphens", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal ["0_ZBZQ4KMP", "0_JQEUW7AI"], i
+    assert_equal ["0_ZBZQ4KMP", "0_JQEUW7AI"].sort, i.sort
   end
 
   def test_betterbibtexkey
@@ -82,7 +82,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"betterbibtexkey" => "Doe2005,Doe2006", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal ["0_ZBZQ4KMP","0_4T8MCITQ"], i
+    assert_equal ["0_ZBZQ4KMP","0_4T8MCITQ"].sort, i.sort
   end
 
 # doesn't work
