@@ -82,7 +82,7 @@ function makeCslEngine (styleId) {
     if (!style) {
         return null;
     } else {
-        let csl = style.getCiteProc(true);
+        let csl = style.getCiteProc();
         csl.opt.development_extensions.wrap_url_and_doi = true;
         return csl;
     }
