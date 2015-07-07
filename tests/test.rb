@@ -315,7 +315,7 @@ end
     resp = @client.get(@item_url, {"key" => "0_4T8MCITQ", "format" => "json"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({"id"=>2858,
+    assert_equal({"id"=>"http://zotero.org/users/1254/items/4T8MCITQ",
       "type"=>"article-journal",
       "title"=>"Article", 
       "container-title"=>"Journal of Generic Studies", 
