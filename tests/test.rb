@@ -36,6 +36,21 @@ class ZotxtTest < MiniTest::Test
     assert_equal "0_ZBZQ4KMP", i[0]
   end
 
+  def test_items_easykey_json_format
+    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "json"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal({'id'=>'http://zotero.org/users/1254/items/ZBZQ4KMP',
+                  'type'=>'book',
+                  'title'=>'First Book',
+                  'publisher'=>'Cambridge University Press',
+                  'publisher-place'=>'Cambridge',
+                  'event-place'=>'Cambridge',
+                  'note'=>'bibtex: Doe2005',
+                  'author'=>[{'family'=>'Doe', 'given'=>'John'}],
+                  'issued'=>{'date-parts'=>[['2005']]}}, i[0])
+  end
+
   def test_items_easykey_two_word
     resp = @client.get(@item_url, {"easykey" => "united_nations:2005book", "format" => "key"})
     assert_equal 200, resp.status
