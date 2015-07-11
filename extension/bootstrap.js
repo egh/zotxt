@@ -385,6 +385,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         let itemGetter = new z.Translate.ItemGetter();
         itemGetter.setItems(items);
         let responseData = [];
+        let item;
         while((item = itemGetter.nextItem())) {
             responseData.push(z.Utilities.itemToCSLJSON(item));
         }
