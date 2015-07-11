@@ -17,7 +17,6 @@
 
 Components.utils.import('resource://gre/modules/Services.jsm');
 var z;
-var console = Services.console;
 var easyKeyRe;
 var alternateEasyKeyRe;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
@@ -51,23 +50,6 @@ function loadZotero () {
         alternateEasyKeyRe = z.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
     }
 }
-
-/**
- * Proxy sys item for passing in to citeproc. Wraps the
- * zotero.Cite.System object, but allows for locally registered items.
- */
-let mySys = {
-    retrieveLocale : function (lang) {
-        return z.Cite.System.retrieveLocale(lang);
-    },
-    retrieveItem : function(id) {
-        if (z.localItems[id] != undefined) {
-            return z.localItems[id];
-        } else {
-            return z.Cite.System.retrieveItem(id);
-        }
-    }
-};
 
 function fixStyleId(styleId) {
     if (!styleId) {
@@ -397,7 +379,6 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
 }
 
 let bibliographyEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url['query']);
     let cslEngine = makeCslEngine(data.styleId);
     if (!cslEngine) {
         sendResponseCallback(400, 'text/plain', 'No style found.');
