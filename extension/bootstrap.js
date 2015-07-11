@@ -256,7 +256,7 @@ function extractIds (citationGroups) {
 }
 
 function myExport (items, translatorId, successCallback, failureCallback) {
-    let translation = new z.Translate.Export;
+    let translation = new z.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
     translation.setHandler('done', function (obj, worked) {
@@ -404,7 +404,7 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
 };
 
 let completeEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url['query']);
+    let q = cleanQuery(url.query);
     if (q.easykey) {
         let items = easyKeySearch(parseEasyKey(q.easykey));
         if (!items) {
@@ -416,7 +416,7 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
 };
 
 let searchEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url['query']);
+    let q = cleanQuery(url.query);
     if (q.q) {
         let results = search(q.q, q.method);
         handleResponseFormat(q.format, q.style, results, sendResponseCallback);
@@ -426,7 +426,7 @@ let searchEndpoint = function (url, data, sendResponseCallback) {
 };
 
 let itemsEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url['query']);
+    let q = cleanQuery(url.query);
     let items = [];
     if (q.selected) {
         let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
@@ -455,7 +455,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         }
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
-        let vars = keys.map(function(_) { return '?'; }).join(',');
+        let vars = keys.map(function() { return '?'; }).join(',');
         let sql = 'select itemID from keys where citekey in (' + vars + ')';
         let ids = z.DB.columnQuery(sql, keys);
         if (ids) {
@@ -476,7 +476,7 @@ let selectEndpoint = function (url, data, sendResponseCallback) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
             getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     ZoteroPane.show();
-    let q = cleanQuery(url['query']);
+    let q = cleanQuery(url.query);
     let item = null;
     if (q.easykey) {
         try {
