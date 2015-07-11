@@ -96,7 +96,7 @@ function runSearch(s) {
     let i = s.search();
     if (!i) {
         return [];
-    } else if (i.length == 0) {
+    } else if (i.length === 0) {
         return [];
     } else {
         return i.map(function(id) {
@@ -200,7 +200,7 @@ function findByEasyKey(key) {
                     // remove all items not in the local library
                     results = results.filter(function (item) { return item.libraryID === null; });
                 }
-                if (results.length == 0) {
+                if (results.length === 0) {
                     throw {'name': 'EasyKeyError', 'message': 'search failed to return a single item'};
                 } else if (results.length > 1) {
                     throw {'name': 'EasyKeyError', 'message': 'search return multiple items'};
@@ -225,9 +225,9 @@ function processCitationsGroup (citationGroup) {
     function processCitationItem (citation) {
         let retval = {};
         for (let x in citation) {
-            if (x == 'easyKey') {
+            if (x === 'easyKey') {
                 retval.id = findByEasyKey(citation[x]).id;
-            } else if (x == 'key') {
+            } else if (x === 'key') {
                 retval.id = findByKey(citation[x]).id;
             } else {
                 retval[x] = citation[x];
@@ -279,7 +279,7 @@ function search (query, method) {
 }
 
 function handleResponseFormat(format, style, items, sendResponseCallback) {
-    if (format == 'key') {
+    if (format === 'key') {
         let responseData = items.map (function (item) {
             return ((item.libraryID || '0') + '_' + item.key);
         });
@@ -314,7 +314,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                  function () {
                      sendResponseCallback(400);
                  });
-    } else if (format == 'recoll') {
+    } else if (format === 'recoll') {
         let responseData = [];
         for (let i in items) {
             let item = items[i];
@@ -438,7 +438,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     } else if (q.key) {
         items = q.key.split(',').map(function (key) {
             let retval = findByKey(key);
-            if (retval == false) {
+            if (retval === false) {
                 return sendResponseCallback(400, 'text/plain', 'item with key ' + key + ' not found!');
             } else {
                 return retval;
@@ -487,7 +487,7 @@ let selectEndpoint = function (url, data, sendResponseCallback) {
         }
     } else if (q.key) {
         item = findByKey(q.key);
-        if (item == false) {
+        if (item === false) {
             sendResponseCallback(400, 'text/plain', 'item with key ' + q.key + ' not found!');
             return;
         }
