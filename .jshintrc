@@ -51,7 +51,7 @@
   "unused": true,
 
   // use es6 - EGH
-  "esnext": true,
+  "moz": true,
 
   // otherwise use strict complains about bind(this) - EGH
   "validthis": true,
