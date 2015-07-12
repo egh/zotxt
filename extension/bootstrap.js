@@ -99,16 +99,18 @@ function runSearch(s) {
     } else if (i.length === 0) {
         return [];
     } else {
-        return i.map(function(id) {
+        let dedupedItems = new Set();
+        i.map(function(id) {
             return z.Items.get(id);
-        }).map(function (item) {
+        }).forEach(function (item) {
             // not Regular item or standalone note/attachment
             if (!item.isRegularItem() && item.getSource()) {
-                return z.Items.get(item.getSource());
+                dedupedItems.add(z.Items.get(item.getSource()));
             } else {
-                return item;
+                dedupedItems.add(item);
             }
         });
+        return Array.from(dedupedItems);
     }
 }
 
