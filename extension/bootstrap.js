@@ -138,12 +138,12 @@ function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, z.getCollections(null));
     } else {
-        for (let c in collections) {
-            if (collections[c].name === name) {
-                return collections[c];
+        for (let collection of collections) {
+            if (collection.name === name) {
+                return collection;
             } else {
-                if (collections[c].hasChildCollections) {
-                    let retval = getCollection(name, z.getCollections(collections[c].id));
+                if (collection.hasChildCollections) {
+                    let retval = getCollection(name, z.getCollections(collection.id));
                     if (retval) return retval;
                 }
             }
@@ -168,8 +168,8 @@ function easyKeySearch(parsedKey) {
     let s = new z.Search();
     /* allow multiple names separated by _ */
     var splitName = parsedKey.creator.split('_');
-    for (let i in splitName) {
-        s.addCondition('creator', 'contains', splitName[i]);
+    for (let name of splitName) {
+        s.addCondition('creator', 'contains', name);
     }
     if (parsedKey.title != null) {
         s.addCondition('title', 'contains', parsedKey.title);
@@ -318,13 +318,12 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                  });
     } else if (format === 'recoll') {
         let responseData = [];
-        for (let i in items) {
-            let item = items[i];
+        for (let item of items) {
             if (item.isRegularItem()) {
                 let attachments = item.getAttachments(false);
                 let attachmentPaths = [];
-                for (let a in attachments) {
-                    let attachment = z.Items.get(attachments[a]);
+                for (let attachmentId of attachments) {
+                    let attachment = z.Items.get(attachmentId);
                     if (attachment.isAttachment()) {
                         let path = attachment.getFile().path;
                         if (path) {
