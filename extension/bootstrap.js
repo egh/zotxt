@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
+/* globals Components, Set, FileUtils, NetUtil */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -66,6 +67,7 @@ function makeCslEngine (styleId) {
     if (!style) {
         return null;
     } else {
+        // jshint camelcase: false
         let csl = style.getCiteProc();
         csl.opt.development_extensions.wrap_url_and_doi = true;
         return csl;
