@@ -17,7 +17,7 @@
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
-var z;
+var Zotero;
 var easyKeyRe;
 var alternateEasyKeyRe;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
@@ -42,13 +42,13 @@ let easyKeyExporterMetadata = {
 let jsonMediaType = 'application/json; charset=UTF-8';
 
 function loadZotero () {
-    if (!z) {
-        z = Components.classes['@zotero.org/Zotero;1'].
+    if (!Zotero) {
+        Zotero = Components.classes['@zotero.org/Zotero;1'].
             getService(Components.interfaces.nsISupports).wrappedJSObject;
 
         /* these must be initialized AFTER zotero is loaded */
-        easyKeyRe = z.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
-        alternateEasyKeyRe = z.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
+        easyKeyRe = Zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
+        alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
     }
 }
 
@@ -63,7 +63,7 @@ function fixStyleId(styleId) {
 }
 
 function makeCslEngine (styleId) {
-    let style = z.Styles.get(fixStyleId(styleId));
+    let style = Zotero.Styles.get(fixStyleId(styleId));
     if (!style) {
         return null;
     } else {
@@ -103,11 +103,11 @@ function runSearch(s) {
     } else {
         let dedupedItems = new Set();
         i.map(function(id) {
-            return z.Items.get(id);
+            return Zotero.Items.get(id);
         }).forEach(function (item) {
             // not Regular item or standalone note/attachment
             if (!item.isRegularItem() && item.getSource()) {
-                dedupedItems.add(z.Items.get(item.getSource()));
+                dedupedItems.add(Zotero.Items.get(item.getSource()));
             } else {
                 dedupedItems.add(item);
             }
@@ -117,7 +117,7 @@ function runSearch(s) {
 }
 
 function rawSearch(key) {
-    let s = new z.Search();
+    let s = new Zotero.Search();
     let str = '@' + key;
     s.addCondition('joinMode', 'any');
     s.addCondition('tag', 'is', str);
@@ -138,14 +138,14 @@ function cleanQuery(q) {
 
 function getCollection(name, collections) {
     if (!collections) {
-        return getCollection(name, z.getCollections(null));
+        return getCollection(name, Zotero.getCollections(null));
     } else {
         for (let collection of collections) {
             if (collection.name === name) {
                 return collection;
             } else {
                 if (collection.hasChildCollections) {
-                    let retval = getCollection(name, z.getCollections(collection.id));
+                    let retval = getCollection(name, Zotero.getCollections(collection.id));
                     if (retval) return retval;
                 }
             }
@@ -167,7 +167,7 @@ function collectionSearch(name) {
  * Find many items by a (possibly incomplete) parsed easy key.
  */
 function easyKeySearch(parsedKey) {
-    let s = new z.Search();
+    let s = new Zotero.Search();
     /* allow multiple names separated by _ */
     var splitName = parsedKey.creator.split('_');
     for (let name of splitName) {
@@ -218,8 +218,8 @@ function findByEasyKey(key) {
 }
 
 function findByKey(key) {
-    let lkh = z.Items.parseLibraryKeyHash(key);
-    return z.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+    let lkh = Zotero.Items.parseLibraryKeyHash(key);
+    return Zotero.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
 }
 
 /**
@@ -260,7 +260,7 @@ function extractIds (citationGroups) {
 }
 
 function myExport (items, translatorId, successCallback, failureCallback) {
-    let translation = new z.Translate.Export();
+    let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
     translation.setHandler('done', function (obj, worked) {
@@ -276,7 +276,7 @@ function myExport (items, translatorId, successCallback, failureCallback) {
 
 function search (query, method) {
     if (!method) { method = 'titleCreatorYear'; }
-    let s = new z.Search();
+    let s = new Zotero.Search();
     s.addCondition('joinMode', 'any');
     s.addCondition('quicksearch-' + method, 'contains', query);
     return runSearch(s);
@@ -295,9 +295,9 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
             csl.updateItems([item.id], true);
             return {
                 'key': ((item.libraryID || '0') + '_' + item.key),
-                'html': z.Cite.makeFormattedBibliography(csl, 'html'),
+                'html': Zotero.Cite.makeFormattedBibliography(csl, 'html'),
                 // strip newlines
-                'text': z.Cite.makeFormattedBibliography(csl, 'text')
+                'text': Zotero.Cite.makeFormattedBibliography(csl, 'text')
                     .replace(/(\r\n|\n|\r)/gm,'')
             };
         });
@@ -325,7 +325,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                 let attachments = item.getAttachments(false);
                 let attachmentPaths = [];
                 for (let attachmentId of attachments) {
-                    let attachment = z.Items.get(attachmentId);
+                    let attachment = Zotero.Items.get(attachmentId);
                     if (attachment.isAttachment()) {
                         let path = attachment.getFile().path;
                         if (path) {
@@ -338,7 +338,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                 });
                 responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
                                    'creators': creators,
-                                   'modified': z.Date.dateToISO(z.Date.sqlToDate(item.dateModified)),
+                                   'modified': Zotero.Date.dateToISO(Zotero.Date.sqlToDate(item.dateModified)),
                                    'title': item.getField('title'),
                                    'paths': attachmentPaths});
             }
@@ -369,12 +369,12 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                      });
         }
     } else {
-        let itemGetter = new z.Translate.ItemGetter();
+        let itemGetter = new Zotero.Translate.ItemGetter();
         itemGetter.setItems(items);
         let responseData = [];
         let item;
         while((item = itemGetter.nextItem())) {
-            responseData.push(z.Utilities.itemToCSLJSON(item));
+            responseData.push(Zotero.Utilities.itemToCSLJSON(item));
         }
         sendResponseCallback(200, jsonMediaType,
                              JSON.stringify(responseData, null, '  '));
@@ -460,14 +460,14 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         let keys = q.betterbibtexkey.split(',');
         let vars = keys.map(function() { return '?'; }).join(',');
         let sql = 'select itemID from keys where citekey in (' + vars + ')';
-        let ids = z.DB.columnQuery(sql, keys);
+        let ids = Zotero.DB.columnQuery(sql, keys);
         if (ids) {
             items = ids.map(function (id) {
-                return z.Items.get(id);
+                return Zotero.Items.get(id);
             });
         }
     } else if (q.all) {
-        items = z.Items.getAll();
+        items = Zotero.Items.getAll();
     } else {
         sendResponseCallback(400, 'text/plain', 'No param supplied!');
     }
@@ -538,7 +538,7 @@ let endpoints = {
 function loadEndpoints () {
     loadZotero();
     for (let e in endpoints) {
-        let ep = z.Server.Endpoints['/zotxt/' + e] = function() {};
+        let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
         ep.prototype = endpoints[e];
     }
 }
@@ -566,20 +566,19 @@ function uninstall(data, reason) {
     /* TODO uninstall exporters? */
 }
 
-
 function installTranslator(metadata, filename) {
     loadZotero();
     let file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
                                            'resource', 'translators', filename]);
     NetUtil.asyncFetch(file, function(inputStream, status) {
         if (!Components.isSuccessCode(status)) {
-            z.debug('error reading file');
+            Zotero.debug('error reading file');
             return;
         }
 
         let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-        z.Translators.save(metadata, data);
-        z.Translators.init();
+        Zotero.Translators.save(metadata, data);
+        Zotero.Translators.init();
     });
 }
 
