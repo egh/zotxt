@@ -320,10 +320,22 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                  function () {
                      sendResponseCallback(400);
                  });
-    } else if (format === 'recoll') {
+    } else if (format === 'quickBib') {
         let responseData = [];
         for (let item of items) {
             if (item.isRegularItem()) {
+                let creators = item.getCreators();
+                let creatorString = "";
+                if (creators.length > 0) {
+                    creatorString = creators[0].ref.lastName + ', ' + creators[0].ref.firstName;
+                }
+                responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
+                                   'quickBib': creatorString + ' - ' + item.getField('title')});
+            }
+        }
+        sendResponseCallback(200, jsonMediaType,
+                             JSON.stringify(responseData, null, '  '));
+
     } else if (format === 'paths') {
         let promises = [];
         let responseData = [];
