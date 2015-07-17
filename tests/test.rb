@@ -51,6 +51,24 @@ class ZotxtTest < MiniTest::Test
                   'issued'=>{'date-parts'=>[['2005']]}}, i[0])
   end
 
+  def test_items_easykey_paths_format
+    resp = @client.get(@item_url, {'easykey' => 'doe:2006article', 'format' => 'paths'})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal('0_4T8MCITQ', i[0]['key'])
+    # assert_match not working?
+    assert(i[0]['paths'][0] =~ %r{zotero/storage/QWFHQ73F/doe$})
+
+    # should be fetched afer deletion
+    File.unlink(i[0]['paths'][0])
+    resp = @client.get(@item_url, {'easykey' => 'doe:2006article', 'format' => 'paths'})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal('0_4T8MCITQ', i[0]['key'])
+    # assert_match not working?
+    assert(i[0]['paths'][0] =~ %r{zotero/storage/QWFHQ73F/doe$}, 'no path')
+  end
+
   def test_items_easykey_two_word
     resp = @client.get(@item_url, {"easykey" => "united_nations:2005book", "format" => "key"})
     assert_equal 200, resp.status
@@ -270,7 +288,8 @@ end
 	author = {Doe, John},
 	year = {2006},
 	note = {bibtex: Doe2006},
-	pages = {33--34}
+	pages = {33--34},
+	file = {doe:/home/egh/.mozilla/firefox/xmv76vsh.default/zotero/storage/QWFHQ73F/doe:text/plain}
 }""", resp.body)
   end
 

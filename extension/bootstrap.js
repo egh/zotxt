@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* globals Components, Set, FileUtils, NetUtil */
+/* globals Components, Set, FileUtils, NetUtil, Q */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
+
 var Zotero;
 var easyKeyRe;
 var alternateEasyKeyRe;
@@ -47,6 +48,7 @@ function loadZotero () {
             getService(Components.interfaces.nsISupports).wrappedJSObject;
 
         /* these must be initialized AFTER zotero is loaded */
+        Components.utils.import('resource://zotero/q.js');
         easyKeyRe = Zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
         alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
     }
@@ -322,29 +324,43 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         let responseData = [];
         for (let item of items) {
             if (item.isRegularItem()) {
+    } else if (format === 'paths') {
+        let promises = [];
+        let responseData = [];
+        for (let item of items) {
+            if (item.isRegularItem()) {
                 let attachments = item.getAttachments(false);
                 let attachmentPaths = [];
+                let itemPromises = [];
                 for (let attachmentId of attachments) {
                     let attachment = Zotero.Items.get(attachmentId);
                     if (attachment.isAttachment()) {
                         let path = attachment.getFile().path;
                         if (path) {
                             attachmentPaths.push(path);
+                        } else {
+                            /* Need to download from storage */
+                            let promise = Q.fcall(function () {
+                                return Zotero.Sync.Storage.downloadFile(attachment);
+                                                                 // { onProgress: function () {} });
+                            }).then(function () {
+                                attachmentPaths.push(attachment.getFile().path);
+                            });
+                            itemPromises.push(promise);
+                            promises.push(promise);
                         }
                     }
                 }
-                let creators = item.getCreators().map (function (c) {
-                    return c.ref.firstName + ' ' + c.ref.lastName;
+                Q.allResolved(itemPromises).then(function () {
+                    responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
+                                       'paths': attachmentPaths});
                 });
-                responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
-                                   'creators': creators,
-                                   'modified': Zotero.Date.dateToISO(Zotero.Date.sqlToDate(item.dateModified)),
-                                   'title': item.getField('title'),
-                                   'paths': attachmentPaths});
             }
         }
-        sendResponseCallback(200, jsonMediaType,
-                             JSON.stringify(responseData, null, '  '));
+        Q.allResolved(promises).then(function () {
+            sendResponseCallback(200, jsonMediaType,
+                                 JSON.stringify(responseData, null, '  '));
+        });
     } else if (format === 'easykey' || format === 'betterbibtexkey') {
         let translatorId = null;
         if (format === 'easykey') {
