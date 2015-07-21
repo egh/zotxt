@@ -311,7 +311,14 @@ end
     results = JSON.parse(resp.body)
     assert_equal "doe:2006article", results[0]
   end
-  
+
+  def test_format_easykey_clean_html
+    resp = @client.get(@item_url, {"easykey" => "doe:2007why", "format" => "easykey"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "doe:2007why", results[0]
+  end
+
   def test_selected
     resp = @client.get(@item_url, {"selected" => "t", "format" => "easykey"})
     assert_equal 200, resp.status
