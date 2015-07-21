@@ -29,7 +29,7 @@ function determineYear (item) {
 }
 
 function stripFormatting(str) {
-    return str.replace(new RegExp("(</?i>|</?b>|</?sub>|</?sup>|</span>|<span style=[\"']font-variant:small-caps;?[\"']>)", "g"), "");
+    return str.replace(new RegExp("(</?i>|</?b>|</?sub>|</?sup>|</span>|<span[^>]+>)", "g"), "");
 }
 
 function cleanString(string) {
