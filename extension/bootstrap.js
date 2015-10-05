@@ -424,8 +424,10 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
             retval.bibliography = cslEngine.makeBibliography();
             retval.citationClusters = [];
             citationGroups.map (function (citationGroup) {
-                retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
-            });
+		cslEngine.appendCitationCluster(citationGroup).map(function(updated) {
+		    retval.citationClusters[updated[0]] = updated[1];
+		});
+	    });
             sendResponseCallback(200, jsonMediaType, JSON.stringify(retval, null, '  '));
             return;
         } catch (ex if (ex.name === 'EasyKeyError')) {

@@ -143,7 +143,7 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert(i[0].key? 'html')
-end
+  end
 
   def test_items_key
     resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMP", "format" => "key"})
@@ -174,7 +174,6 @@ end
   def test_selected
     resp = @client.get(@item_url, {"selected" => "selected" })
     assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
   end
 
   def test_bibliography
@@ -191,7 +190,24 @@ end
     i = JSON.parse(resp.body)
     assert_equal ["(Doe 2005)"], i["citationClusters"]
   end
-  
+
+  def test_ambiguous_bibliography
+    r = {
+      "styleId" => "chicago-author-date",
+      "citationGroups" => [
+        { "citationItems" => [ { "easyKey" => "jenkins:2011jesus" } ],
+          "properties" => { "index" => 0, "noteIndex" => 0 } },
+        { "citationItems" => [ { "easyKey" => "jenkins:2009lost" } ],
+          "properties" => { "index" => 1, "noteIndex" => 0 } }
+      ]
+    }
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal ["(J.P. Jenkins 2011)", "(P. Jenkins 2009)"], i["citationClusters"]
+  end
+
   def test_bibliography_key
     r = {
       "styleId" => "chicago-author-date",
