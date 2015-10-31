@@ -488,12 +488,10 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         }
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
-        let vars = keys.map(function() { return '?'; }).join(',');
-        let sql = 'select itemID from keys where citekey in (' + vars + ')';
-        let ids = Zotero.DB.columnQuery(sql, keys);
-        if (ids) {
-            items = ids.map(function (id) {
-                return Zotero.Items.get(id);
+        let results = Zotero.BetterBibTeX.DB.keys.find({ citekey: { '$in' : keys } });
+        if (results) {
+            items = results.map(function (result) {
+                return Zotero.Items.get(result.itemID);
             });
         }
     } else if (q.all) {
