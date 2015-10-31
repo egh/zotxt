@@ -205,7 +205,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal ["(J.P. Jenkins 2011)", "(P. Jenkins 2009)"], i["citationClusters"]
+    assert_equal ["(J. P. Jenkins 2011)", "(P. Jenkins 2009)"], i["citationClusters"]
   end
 
   def test_bibliography_key
