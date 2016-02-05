@@ -9,7 +9,7 @@ setup(name='pandoc-zotxt',
       ],
       author='Erik Hetzner',
       author_email='egh@e6h.org',
-      url='https://bitbucket.org/egh/zotxt',
+      url='https://gitlab.com/egh/zotxt',
       packages=find_packages(exclude=[
           'tests']),
       entry_points={
