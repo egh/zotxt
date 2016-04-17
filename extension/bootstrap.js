@@ -265,6 +265,9 @@ function myExport (items, translatorId, successCallback, failureCallback) {
     let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
+    if (translatorId === Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID) {
+      translation.setDisplayOptions({quickCopyMode: 'pandoc'});
+    }
     translation.setHandler('done', function (obj, worked) {
         if (worked) {
             successCallback(obj.string);
@@ -378,7 +381,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         if (format === 'easykey') {
             translatorId = easyKeyExporterMetadata.translatorID;
         } else {
-            translatorId = '4c52eb69-e778-4a78-8ca2-4edf024a5074';
+            translatorId = Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID;
         }
         if (items.length === 0) {
             sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, '  '));
