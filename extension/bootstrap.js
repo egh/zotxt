@@ -265,7 +265,7 @@ function myExport (items, translatorId, successCallback, failureCallback) {
     let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
-    if (translatorId === Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID) {
+    if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID)) {
       translation.setDisplayOptions({quickCopyMode: 'pandoc'});
     }
     translation.setHandler('done', function (obj, worked) {
@@ -381,7 +381,12 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
         if (format === 'easykey') {
             translatorId = easyKeyExporterMetadata.translatorID;
         } else {
-            translatorId = Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID;
+            if (!Zotero.BetterBibTeX) {
+                sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
+                return;
+            } else {
+                translatorId = Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID;
+            }
         }
         if (items.length === 0) {
             sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, '  '));
@@ -491,6 +496,10 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         }
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
+        if (!Zotero.BetterBibTeX) {
+            sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
+            return;
+        }
         let results = Zotero.BetterBibTeX.DB.keys.find({ citekey: { '$in' : keys } });
         if (results) {
             items = results.map(function (result) {
