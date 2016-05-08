@@ -1,0 +1,306 @@
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:z="http://www.zotero.org/namespaces/export#"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/"
+ xmlns:link="http://purl.org/rss/1.0/modules/link/"
+ xmlns:vcard="http://nwalsh.com/rdf/vCard#">
+    <bib:Article rdf:about="#item_363">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <prism:volume>6</prism:volume>
+                <dc:title>Journal of Generic Studies</dc:title>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenname>John</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_8229"/>
+        <bib:pages>33-34</bib:pages>
+        <dc:date>2006</dc:date>
+        <dc:description>bibtex: Doe2006</dc:description>
+        <dc:title>Article</dc:title>
+    </bib:Article>
+    <z:Attachment rdf:about="#item_8229">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="storage:doe"/>
+        <dc:title>doe</dc:title>
+        <link:type>text/plain</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="#item_709">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                   <foaf:Person><foaf:surname>Hüáéèñ</foaf:surname></foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2015</dc:date>
+        <dc:title>acćénts</dc:title>
+    </bib:Book>
+    <rdf:Description rdf:about="#item_1139">
+        <z:itemType>document</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Roe Doe</foaf:surname>
+                        <foaf:givenname>Jane</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2015</dc:date>
+        <dc:title>Double Name</dc:title>
+    </rdf:Description>
+    <bib:Memo rdf:about="#item_1445">
+        <z:itemType>note</z:itemType>
+        <rdf:value>&lt;p&gt;Test standalone.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Hello world.&lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <bib:Book rdf:about="#item_1760">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                       <foaf:surname>United Nations</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2005</dc:date>
+        <dc:title>A Wonderful book</dc:title>
+    </bib:Book>
+    <rdf:Description rdf:about="#item_2300">
+        <z:itemType>document</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Roe-Doe</foaf:surname>
+                        <foaf:givenname>John</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2015</dc:date>
+        <dc:description>bibtex: Roe-Doe2015</dc:description>
+        <dc:title>Hyphens</dc:title>
+    </rdf:Description>
+    <bib:BookSection rdf:about="urn:isbn:978-3-11-028354-9">
+        <z:itemType>bookSection</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Book>
+                <dcterms:isPartOf>
+                    <bib:Series>
+                        <dc:identifier>Institut für Deutsche Sprache, Jahrbuch 2011</dc:identifier>
+                    </bib:Series>
+                </dcterms:isPartOf>
+                <dc:identifier>ISBN 978-3-11-028354-9</dc:identifier>
+                <dc:title>Deutsch im Sprachvergleich. Grammatische Kontraste  und Konvergenzen</dc:title>
+            </bib:Book>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Berlin</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>De Gruyter</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                       <foaf:surname>Matthias Hüning</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <bib:editors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Gunkel</foaf:surname>
+                        <foaf:givenname>Lutz</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Zifonun</foaf:surname>
+                        <foaf:givenname>Gisela</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:editors>
+        <dc:subject>@hüning:2012foo</dc:subject>
+        <bib:pages>161-186</bib:pages>
+        <dc:date>2012</dc:date>
+        <z:libraryCatalog>Open WorldCat</z:libraryCatalog>
+        <z:language>German</z:language>
+        <dc:title>Wortbildung im niederländisch-deutschen Sprachvergleich</dc:title>
+    </bib:BookSection>
+    <bib:BookSection rdf:about="#item_3398">
+        <z:itemType>bookSection</z:itemType>
+        <dcterms:isPartOf>
+           <bib:Book><dc:title>Third Book</dc:title></bib:Book>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Oxford</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>Oxford University Press</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:editors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Smith</foaf:surname>
+                        <foaf:givenname>Sam</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:editors>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenname>John</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Roe</foaf:surname>
+                        <foaf:givenname>Jenny</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2007</dc:date>
+        <dc:title>&lt;i&gt;Why Water&lt;/i&gt; Is Wet</dc:title>
+    </bib:BookSection>
+    <rdf:Description rdf:about="#item_3468">
+        <z:itemType>document</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenname>Jane</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2015</dc:date>
+        <dc:title>Duplicated in group library</dc:title>
+    </rdf:Description>
+    <bib:Book rdf:about="#item_3992">
+        <z:itemType>book</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Cambridge</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>Cambridge University Press</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenname>John</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2005</dc:date>
+        <dc:description>bibtex: Doe2005</dc:description>
+        <dc:title>First Book</dc:title>
+    </bib:Book>
+    <bib:Book rdf:about="urn:isbn:978-0-06-176893-4">
+        <z:itemType>book</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>New York</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>HarperOne</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Jenkins</foaf:surname>
+                        <foaf:givenname>John Philip</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <prism:edition>Reprint edition</prism:edition>
+        <dc:identifier>ISBN 978-0-06-176893-4</dc:identifier>
+        <dc:date>March 8, 2011</dc:date>
+        <z:libraryCatalog>Amazon</z:libraryCatalog>
+        <z:language>English</z:language>
+        <dc:title>Jesus Wars: How Four Patriarchs, Three Queens, and Two Emperors Decided What Christians Would Believe for the Next 1,500 years</dc:title>
+        <z:shortTitle>Jesus Wars</z:shortTitle>
+        <z:numPages>352</z:numPages>
+    </bib:Book>
+    <bib:Book rdf:about="urn:isbn:978-0-06-147281-7">
+        <z:itemType>book</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>New York, NY</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>HARPER COLLINS PUBLISHERS</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Jenkins</foaf:surname>
+                        <foaf:givenname>Philip</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <prism:edition>Reprint edition</prism:edition>
+        <dc:identifier>ISBN 978-0-06-147281-7</dc:identifier>
+        <dc:date>1 Dec. 2009</dc:date>
+        <z:libraryCatalog>Amazon</z:libraryCatalog>
+        <z:language>English</z:language>
+        <dcterms:abstract>--This text refers to an alternate Paperback edition.</dcterms:abstract>
+        <dc:title>The Lost History of Christianity</dc:title>
+        <z:numPages>304</z:numPages>
+    </bib:Book>
+</rdf:RDF>
