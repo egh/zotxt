@@ -282,8 +282,10 @@ function myExport (items, translatorId, successCallback, failureCallback) {
 function search (query, method) {
     if (!method) { method = 'titleCreatorYear'; }
     let s = new Zotero.Search();
-    s.addCondition('joinMode', 'any');
-    s.addCondition('quicksearch-' + method, 'contains', query);
+    s.addCondition('joinMode', 'all');
+    for (let word of query.split(/(?:\+|\s+)/)) {
+        s.addCondition('quicksearch-' + method, 'contains', word);
+    }
     return runSearch(s);
 }
 
