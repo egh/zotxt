@@ -334,8 +334,11 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                 if (creators.length > 0) {
                     creatorString = creators[0].ref.lastName + ', ' + creators[0].ref.firstName;
                 }
+                if (creators.length > 1) {
+                    creatorString += ", et al.";
+                }
                 responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
-                                   'quickBib': creatorString + ' - ' + item.getField('title')});
+                                   'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
             }
         }
         sendResponseCallback(200, jsonMediaType,
