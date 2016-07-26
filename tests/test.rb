@@ -54,7 +54,6 @@ class ZotxtTest < MiniTest::Test
                   'publisher'=>'Cambridge University Press',
                   'publisher-place'=>'Cambridge',
                   'event-place'=>'Cambridge',
-                  'note'=>'bibtex: Doe2005',
                   'author'=>[{'family'=>'Doe', 'given'=>'John'}],
                   'issued'=>{'date-parts'=>[['2005']]}}, i[0])
   end
@@ -115,14 +114,14 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_betterbibtexkey
-    resp = @client.get(@item_url, {"betterbibtexkey" => "Doe2005", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "doe_first_2005", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key], i
   end
 
   def test_betterbibtexkey_two_items
-    resp = @client.get(@item_url, {"betterbibtexkey" => "Doe2005,Doe2006", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "doe_first_2005,doe_article_2006", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key,@doe_article_key].sort, i.sort
@@ -316,7 +315,6 @@ class ZotxtTest < MiniTest::Test
 	journal = {Journal of Generic Studies},
 	author = {Doe, John},
 	year = {2006},
-	note = {bibtex: Doe2006},
 	pages = {33--34},
 	file = {doe:/home/egh/.mozilla/firefox/xmv76vsh.default/zotero/storage/QWFHQ73F/doe:text/plain}
 }""", resp.body)
@@ -359,7 +357,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "betterbibtexkey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal "Doe2006", results[0]
+    assert_equal "doe_article_2006", results[0]
   end
 
   def test_format_export_uuid
@@ -392,7 +390,6 @@ class ZotxtTest < MiniTest::Test
       "page"=>"33-34",
       "volume"=>"6",
       "author"=>[{"family"=>"Doe", "given"=>"John"}],
-      "note"=>"bibtex: Doe2006",
       "issued"=>{"date-parts"=>[["2006"]]}
                    }, results[0])
   end
