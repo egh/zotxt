@@ -22,6 +22,7 @@ var Zotero;
 var easyKeyRe;
 var alternateEasyKeyRe;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
+var timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
 
 let easyKeyExporterMetadata = {
     'translatorID':'9d774afe-a51d-4055-a6c7-23bc96d19fe7',
@@ -43,15 +44,20 @@ let easyKeyExporterMetadata = {
 let jsonMediaType = 'application/json; charset=UTF-8';
 
 function loadZotero () {
-    if (!Zotero) {
-        Zotero = Components.classes['@zotero.org/Zotero;1'].
-            getService(Components.interfaces.nsISupports).wrappedJSObject;
-
-        /* these must be initialized AFTER zotero is loaded */
-        Components.utils.import('resource://zotero/q.js');
-        easyKeyRe = Zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
-        alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
-    }
+    let callback = function (resolve, reject) {
+        if (!Zotero) {
+            if (!("@zotero.org/Zotero;1" in Components.classes)) {
+                return timer.initWithCallback(function () { return callback(resolve, reject); }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+            } else {
+                Zotero = Components.classes["@zotero.org/Zotero;1"]
+                    .getService(Components.interfaces.nsISupports).wrappedJSObject;
+                easyKeyRe = Zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
+                alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
+                return resolve(Zotero);
+            }
+        }
+    };
+    return new Promise(callback);
 }
 
 function fixStyleId(styleId) {
@@ -593,11 +599,12 @@ let endpoints = {
  * Function to load our endpoints into the Zotero connector server.
  */
 function loadEndpoints () {
-    loadZotero();
-    for (let e in endpoints) {
-        let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
-        ep.prototype = endpoints[e];
-    }
+    loadZotero().then(function () {
+        for (let e in endpoints) {
+            let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
+            ep.prototype = endpoints[e];
+        }
+    });
 }
 
 let observerService = Components.classes['@mozilla.org/observer-service;1'].
@@ -624,7 +631,6 @@ function uninstall(data, reason) {
 }
 
 function installTranslator(metadata, filename) {
-    loadZotero();
     let file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
                                            'resource', 'translators', filename]);
     NetUtil.asyncFetch(file, function(inputStream, status) {
@@ -645,11 +651,13 @@ function install(data, reason) {
 
     /* turn on http server if it is not on */
     /* TODO turn this off when uninstalled? */
-    let prefs = Components.classes['@mozilla.org/preferences-service;1']
+    loadZotero().then(function () {
+        let prefs = Components.classes['@mozilla.org/preferences-service;1']
             .getService(Components.interfaces.nsIPrefService).getBranch('extensions.zotero.');
-    prefs.setBoolPref('httpServer.enabled', true);
-    loadEndpoints();
+        prefs.setBoolPref('httpServer.enabled', true);
+        loadEndpoints();
 
-    /* load exporters */
-    installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
+        /* load exporters */
+        installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
+    });
 }
