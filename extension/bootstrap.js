@@ -265,7 +265,7 @@ function myExport (items, translatorId, successCallback, failureCallback) {
     let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
-    if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID)) {
+    if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'))) {
       translation.setDisplayOptions({quickCopyMode: 'pandoc'});
     }
     translation.setHandler('done', function (obj, worked) {
@@ -390,7 +390,7 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                 sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
                 return;
             } else {
-                translatorId = Zotero.BetterBibTeX.translators.BetterBibTeXQuickCopy.translatorID;
+                translatorId = Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy');
             }
         }
         if (items.length === 0) {
@@ -505,7 +505,7 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
             sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
             return;
         }
-        let results = Zotero.BetterBibTeX.DB.keys.find({ citekey: { '$in' : keys } });
+        let results = Zotero.BetterBibTeX.DB.keys.findObjects({citekey: { '$in': keys }, libraryID: null});
         if (results) {
             items = results.map(function (result) {
                 return Zotero.Items.get(result.itemID);
