@@ -410,15 +410,27 @@ function handleResponseFormat(format, style, items, sendResponseCallback) {
                      });
         }
     } else {
-        let itemGetter = new Zotero.Translate.ItemGetter();
-        itemGetter.setItems(items);
-        let responseData = [];
-        let item;
-        while((item = itemGetter.nextItem())) {
-            responseData.push(Zotero.Utilities.itemToCSLJSON(item));
+        /* Use BetterBibTeX JSON if available */
+        if (Zotero.BetterBibTeX) {
+            let translatorId = Zotero.BetterBibTeX.Translators.getID('Better CSL JSON');
+            myExport(items, translatorId,
+                     function (output) {
+                         sendResponseCallback(200, 'text/plain; charset=UTF-8', output);
+                     },
+                     function () {
+                         sendResponseCallback(400);
+                     });
+        } else {
+            let itemGetter = new Zotero.Translate.ItemGetter();
+            itemGetter.setItems(items);
+            let responseData = [];
+            let item;
+            while((item = itemGetter.nextItem())) {
+                responseData.push(Zotero.Utilities.itemToCSLJSON(item));
+            }
+            sendResponseCallback(200, jsonMediaType,
+                                 JSON.stringify(responseData, null, '  '));
         }
-        sendResponseCallback(200, jsonMediaType,
-                             JSON.stringify(responseData, null, '  '));
     }
 }
 
