@@ -443,7 +443,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_python
-    out = `echo @hüning:2012foo | pandoc -F ../pandoc-zotxt/venv/bin/pandoc-zotxt`
+    out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt`
     assert_equal "<p><span class=\"citation\">@hüning:2012foo</span></p>\n", out
   end
 end
