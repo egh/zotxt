@@ -35,9 +35,9 @@ def toJSONFilter(filters=[], metafilters=[]):
         format = ""
     altered = doc
     for action in filters:
-        altered = walk(altered, action, format, doc[0]['unMeta'])
+        altered = walk(altered, action, format, doc['meta'])
     for action in metafilters:
-        action(altered[0]['unMeta'])
+        action(altered['meta'])
         json.dump(altered, sys.stdout)
 
 known_keys = set([])
