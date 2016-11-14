@@ -8,27 +8,27 @@ import subprocess
 
 
 class ZotxtTest(TestCase):
-    DOE_DATA = [{u'publisher': u'Cambridge University Press', u'publisher-place': u'Cambridge', u'author': [{u'given': u'John', u'family': u'Doe'}], u'issued': {u'date-parts': [[u'2005']]}, u'title': u'First Book', u'event-place': u'Cambridge', u'type': u'book', u'id': u'doe:2005first', u'note': u'bibtex: Doe2005'}]
+    DOE_DATA = [{u'publisher': u'Cambridge University Press', u'publisher-place': u'Cambridge', u'author': [{u'given': u'John', u'family': u'Doe'}], u'issued': {u'date-parts': [[u'2005']]}, u'title': u'First Book', u'event-place': u'Cambridge', u'type': u'book', u'id': u'doe:2005first'}]
     DOE_DATA_BIBTEX = [{u'publisher': u'Cambridge University Press', u'publisher-place': u'Cambridge', u'author': [{u'given': u'John', u'family': u'Doe'}], u'issued': {u'date-parts': [[u'2005']]}, u'title': u'First Book', u'event-place': u'Cambridge', u'type': u'book', u'id': u'Doe2005', u'note': u'bibtex: Doe2005'}]
     ACCENT_DATA = [{u'publisher': u'De Gruyter', u'ISBN': u'978-3-11-028354-9', u'publisher-place': u'Berlin', u'language': u'German', u'title': u'Wortbildung im niederländisch-deutschen Sprachvergleich', u'issued': {u'date-parts': [[u'2012']]}, u'container-title': u'Deutsch im Sprachvergleich. Grammatische Kontraste  und Konvergenzen', u'id': u'hüning:2012foo', u'source': u'Open WorldCat', u'event-place': u'Berlin', u'collection-number': u'Institut für Deutsche Sprache, Jahrbuch 2011', u'author': [{u'literal': u'Matthias Hüning'}], u'type': u'chapter', u'page': u'161-186', u'editor': [{u'given': u'Lutz', u'family': u'Gunkel'}, {u'given': u'Gisela', u'family': u'Zifonun'}]}]
-    INPUT_TEMPLATE = [{"unMeta": {}},
+    INPUT_TEMPLATE = {"meta": {},
+                      "blocks":
                       [{"t": "Para",
                         "c": [{"t": "Cite",
                                "c": [[{"citationSuffix": [],
                                        "citationNoteNum": 0,
-                                       "citationMode": {"t": "AuthorInText",
-                                                        "c": []},
+                                       "citationMode": {"t": "AuthorInText"},
                                        "citationPrefix": [],
                                        "citationId": "REPLACE_ME",
                                        "citationHash": 0}],
                                      [{"t": "Str",
-                                       "c": "@REPLACE_ME"}]]}]}]]
+                                       "c": "@REPLACE_ME"}]]}]}]}
 
     def checker(self, input_data, bib_data):
         walk(input_data, extractCites, 'json', {})
-        alterMetadata(input_data[0]['unMeta'])
-        jsonFile = input_data[0]['unMeta']['bibliography']['c'][0]['c']
-        with open(jsonFile) as f:
+        alterMetadata(input_data['meta'])
+        json_file = input_data['meta']['bibliography']['c'][0]['c']
+        with open(json_file) as f:
             test_data = json.load(f)
             self.assertEqual(len(bib_data), len(test_data))
             for i in range(len(bib_data)):
@@ -37,8 +37,8 @@ class ZotxtTest(TestCase):
     def check_citekey(self, key, bib_data):
         # simple
         input_data = deepcopy(self.INPUT_TEMPLATE)
-        input_data[1][0]["c"][0]["c"][0][0]["citationId"] = key
-        input_data[1][0]["c"][0]["c"][1][0]["c"] = "@%s" % (key)
+        input_data['blocks'][0]["c"][0]["c"][0][0]["citationId"] = key
+        input_data['blocks'][0]["c"][0]["c"][1][0]["c"] = "@%s" % (key)
         self.checker(input_data, bib_data)
 
         # pandoc integration
