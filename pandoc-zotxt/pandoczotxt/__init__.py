@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.    If not, see <http://www.gnu.org/licenses/>.
 
-from pandocfilters import walk, Str, elt
-import codecs
 import json
+import urllib2
 import sys
 import tempfile
+<<<<<<< Updated upstream
 import urllib
 import urllib2
 
@@ -85,6 +85,17 @@ def alterMetadata(meta):
     tmpfile.close()
     meta['bibliography'] = MetaInlines([Str(tmpfile.name)])
 
+=======
+>>>>>>> Stashed changes
 
 def run():
-        toJSONFilter(filters=[extractCites], metafilters=[alterMetadata])
+    request = urllib2.Request("http://localhost:23119/zotxt/pandoc",
+                              sys.stdin.read(),
+                              headers={"Content-Type" : "application/json"})
+    doc = json.loads(urllib2.urlopen(request).read())
+    bib_url = doc[0]['unMeta']['bibliography']['c'][0]['c']
+    request = urllib2.urlopen(bib_url).read()
+    print request
+    tmpfile = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
+    json.dump(doc
+-   json.dump(cites, tmpfile, indent=2)

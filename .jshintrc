@@ -52,6 +52,7 @@
 
   // use es6 - EGH
   "moz": true,
+  "esnext": true,
 
   // otherwise use strict complains about bind(this) - EGH
   "validthis": true,

@@ -18,6 +18,90 @@
 
 Components.utils.import('resource://gre/modules/Services.jsm');
 
+/**
+ * Pandoc filter, reworked from Python
+ */
+
+function elt(eltType, numargs) {
+    if (numargs === 1) {
+        return function() {
+	    return {'t': eltType, 'c': arguments[0]};
+        };
+    } else {
+        return function() {
+            return {'t': eltType, 'c': Array.prototype.slice.call(arguments)};
+        };
+    }
+}
+
+function walk(thing, action, format, meta) {
+    if (Array.isArray(thing)) {
+        let retval = [];
+        thing.forEach(function(item) {
+            if (item === Object(item) && item.t) {
+                let res = action(item.t, item.c, format, meta);
+                if (!res) {
+                    retval.push(walk(item, action, format, meta));
+                } else if (Array.isArray(res)) {
+                    res.forEach(function(item2) {
+                        retval.push(walk(item2, action, format, meta));
+                    });
+                } else {
+                    retval.push(walk(res, action, format, meta));
+                }
+            } else {
+                retval.push(walk(item, action, format, meta));
+            }
+        });
+        return retval;
+    } else if (thing === Object(thing)) {
+        let retval = {};
+        Object.keys(thing).forEach(function (k) {
+            retval[k] = walk(thing[k], action, format, meta);
+        });
+        return retval;
+    } else {
+        return thing;
+    }
+}
+
+let Pandoc = {
+    Elements: {
+        Plain: elt('Plain', 1),
+        Para: elt('Para', 1),
+        CodeBlock: elt('CodeBlock', 2),
+        RawBlock: elt('RawBlock', 2),
+        BlockQuote: elt('BlockQuote', 1),
+        OrderedList: elt('OrderedList', 2),
+        BulletList: elt('BulletList', 1),
+        DefinitionList: elt('DefinitionList', 1),
+        Header: elt('Header', 3),
+        HorizontalRule: elt('HorizontalRule', 0),
+        Table: elt('Table', 5),
+        Div: elt('Div', 2),
+        Null: elt('Null', 0),
+        Str: elt('Str', 1),
+        Emph: elt('Emph', 1),
+        Strong: elt('Strong', 1),
+        Strikeout: elt('Strikeout', 1),
+        Superscript: elt('Superscript', 1),
+        Subscript: elt('Subscript', 1),
+        SmallCaps: elt('SmallCaps', 1),
+        Quoted: elt('Quoted', 2),
+        Cite: elt('Cite', 2),
+        Code: elt('Code', 2),
+        Space: elt('Space', 0),
+        LineBreak: elt('LineBreak', 0),
+        Math: elt('Math', 2),
+        RawInline: elt('RawInline', 2),
+        Link: elt('Link', 2),
+        Image: elt('Image', 2),
+        Note: elt('Note', 1),
+        Span: elt('Span', 2),
+        MetaInlines: elt('MetaInlines', 1)
+    }
+};
+
 var Zotero;
 var easyKeyRe;
 var alternateEasyKeyRe;
@@ -561,30 +645,66 @@ let selectEndpoint = function (url, data, sendResponseCallback) {
                          JSON.stringify('success', null, '  '));
 };
 
+let pandocEndpoint = function (url, data, sendResponseCallback) {
+    let foundKeys = new Set([]);
+    function extractCites(key, value, format, meta) {
+        if (key === 'Cite') {
+            value[0].forEach(function (cite) {
+                foundKeys.add(cite.citationId);
+            });
+        }
+    }
+    walk(data, extractCites);
+    let keyString = [...foundKeys].map(findByEasyKey).map(function (item) {
+        return ((item.libraryID || '0') + '_' + item.key);
+    }).join(',');
+    data[0]['unMeta']['bibliography'] = Pandoc.Elements.MetaInlines([Pandoc.Elements.Str(`http://localhost:23119/zotxt/items?format=json&key=${keyString}`)]);
+    sendResponseCallback(200, jsonMediaType, JSON.stringify(data, null, '  '));
+    // let citationGroups = data.citationGroups.map(processCi
+    //         cslEngine.updateItems(extractIds(citationGroups));
+    //         let retval = {};
+    //         retval.bibliography = cslEngine.makeBibliography();
+    //         retval.citationClusters = [];
+    //         citationGroups.map (function (citationGroup) {
+    //             retval.citationClusters.push(cslEngine.appendCitationCluster(citationGroup, true)[0][1]);
+    //         });
+    //         sendResponseCallback(200, jsonMediaType, JSON.stringify(retval, null, '  '));
+    //         return;
+    //     } catch (ex if (ex.name === 'EasyKeyError')) {
+    //         sendResponseCallback(400, 'text/plain', ex.message);
+    //     }
+    // }
+};
+
 let endpoints = {
     'bibliography' : {
         supportedMethods:  ['POST'],
         supportedDataTypes: ['application/json'],
         init : bibliographyEndpoint
     },
+    'pandoc': {
+        supportedMethods:['POST'],
+        supportedDataTypes : ['application/json'],
+        init : pandocEndpoint
+    },
     'complete' : {
         supportedMethods: ['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
+        supportedDataTypes : ['application/x-www-form-urlencoded'],
         init : completeEndpoint
     },
     'search' : {
         supportedMethods: ['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
+        supportedDataTypes : ['application/x-www-form-urlencoded'],
         init : searchEndpoint
     },
     'items' : {
         supportedMethods:['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
+        supportedDataTypes : ['application/x-www-form-urlencoded'],
         init : itemsEndpoint
     },
     'select' : {
         supportedMethods:['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
+        supportedDataTypes : ['application/x-www-form-urlencoded'],
         init : selectEndpoint
     }
 };

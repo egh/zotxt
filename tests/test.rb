@@ -12,6 +12,7 @@ class ZotxtTest < MiniTest::Test
     @complete_url = "#{@base_url}/complete"
     @bibliography_url = "#{@base_url}/bibliography"
     @search_url = "#{@base_url}/search"
+    @pandoc_url = "#{@base_url}/pandoc"
     @select_url = "#{@base_url}/select"
     @doe_first_book_key = find_item_key("doe first book 2005")
     @doe_article_key = find_item_key("doe article 2006")
@@ -440,6 +441,13 @@ class ZotxtTest < MiniTest::Test
     assert_equal 400, resp.status
     resp = @client.get(@select_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status
+  end
+
+  def test_pandoc
+    data = `echo @doe:2005first | pandoc -t json`
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@pandoc_url, header: header, body: data)
+    puts resp.body
   end
 
   def test_python
