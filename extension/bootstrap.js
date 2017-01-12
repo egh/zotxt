@@ -47,7 +47,9 @@ function loadZotero () {
     let callback = function (resolve, reject) {
         if (!Zotero) {
             if (!("@zotero.org/Zotero;1" in Components.classes)) {
-                return timer.initWithCallback(function () { return callback(resolve, reject); }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+                return timer.initWithCallback(function () {
+                    return callback(resolve, reject);
+                }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
             } else {
                 Zotero = Components.classes["@zotero.org/Zotero;1"]
                     .getService(Components.interfaces.nsISupports).wrappedJSObject;
@@ -55,6 +57,8 @@ function loadZotero () {
                 alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
                 return resolve(Zotero);
             }
+        } else {
+            return resolve(Zotero);
         }
     };
     return new Promise(callback);
