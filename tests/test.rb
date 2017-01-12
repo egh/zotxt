@@ -7,7 +7,7 @@ require 'open3'
 class ZotxtTest < MiniTest::Test
   def setup
     @client = HTTPClient.new
-    @base_url = "http://localhost:23119/zotxt"
+    @base_url = "http://127.0.0.1:23119/zotxt"
     @item_url = "#{@base_url}/items"
     @complete_url = "#{@base_url}/complete"
     @bibliography_url = "#{@base_url}/bibliography"
