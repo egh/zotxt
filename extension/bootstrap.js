@@ -109,22 +109,25 @@ function parseEasyKey(key) {
 function runSearch(s) {
     let i = s.search();
     if (!i) {
-        return [];
+        return new Promise(function(resolve, reject) { resolve([]); });
     } else if (i.length === 0) {
-        return [];
+        return new Promise(function(resolve, reject) { resolve([]); });
     } else {
-        let dedupedItems = new Set();
-        i.map(function(id) {
-            return Zotero.Items.get(id);
-        }).forEach(function (item) {
+        // let dedupedItems = new Set();
+        return i.map(function(id) {
+            let item = Zotero.Items.get(id);
             // not Regular item or standalone note/attachment
             if (!item.isRegularItem() && item.getSource()) {
-                dedupedItems.add(Zotero.Items.get(item.getSource()));
+                return Zotero.Items.get(item.getSource());
             } else {
-                dedupedItems.add(item);
+                return item;
             }
+        }).all(function (items) {
+            function uniq(value, index, self) {
+                return self.indexOf(value) === index;
+            }
+            return items.filter(uniq);
         });
-        return Array.from(dedupedItems);
     }
 }
 
