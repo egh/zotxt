@@ -107,28 +107,24 @@ function parseEasyKey(key) {
 }
 
 function runSearch(s) {
-    let i = s.search();
-    if (!i) {
-        return new Promise(function(resolve, reject) { resolve([]); });
-    } else if (i.length === 0) {
-        return new Promise(function(resolve, reject) { resolve([]); });
-    } else {
-        // let dedupedItems = new Set();
-        return i.map(function(id) {
-            let item = Zotero.Items.get(id);
-            // not Regular item or standalone note/attachment
-            if (!item.isRegularItem() && item.getSource()) {
-                return Zotero.Items.get(item.getSource());
-            } else {
-                return item;
-            }
-        }).all(function (items) {
-            function uniq(value, index, self) {
-                return self.indexOf(value) === index;
-            }
-            return items.filter(uniq);
-        });
-    }
+    let seenIds = new Set([]); // To uniqify results
+    return s.search().map(function(id) {
+        return Zotero.Items.getAsync(id);
+    }).map(function (item) {
+        // not Regular item or standalone note/attachment
+        if (!item.isRegularItem() && item.parentKey) {
+            return findByKey(item.parentKey);
+        } else {
+            return item;
+        }
+    }).filter(function(item) {
+        if (seenIds.has(item.id)) {
+            return false;
+        } else {
+            seenIds.add(item.id);
+            return true;
+        }
+    });
 }
 
 function rawSearch(key) {
