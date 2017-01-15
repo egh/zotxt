@@ -233,8 +233,12 @@ function findByEasyKey(key) {
 }
 
 function findByKey(key) {
-    let lkh = Zotero.Items.parseLibraryKeyHash(key);
-    return Zotero.Items.getByLibraryAndKey(lkh.libraryID, lkh.key);
+    if (key.indexOf('/') !== -1) {
+        let lkh = Zotero.Items.parseLibraryKey(key);
+        return Zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key);
+    } else {
+        return Zotero.Items.getByLibraryAndKeyAsync(1, key);
+    }
 }
 
 /**
