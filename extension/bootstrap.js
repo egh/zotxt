@@ -278,22 +278,14 @@ function extractIds (citationGroups) {
     return ids;
 }
 
-function myExport (items, translatorId, successCallback, failureCallback) {
+function myExport (items, translatorId) {
     let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
     if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'))) {
       translation.setDisplayOptions({quickCopyMode: 'pandoc'});
     }
-    translation.setHandler('done', function (obj, worked) {
-        if (worked) {
-            successCallback(obj.string);
-        } else {
-            failureCallback();
-        }
-    });
-    translation.translate();
-    return;
+    return translation.translate();
 }
 
 function search (query, method) {
