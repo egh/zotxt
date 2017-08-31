@@ -609,20 +609,34 @@ function loadEndpoints () {
 let observerService = Components.classes['@mozilla.org/observer-service;1'].
         getService(Components.interfaces.nsIObserverService);
 
-let observer = {
+let startupObserver = {
     'observe': function(subject, topic, data) {
-        loadEndpoints();
+        loadZotero().then(function () {
+            Components.utils.import('resource://gre/modules/FileUtils.jsm');
+            Components.utils.import('resource://gre/modules/NetUtil.jsm');
+
+            /* turn on http server if it is not on */
+            /* TODO turn this off when uninstalled? */
+            let prefs = Components.classes['@mozilla.org/preferences-service;1']
+                .getService(Components.interfaces.nsIPrefService).getBranch('extensions.zotero.');
+            prefs.setBoolPref('httpServer.enabled', true);
+
+            /* load exporters */
+            // installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
+
+            loadEndpoints();
+        });
     }
 };
 
 function startup(data, reason) {
     /* wait until after zotero is loaded */
-    observerService.addObserver(observer, 'final-ui-startup', false);
+    observerService.addObserver(startupObserver, 'final-ui-startup', false);
 }
 
 
 function shutdown (data, reason) {
-    observerService.removeObserver(observer, 'final-ui-startup');
+    observerService.removeObserver(startupObserver, 'final-ui-startup');
 }
 
 function uninstall(data, reason) {
