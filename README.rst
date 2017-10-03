@@ -10,6 +10,14 @@ Mozilla addons site:
 
   https://addons.mozilla.org/en-US/firefox/addon/zotxt/
 
+Installing in Zotero standalone
+------------------------
+
+1. In Firefox, go to https://addons.mozilla.org/en-US/firefox/addon/zotxt/
+2. Click right on "Add to Firefox" and save the xpi file.
+3. Start Zotero standalone.
+4. In Zotero, select Tools -> Add-ons -> Gear (upper right) -> Install Add-On from file, and install this xpi file.
+
 Writing with pandoc (1.12 or later)
 -----------------------------------
 
