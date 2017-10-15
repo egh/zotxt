@@ -198,32 +198,31 @@ function easyKeySearch(parsedKey) {
  */
 function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
-        return knownEasyKeys[key];
+        return new Promise(function (resolve, reject) { return resolve(knownEasyKeys[key]); });;
     } else {
         let parsedKey = parseEasyKey(key);
         if (!parsedKey) {
-            throw {'name': 'EasyKeyError', 'message': 'EasyKey must be of the form DoeTitle2000 or doe:2000title'};
+            return new Promise(function (resolve, reject) {
+                reject({'name': 'EasyKeyError', 'message': 'EasyKey must be of the form DoeTitle2000 or doe:2000title'});
+            });
         } else {
             /* first try raw search */
-            let rawResults = rawSearch(key);
-            if (rawResults.length > 0) {
-                return rawResults[0];
-            } else {
-                let results = easyKeySearch(parsedKey);
-                if (results.length > 1) {
-                    // hack to ignore group library duplicates
-                    // remove all items not in the local library
-                    results = results.filter(function (item) { return item.libraryID === null; });
+            return rawSearch(key).then(function(items) {
+                if (items.length > 0) {
+                    return items;
+                } else {
+                    return easyKeySearch(parsedKey);
                 }
-                if (results.length === 0) {
+            }).then (function (items) {
+                if (items.length === 0) {
                     throw {'name': 'EasyKeyError', 'message': 'search failed to return a single item'};
-                } else if (results.length > 1) {
+                } else if (items.length > 1) {
                     throw {'name': 'EasyKeyError', 'message': 'search return multiple items'};
                 } else {
-                    knownEasyKeys[key] = results[0];
-                    return results[0];
+                    knownEasyKeys[key] = items[0];
+                    return items[0];
                 }
-            }
+            });
         }
     }
 }
