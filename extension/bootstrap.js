@@ -536,61 +536,28 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     return;
 };
 
-let selectEndpoint = function (url, data, sendResponseCallback) {
+let selectEndpoint = function (options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
             getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     ZoteroPane.show();
-    let q = cleanQuery(url.query);
-    let item = null;
+    let q = cleanQuery(options.query);
+    let promise = null;
     if (q.easykey) {
-        try {
-            item = findByEasyKey(q.easykey);
-        } catch (ex if (ex.name === 'EasyKeyError')) {
-            sendResponseCallback(400, 'text/plain', ex.message);
-            return;
-        }
+        promise = findByEasyKey(q.easykey);
     } else if (q.key) {
-        item = findByKey(q.key);
-        if (item === false) {
-            sendResponseCallback(400, 'text/plain', 'item with key ' + q.key + ' not found!');
-            return;
-        }
+        promise = findByKey(q.key);
     } else {
-        sendResponseCallback(400, 'text/plain', 'No param supplied!');
-        return;
+        return [400, 'text/plain', 'No param supplied!'];
     }
-    ZoteroPane.selectItem(item.id);
-    // TODO: figure out how to wait here until the item is actually selected
-    sendResponseCallback(200, jsonMediaType,
-                         JSON.stringify('success', null, '  '));
-};
-
-let endpoints = {
-    'bibliography' : {
-        supportedMethods:  ['POST'],
-        supportedDataTypes: ['application/json'],
-        init : bibliographyEndpoint
-    },
-    'complete' : {
-        supportedMethods: ['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
-        init : completeEndpoint
-    },
-    'search' : {
-        supportedMethods: ['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
-        init : searchEndpoint
-    },
-    'items' : {
-        supportedMethods:['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
-        init : itemsEndpoint
-    },
-    'select' : {
-        supportedMethods:['GET'],
-        supportedDataType : ['application/x-www-form-urlencoded'],
-        init : selectEndpoint
-    }
+    return promise.then(function(item) {
+        if (item === false) {
+            return [400, 'text/plain', 'item with key ' + q.key + ' not found!'];
+        }
+        ZoteroPane.selectItem(item.id);
+        return [200, jsonMediaType, JSON.stringify('success', null, '  ')];
+    }).catch(function(ex) {
+        return [400, 'text/plain', ex.message];
+    });
 };
 
 /**
@@ -598,6 +565,13 @@ let endpoints = {
  */
 function loadEndpoints () {
     loadZotero().then(function () {
+        let endpoints = {
+            'select' : {
+                supportedMethods:['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : selectEndpoint
+            }
+        };
         for (let e in endpoints) {
             let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
             ep.prototype = endpoints[e];
