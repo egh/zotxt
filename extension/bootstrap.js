@@ -293,13 +293,15 @@ function search (query, method) {
     return runSearch(s);
 }
 
-function handleResponseFormat(format, style, items, sendResponseCallback) {
+function item2key(item) {
+    return ((item.libraryID || '1') + '_' + item.key);
+}
+
+const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
+
+function handleResponseFormat(format, style, items) {
     if (format === 'key') {
-        let responseData = items.map (function (item) {
-            return ((item.libraryID || '0') + '_' + item.key);
-        });
-        sendResponseCallback(200, jsonMediaType,
-                             JSON.stringify(responseData, null, '  '));
+        return [200, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
     } else if (format === 'bibliography') {
         let csl = makeCslEngine(style);
         let responseData = items.map (function (item) {
@@ -477,13 +479,13 @@ let completeEndpoint = function (url, data, sendResponseCallback) {
     }
 };
 
-let searchEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url.query);
-    if (q.q) {
-        let results = search(q.q, q.method);
-        handleResponseFormat(q.format, q.style, results, sendResponseCallback);
+const searchEndpoint = function (options) {
+    const query = cleanQuery(options.query);
+    if (query.q) {
+        let format = mkFormatter(query.format, query.style);
+        return search(query.q, query.method).then(format);
     } else {
-        sendResponseCallback(400, 'text/plain', 'q param required.');
+        return [400, 'text/plain', 'q param required.'];
     }
 };
 
@@ -566,6 +568,11 @@ let selectEndpoint = function (options) {
 function loadEndpoints () {
     loadZotero().then(function () {
         let endpoints = {
+            'search' : {
+                supportedMethods: ['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : searchEndpoint
+            },
             'select' : {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
