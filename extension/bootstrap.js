@@ -327,8 +327,7 @@ function handleResponseFormat(format, style, items) {
                     .replace(/(\r\n|\n|\r)/gm,'')
             };
         });
-        sendResponseCallback(200, jsonMediaType,
-                             JSON.stringify(responseData, null, '  '));
+        return [200, jsonMediaType, JSON.stringify(responseData, null, '  ')];
     } else if (format === 'bibtex' || (format && format.match(uuidRe))) {
         /* return raw export data */
         let translatorId = null;
