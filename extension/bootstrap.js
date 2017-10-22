@@ -438,8 +438,7 @@ function handleResponseFormat(format, style, items) {
             while((item = itemGetter.nextItem())) {
                 responseData.push(Zotero.Utilities.itemToCSLJSON(item));
             }
-            sendResponseCallback(200, jsonMediaType,
-                                 JSON.stringify(responseData, null, '  '));
+            return [200, jsonMediaType, JSON.stringify(responseData, null, '  ')];
         }
     }
 }
