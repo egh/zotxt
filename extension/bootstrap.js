@@ -280,7 +280,20 @@ function myExport (items, translatorId) {
     if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'))) {
       translation.setDisplayOptions({quickCopyMode: 'pandoc'});
     }
-    return translation.translate();
+    /* I don't understand why Zotero still has `setHandler` now that we are in
+     * promise-land, but OK */
+    let callback = function (resolve, reject) {
+        translation.setHandler("done", function (obj, worked) {
+            if (worked) {
+                resolve(obj.string);
+            } else {
+                reject();
+            }
+        });
+    };
+    let promise = new Promise(callback);
+    translation.translate();
+    return promise;
 }
 
 function search (query, method) {
