@@ -406,27 +406,22 @@ function handleResponseFormat(format, style, items) {
             translatorId = easyKeyExporterMetadata.translatorID;
         } else {
             if (!Zotero.BetterBibTeX) {
-                sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
-                return;
+                return [400, 'text/plain', 'BetterBibTex not installed.'];
             } else {
                 translatorId = Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy');
             }
         }
         if (items.length === 0) {
-            sendResponseCallback(200, jsonMediaType, JSON.stringify([], null, '  '));
+            return [200, 'application/json', JSON.stringify([], null, '  ')];
         } else {
-            myExport(items, translatorId,
-                     /* success */
-                     function (rawKeys) {
-                         let keys = rawKeys.split(' ');
-                         // remove leading @
-                         let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
-                         sendResponseCallback(200, jsonMediaType, JSON.stringify(keys2, null, '  '));
-                     },
-                     /* failure */
-                     function () {
-                         sendResponseCallback(400);
-                     });
+            return myExport(items, translatorId).then(function(rawKeys) {
+                let keys = rawKeys.split(' ');
+                // remove leading @
+                let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
+                return [200, jsonMediaType, JSON.stringify(keys2, null, '  ')];
+            }).catch(function() {
+                return [400];
+            });
         }
     } else {
         /* Use BetterBibTeX JSON if available */
