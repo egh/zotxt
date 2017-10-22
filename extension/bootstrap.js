@@ -427,13 +427,9 @@ function handleResponseFormat(format, style, items) {
         /* Use BetterBibTeX JSON if available */
         if (Zotero.BetterBibTeX) {
             let translatorId = Zotero.BetterBibTeX.Translators.getID('Better CSL JSON');
-            myExport(items, translatorId,
-                     function (output) {
-                         sendResponseCallback(200, 'text/plain; charset=UTF-8', output);
-                     },
-                     function () {
-                         sendResponseCallback(400);
-                     });
+            return myExport(items, translatorId).then(function (output) {
+                return [200, 'text/plain; charset=UTF-8', output];
+            });
         } else {
             let itemGetter = new Zotero.Translate.ItemGetter();
             itemGetter.setItems(items);
