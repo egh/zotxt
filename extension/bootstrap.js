@@ -475,15 +475,18 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
     }
 };
 
-let completeEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url.query);
-    if (q.easykey) {
-        let items = easyKeySearch(parseEasyKey(q.easykey));
-        if (!items) {
-            sendResponseCallback(400, 'text/plain', 'EasyKey must be of the form DoeTitle2000 or doe:2000title');
-        } else {
-            handleResponseFormat('easykey', null, items, sendResponseCallback);
-        }
+let completeEndpoint = function (options) {
+    if (!options.query.easykey) {
+        return [400, 'text/plain', 'Option easykey is required.'];
+    } else {
+        let q = cleanQuery(options.query);
+        return easyKeySearch(parseEasyKey(q.easykey)).then(function (items) {
+            if (!items) {
+                return [400, 'text/plain', 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
+            } else {
+                return handleResponseFormat('easykey', null, items);
+            }
+        });
     }
 };
 
@@ -576,6 +579,11 @@ let selectEndpoint = function (options) {
 function loadEndpoints () {
     loadZotero().then(function () {
         let endpoints = {
+            'complete' : {
+                supportedMethods: ['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : completeEndpoint
+            },
             'search' : {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
