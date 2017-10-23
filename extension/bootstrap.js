@@ -494,9 +494,10 @@ const searchEndpoint = function (options) {
     }
 };
 
-let itemsEndpoint = function (url, data, sendResponseCallback) {
-    let q = cleanQuery(url.query);
+let itemsEndpoint = function (options) {
+    const q = cleanQuery(options.query);
     let items = [];
+    const format = mkFormatter(q.format, q.style);
     if (q.selected) {
         let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
                 getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
@@ -508,25 +509,19 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
         items = q.key.split(',').map(function (key) {
             let retval = findByKey(key);
             if (retval === false) {
-                return sendResponseCallback(400, 'text/plain', 'item with key ' + key + ' not found!');
+                return [400, 'text/plain', 'item with key ' + key + ' not found!'];
             } else {
                 return retval;
             }
         });
     } else if (q.easykey) {
-        try {
-            items = q.easykey.split(',').map(function (key) {
-                return findByEasyKey(key);
-            });
-        } catch (ex if (ex.name === 'EasyKeyError')) {
-            sendResponseCallback(400, 'text/plain', ex.message);
-            return;
-        }
+        return Promise.all(q.easykey.split(',').map(findByEasyKey))
+            .then(format)
+            .catch((ex) => [400, 'text/plain', ex.message]);
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
         if (!Zotero.BetterBibTeX) {
-            sendResponseCallback(400, 'text/plain', 'BetterBibTex not installed.');
-            return;
+            return [400, 'text/plain', 'BetterBibTex not installed.'];
         }
         let results = Zotero.BetterBibTeX.DB.keys.findObjects({citekey: { '$in': keys }, libraryID: null});
         if (results) {
@@ -537,10 +532,8 @@ let itemsEndpoint = function (url, data, sendResponseCallback) {
     } else if (q.all) {
         items = Zotero.Items.getAll();
     } else {
-        sendResponseCallback(400, 'text/plain', 'No param supplied!');
+        return [400, 'text/plain', 'No param supplied!'];
     }
-    handleResponseFormat(q.format, q.style, items, sendResponseCallback);
-    return;
 };
 
 let selectEndpoint = function (options) {
@@ -582,6 +575,11 @@ function loadEndpoints () {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : searchEndpoint
+            },
+            'items' : {
+                supportedMethods:['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : itemsEndpoint
             },
             'select' : {
                 supportedMethods:['GET'],
