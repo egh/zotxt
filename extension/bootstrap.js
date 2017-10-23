@@ -530,7 +530,7 @@ let itemsEndpoint = function (options) {
             });
         }
     } else if (q.all) {
-        items = Zotero.Items.getAll();
+        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(format);
     } else {
         return [400, 'text/plain', 'No param supplied!'];
     }
