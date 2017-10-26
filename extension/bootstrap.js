@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* globals Components, Set, FileUtils, NetUtil, Q */
+/* global Components, Set, FileUtils, NetUtil, Q */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
