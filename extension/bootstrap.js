@@ -106,24 +106,37 @@ function parseEasyKey(key) {
     }
 }
 
+
+/**
+ * Returns a promise resolving to an iterable of promises.
+ * Sorry, that's just how it is.
+ */
 function runSearch(s) {
-    let seenIds = new Set([]); // To uniqify results
-    return s.search().map(function(id) {
-        return Zotero.Items.getAsync(id);
-    }).map(function (item) {
-        // not Regular item or standalone note/attachment
-        if (!item.isRegularItem() && item.parentKey) {
-            return findByKey(item.parentKey);
-        } else {
-            return item;
-        }
-    }).filter(function(item) {
-        if (seenIds.has(item.id)) {
-            return false;
-        } else {
-            seenIds.add(item.id);
-            return true;
-        }
+    return s.search().then((ids) => {
+        return ids;
+    }).then((ids) => {
+        let idPromises = ids.map((id) => {
+            return Zotero.Items.getAsync(id);
+        });
+        let items = Zotero.Promise.map(idPromises, (item) => {
+            Zotero.debug(item);
+            // not Regular item or standalone note/attachment
+            if (!item.isRegularItem() && item.parentKey) {
+                return findByKey(item.parentKey);
+            } else {
+                return item;
+            }
+        });
+
+        let seenIds = new Set([]); // To uniqify results
+        return Zotero.Promise.filter(items, (item) => {
+            if (seenIds.has(item.id)) {
+                return false;
+            } else {
+                seenIds.add(item.id);
+                return true;
+            }
+        });
     });
 }
 
@@ -312,7 +325,6 @@ function item2key(item) {
 
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
-function handleResponseFormat(format, style, items) {
     if (format === 'key') {
         return [200, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
     } else if (format === 'bibliography') {
@@ -357,6 +369,8 @@ function handleResponseFormat(format, style, items) {
                 }
                 responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
                                    'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
+function handleResponseFormat(format, style, itemPromises) {
+    return Promise.all(itemPromises).then((items) => {
             }
         }
         sendResponseCallback(200, jsonMediaType,
@@ -440,6 +454,7 @@ function handleResponseFormat(format, style, items) {
             return [200, jsonMediaType, JSON.stringify(responseData, null, '  ')];
         }
     }
+    });
 }
 
 let bibliographyEndpoint = function (url, data, sendResponseCallback) {
