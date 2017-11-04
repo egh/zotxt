@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery' ];
+var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems' ];
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
@@ -41,9 +41,23 @@ function cleanQuery(q) {
     return retval;
 }
 
+/* Given a iterable of promises that return an item, return a deduped iterable
+ * of promises (based on the id). */
+function dedupItems(items, filter) {
+    let seenIds = new Set([]); // To uniqify results
+    return filter(items, (item) => {
+        if (seenIds.has(item.id)) {
+            return false;
+        } else {
+            seenIds.add(item.id);
+            return true;
+        }
+    });
+};
 
 if (process) {
     module.exports.fixStyleId = fixStyleId;
     module.exports.parseEasyKey = parseEasyKey;
     module.exports.cleanQuery = cleanQuery;
+    module.exports.dedupItems = dedupItems;
 }

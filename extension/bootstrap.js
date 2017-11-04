@@ -94,16 +94,7 @@ function runSearch(s) {
                 return item;
             }
         });
-
-        let seenIds = new Set([]); // To uniqify results
-        return Zotero.Promise.filter(items, (item) => {
-            if (seenIds.has(item.id)) {
-                return false;
-            } else {
-                seenIds.add(item.id);
-                return true;
-            }
-        });
+        return dedupItems(items, Zotero.Promise.Filter);
     });
 }
 
