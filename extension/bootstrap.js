@@ -64,16 +64,6 @@ function loadZotero () {
     return new Promise(callback);
 }
 
-function fixStyleId(styleId) {
-    if (!styleId) {
-        return  'http://www.zotero.org/styles/chicago-note-bibliography';
-    } else if (!styleId.match(/^http:/)) {
-        return 'http://www.zotero.org/styles/' + styleId;
-    } else {
-        return styleId;
-    }
-}
-
 function makeCslEngine (styleId) {
     let style = Zotero.Styles.get(fixStyleId(styleId));
     if (!style) {
@@ -635,6 +625,7 @@ let startupObserver = {
 function startup(data, reason) {
     /* wait until after zotero is loaded */
     observerService.addObserver(startupObserver, 'final-ui-startup', false);
+    Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
 }
 
 
