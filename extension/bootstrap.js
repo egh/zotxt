@@ -60,18 +60,6 @@ function loadZotero () {
     return new Promise(callback);
 }
 
-function makeCslEngine (styleId) {
-    let style = Zotero.Styles.get(fixStyleId(styleId));
-    if (!style) {
-        return null;
-    } else {
-        // jshint camelcase: false
-        let csl = style.getCiteProc();
-        csl.opt.development_extensions.wrap_url_and_doi = true;
-        return csl;
-    }
-}
-
 let knownEasyKeys = {};
 
 /**
@@ -262,7 +250,7 @@ const mkFormatter = (format, style) => (items) => handleResponseFormat(format, s
     if (format === 'key') {
         return [200, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
     } else if (format === 'bibliography') {
-        let csl = makeCslEngine(style);
+        let csl = makeCslEngine(style, Zotero);
         let responseData = items.map (function (item) {
             csl.updateItems([item.id], true);
             return {
@@ -392,7 +380,7 @@ function handleResponseFormat(format, style, itemPromises) {
 }
 
 let bibliographyEndpoint = function (url, data, sendResponseCallback) {
-    let cslEngine = makeCslEngine(data.styleId);
+    let cslEngine = makeCslEngine(data.styleId, Zotero);
     if (!cslEngine) {
         sendResponseCallback(400, 'text/plain', 'No style found.');
         return;

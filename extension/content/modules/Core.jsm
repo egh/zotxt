@@ -66,7 +66,19 @@ function findByKey(key, zotero) {
     }
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey];
+function makeCslEngine (styleId, zotero) {
+    let style = zotero.Styles.get(fixStyleId(styleId));
+    if (!style) {
+        return null;
+    } else {
+        // jshint camelcase: false
+        let csl = style.getCiteProc();
+        csl.opt.development_extensions.wrap_url_and_doi = true;
+        return csl;
+    }
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

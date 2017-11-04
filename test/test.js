@@ -116,3 +116,33 @@ describe('#core.findByKey()', () => {
         assert(getByLibraryAndKeyAsync.calledWith(2, 'bar'));
     });
 });
+
+
+describe('#core.makeCslEngine()', () => {
+    let opt, getCiteProc, style, get, zotero, styleName;
+
+    beforeEach(()=>{
+        opt = { development_extensions: { wrap_url_and_doi: false } };
+        getCiteProc = sinon.stub().returns({ opt });;
+        style = { getCiteProc };
+        get = sinon.stub().returns(style);
+        zotero = { Styles : { get } };
+        styleName = 'foo';
+    });
+
+    it("sets wrap_url_and_dio", ()=>{
+        core.makeCslEngine(styleName, zotero);
+        assert.equal(true, opt.development_extensions.wrap_url_and_doi);
+    });
+
+    it("sets calls Styles.get", ()=>{
+        core.makeCslEngine(styleName, zotero);
+        sinon.assert.calledOnce(get);
+        sinon.assert.calledWith(get, `http://www.zotero.org/styles/${styleName}`);
+    });
+
+    it("sets calls getCiteProc", ()=>{
+        core.makeCslEngine(styleName, zotero);
+        sinon.assert.calledOnce(getCiteProc);
+    });
+});
