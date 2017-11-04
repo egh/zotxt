@@ -89,7 +89,7 @@ function runSearch(s) {
             Zotero.debug(item);
             // not Regular item or standalone note/attachment
             if (!item.isRegularItem() && item.parentKey) {
-                return findByKey(item.parentKey);
+                return findByKey(item.parentKey, Zotero);
             } else {
                 return item;
             }
@@ -187,15 +187,6 @@ function findByEasyKey(key) {
     }
 }
 
-function findByKey(key) {
-    if (key.indexOf('/') !== -1) {
-        let lkh = Zotero.Items.parseLibraryKey(key);
-        return Zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key);
-    } else {
-        return Zotero.Items.getByLibraryAndKeyAsync(1, key);
-    }
-}
-
 /**
  * Map the easykeys in the citations to ids.
  */
@@ -206,7 +197,7 @@ function processCitationsGroup (citationGroup) {
             if (x === 'easyKey') {
                 retval.id = findByEasyKey(citation[x]).id;
             } else if (x === 'key') {
-                retval.id = findByKey(citation[x]).id;
+                retval.id = findByKey(citation[x], Zotero).id;
             } else {
                 retval[x] = citation[x];
             }
@@ -465,7 +456,7 @@ let itemsEndpoint = function (options) {
         items = collectionSearch(q.collection);
     } else if (q.key) {
         items = q.key.split(',').map(function (key) {
-            let retval = findByKey(key);
+            let retval = findByKey(key, Zotero);
             if (retval === false) {
                 return [400, 'text/plain', 'item with key ' + key + ' not found!'];
             } else {
@@ -503,7 +494,7 @@ let selectEndpoint = function (options) {
     if (q.easykey) {
         promise = findByEasyKey(q.easykey);
     } else if (q.key) {
-        promise = findByKey(q.key);
+        promise = findByKey(q.key, Zotero);
     } else {
         return [400, 'text/plain', 'No param supplied!'];
     }

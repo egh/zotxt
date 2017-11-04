@@ -91,3 +91,28 @@ describe('#core.item2key()', () => {
         assert('1_foo', core.item2key(item));
     });
 });
+
+describe('#core.findByKey()', () => {
+    let getByLibraryAndKeyAsync = sinon.spy();
+    let parseLibraryKey = sinon.stub().returns({ libraryID: 2, key: 'bar' });
+    let zotero = { Items : { getByLibraryAndKeyAsync, parseLibraryKey } };
+
+    it("calls getByLibraryAndKeyAsync when a key without a / is passed in", ()=>{
+        getByLibraryAndKeyAsync.reset();
+        const key = 'foo_bar';
+        core.findByKey(key, zotero);
+        assert(parseLibraryKey.notCalled);
+        assert(getByLibraryAndKeyAsync.calledOnce);
+        assert(getByLibraryAndKeyAsync.calledWith(1, key));
+    });
+
+    it("fetches the library id and calls getByLibraryAndKeyAsync when a key with a / is used", ()=>{
+        getByLibraryAndKeyAsync.reset();
+        const key = 'foo/bar';
+        core.findByKey(key, zotero);
+        assert(parseLibraryKey.calledOnce);
+        assert(parseLibraryKey.calledWith(key));
+        assert(getByLibraryAndKeyAsync.calledOnce);
+        assert(getByLibraryAndKeyAsync.calledWith(2, 'bar'));
+    });
+});

@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems', 'item2key' ];
+var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems', 'item2key', 'findByKey' ];
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
@@ -59,10 +59,20 @@ function item2key(item) {
     return ((item.libraryID || '1') + '_' + item.key);
 }
 
+function findByKey(key, zotero) {
+    if (key.indexOf('/') !== -1) {
+        let lkh = zotero.Items.parseLibraryKey(key);
+        return zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key);
+    } else {
+        return zotero.Items.getByLibraryAndKeyAsync(1, key);
+    }
+}
+
 if (process) {
     module.exports.fixStyleId = fixStyleId;
     module.exports.parseEasyKey = parseEasyKey;
     module.exports.cleanQuery = cleanQuery;
     module.exports.dedupItems = dedupItems;
     module.exports.item2key = item2key;
+    module.exports.findByKey = findByKey;
 }
