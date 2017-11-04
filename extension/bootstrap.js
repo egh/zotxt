@@ -19,8 +19,6 @@
 Components.utils.import('resource://gre/modules/Services.jsm');
 
 var Zotero;
-var easyKeyRe;
-var alternateEasyKeyRe;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
 var timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
 
@@ -53,8 +51,6 @@ function loadZotero () {
             } else {
                 Zotero = Components.classes["@zotero.org/Zotero;1"]
                     .getService(Components.interfaces.nsISupports).wrappedJSObject;
-                easyKeyRe = Zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
-                alternateEasyKeyRe = Zotero.Utilities.XRegExp('^([\\p{Ll}_-]+)(:[0-9]{4})?(\\p{Ll}+)?');
                 return resolve(Zotero);
             }
         } else {
@@ -77,25 +73,6 @@ function makeCslEngine (styleId) {
 }
 
 let knownEasyKeys = {};
-
-/**
- * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
- * did not parse correctly.
- */
-function parseEasyKey(key) {
-    let result = easyKeyRe.exec(key);
-    if (result) {
-        return {creator: result[1], title: result[2], date: result[3]};
-    } else {
-        result = alternateEasyKeyRe.exec(key);
-        if (result) {
-            return {creator: result[1], title: result[3], date: result[2]};
-        } else {
-            return null;
-        }
-    }
-}
-
 
 /**
  * Returns a promise resolving to an iterable of promises.

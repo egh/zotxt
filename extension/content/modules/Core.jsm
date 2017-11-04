@@ -1,4 +1,24 @@
-var EXPORTED_SYMBOLS = [ 'fixStyleId' ];
+var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId' ];
+
+/**
+ * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
+ * did not parse correctly.
+ */
+function parseEasyKey(key, xregexp) {
+    const easyKeyRe = xregexp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
+    const alternateEasyKeyRe = xregexp('^([\\p{Ll}_-]+):([0-9]{4})?(\\p{Ll}+)?');
+    let result = easyKeyRe.exec(key);
+    if (result) {
+        return {creator: result[1], title: result[2], date: result[3]};
+    } else {
+        result = alternateEasyKeyRe.exec(key);
+        if (result) {
+            return {creator: result[1], title: result[3], date: result[2]};
+        } else {
+            return null;
+        }
+    }
+}
 
 function fixStyleId(styleId) {
     if (!styleId) {
@@ -13,4 +33,5 @@ function fixStyleId(styleId) {
 
 if (process) {
     module.exports.fixStyleId = fixStyleId;
+    module.exports.parseEasyKey = parseEasyKey;
 }
