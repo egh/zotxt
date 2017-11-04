@@ -79,3 +79,15 @@ describe('#core.dedupItems()', () => {
         });
     });
 });
+
+describe('#core.item2key()', () => {
+    it('builds a key', ()=>{
+        const item = { libraryID: '2', key: 'foo' };
+        assert('2_foo', core.item2key(item));
+    });
+
+    it('defaults to librar 1', ()=>{
+        const item = { key: 'foo' };
+        assert('1_foo', core.item2key(item));
+    });
+});

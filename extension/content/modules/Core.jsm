@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems' ];
+var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems', 'item2key' ];
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
@@ -55,9 +55,14 @@ function dedupItems(items, filter) {
     });
 };
 
+function item2key(item) {
+    return ((item.libraryID || '1') + '_' + item.key);
+}
+
 if (process) {
     module.exports.fixStyleId = fixStyleId;
     module.exports.parseEasyKey = parseEasyKey;
     module.exports.cleanQuery = cleanQuery;
     module.exports.dedupItems = dedupItems;
+    module.exports.item2key = item2key;
 }

@@ -266,10 +266,6 @@ function search (query, method) {
     return runSearch(s);
 }
 
-function item2key(item) {
-    return ((item.libraryID || '1') + '_' + item.key);
-}
-
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
     if (format === 'key') {
