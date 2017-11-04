@@ -1,5 +1,3 @@
-var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery', 'dedupItems', 'item2key', 'findByKey' ];
-
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
  * did not parse correctly.
@@ -68,11 +66,10 @@ function findByKey(key, zotero) {
     }
 }
 
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey];
+
+var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
+
 if (process) {
-    module.exports.fixStyleId = fixStyleId;
-    module.exports.parseEasyKey = parseEasyKey;
-    module.exports.cleanQuery = cleanQuery;
-    module.exports.dedupItems = dedupItems;
-    module.exports.item2key = item2key;
-    module.exports.findByKey = findByKey;
+    toExport.forEach((s) => { module.exports[s.name] = s; });
 }
