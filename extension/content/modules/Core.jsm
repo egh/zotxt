@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId' ];
+var EXPORTED_SYMBOLS = [ 'parseEasyKey', 'fixStyleId', 'cleanQuery' ];
 
 /**
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
@@ -30,8 +30,20 @@ function fixStyleId(styleId) {
     }
 }
 
+/**
+ * Prepare query values for us.
+ */
+function cleanQuery(q) {
+    let retval = [];
+    for (let key in q) {
+        retval[key] = q[key].replace('+', ' ');
+    }
+    return retval;
+}
+
 
 if (process) {
     module.exports.fixStyleId = fixStyleId;
     module.exports.parseEasyKey = parseEasyKey;
+    module.exports.cleanQuery = cleanQuery;
 }

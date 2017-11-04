@@ -116,17 +116,6 @@ function rawSearch(key) {
     return runSearch(s);
 }
 
-/**
- * Prepare query values for us.
- */
-function cleanQuery(q) {
-    let retval = [];
-    for (let key in q) {
-        retval[key] = q[key].replace('+', ' ');
-    }
-    return retval;
-}
-
 function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, Zotero.getCollections(null));

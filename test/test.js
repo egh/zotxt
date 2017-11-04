@@ -6,7 +6,7 @@ const xregexp = require('xregexp');
 
 const core = require('../extension/content/modules/Core.jsm');
 
-describe('#core.fixStyleId()', function() {
+describe('#core.fixStyleId()', () => {
     it('should return chicago as default', ()=>{
         assert.equal('http://www.zotero.org/styles/chicago-note-bibliography', core.fixStyleId());
     });
@@ -22,7 +22,7 @@ describe('#core.fixStyleId()', function() {
 });
 
 
-describe('#core.parseEasyKey()', function() {
+describe('#core.parseEasyKey()', () => {
     const altRes = {
         creator: 'foo',
         date: '2016',
@@ -41,5 +41,11 @@ describe('#core.parseEasyKey()', function() {
 
     it('should parse a normal easykey', ()=>{
         assert.deepEqual(res, core.parseEasyKey('FooBar2016', xregexp));
+    });
+});
+
+describe('#core.cleanQuery()', () => {
+    it('should replace all + with space', ()=>{
+        assert.deepEqual({foo: 'foo bar'}, core.cleanQuery({foo: 'foo+bar'}));
     });
 });
