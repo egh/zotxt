@@ -91,34 +91,42 @@ function collectionSearch(name) {
     }
 }
 
+function makeEasyKeyError(str) {
+    return Promise.reject({
+        name: 'EasyKeyError',
+        message: str
+    });
+}
+
 /**
  * Find a single item by its easy key, caching the result.
  */
 function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
-        return new Promise(function (resolve, reject) { return resolve(knownEasyKeys[key]); });;
+        return Promise.resolve(knownEasyKeys[key]);
     } else {
         let parsedKey = parseEasyKey(key, Zotero);
         if (!parsedKey) {
-            return new Promise(function (resolve, reject) {
-                reject({'name': 'EasyKeyError', 'message': 'EasyKey must be of the form DoeTitle2000 or doe:2000title'});
-            });
+            return makeEasyKeyError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
         } else {
             /* first try raw search */
-            return runSearch(buildRawSearch(new Zotero.Search(), key), Zotero).then(function(items) {
-                if (items.length > 0) {
-                    return items;
-                } else {
-                    return runSearch(buildEasyKeySearch(new Zotero.Search(), parsedKey), Zotero);
-                }
-            }).then (function (items) {
-                if (items.length === 0) {
-                    throw {'name': 'EasyKeyError', 'message': 'search failed to return a single item'};
+            let search = buildRawSearch(new Zotero.Search(), key);
+            return runSearch(search, Zotero).then(function(items) {
+                if (items.length === 1) {
+                    return knownEasyKeys[key] = items[0];
                 } else if (items.length > 1) {
-                    throw {'name': 'EasyKeyError', 'message': 'search return multiple items'};
+                    return makeEasyKeyError('search return multiple items');
                 } else {
-                    knownEasyKeys[key] = items[0];
-                    return items[0];
+                    let search = buildEasyKeySearch(new Zotero.Search(), parsedKey);
+                    return runSearch(search, Zotero).then (function (items) {
+                        if (items.length === 0) {
+                            return makeEasyKeyError('search failed to return a single item');
+                        } else if (items.length > 1) {
+                            return makeEasyKeyError('search return multiple items');
+                        } else {
+                            return knownEasyKeys[key] = items[0];
+                        }
+                    });
                 }
             });
         }
