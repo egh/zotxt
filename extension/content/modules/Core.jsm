@@ -2,9 +2,9 @@
  * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
  * did not parse correctly.
  */
-function parseEasyKey(key, xregexp) {
-    const easyKeyRe = xregexp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
-    const alternateEasyKeyRe = xregexp('^([\\p{Ll}_-]+):([0-9]{4})?(\\p{Ll}+)?');
+function parseEasyKey(key, zotero) {
+    const easyKeyRe = zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
+    const alternateEasyKeyRe = zotero.Utilities.XRegExp('^([\\p{Ll}_-]+):([0-9]{4})?(\\p{Ll}+)?');
     let result = easyKeyRe.exec(key);
     if (result) {
         return {creator: result[1], title: result[2], date: result[3]};

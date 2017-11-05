@@ -24,6 +24,7 @@ describe('#core.fixStyleId()', () => {
 
 
 describe('#core.parseEasyKey()', () => {
+    const zotero = { Utilities: { XRegExp: xregexp } };
     const altRes = {
         creator: 'foo',
         date: '2016',
@@ -37,11 +38,11 @@ describe('#core.parseEasyKey()', () => {
     };
 
     it('should parse an alternative easykey', ()=>{
-        assert.deepEqual(altRes, core.parseEasyKey('foo:2016bar', xregexp));
+        assert.deepEqual(altRes, core.parseEasyKey('foo:2016bar', zotero));
     });
 
     it('should parse a normal easykey', ()=>{
-        assert.deepEqual(res, core.parseEasyKey('FooBar2016', xregexp));
+        assert.deepEqual(res, core.parseEasyKey('FooBar2016', zotero));
     });
 });
 

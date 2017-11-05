@@ -120,7 +120,7 @@ function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
         return new Promise(function (resolve, reject) { return resolve(knownEasyKeys[key]); });;
     } else {
-        let parsedKey = parseEasyKey(key);
+        let parsedKey = parseEasyKey(key, zotero);
         if (!parsedKey) {
             return new Promise(function (resolve, reject) {
                 reject({'name': 'EasyKeyError', 'message': 'EasyKey must be of the form DoeTitle2000 or doe:2000title'});
@@ -383,7 +383,7 @@ let completeEndpoint = function (options) {
         return [400, 'text/plain', 'Option easykey is required.'];
     } else {
         let q = cleanQuery(options.query);
-        return easyKeySearch(parseEasyKey(q.easykey), zotero).then(function (items) {
+        return easyKeySearch(parseEasyKey(q.easykey, zotero), zotero).then(function (items) {
             if (!items) {
                 return [400, 'text/plain', 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {
