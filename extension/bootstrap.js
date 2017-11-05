@@ -105,7 +105,7 @@ function findByEasyKey(key) {
             });
         } else {
             /* first try raw search */
-            return rawSearch(key, Zotero).then(function(items) {
+            return runSearch(buildRawSearch(new Zotero.Search(), key), Zotero).then(function(items) {
                 if (items.length > 0) {
                     return items;
                 } else {

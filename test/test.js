@@ -204,3 +204,19 @@ describe('#core.buildSearch()', () => {
         sinon.assert.calledWith(addCondition, 'quicksearch-titleCreatorYear', 'contains', 'bar');
     });
 });
+
+describe('#core.buildRawSearch()', () => {
+    let addCondition, search;
+
+    beforeEach(()=>{
+        addCondition = sinon.stub();
+        search = { addCondition };
+    });
+
+    it("sets up the search as expected ", ()=>{
+        core.buildRawSearch(search, 'foo:2016bar');
+        sinon.assert.calledWith(addCondition, 'joinMode', 'any');
+        sinon.assert.calledWith(addCondition, 'tag', 'is', '@foo:2016bar');
+        sinon.assert.calledWith(addCondition, 'note', 'contains', '@foo:2016bar');
+    });
+});

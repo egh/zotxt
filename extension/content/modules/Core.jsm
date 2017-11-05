@@ -97,15 +97,14 @@ function runSearch(s, zotero) {
         return dedupItems(items2, zotero);
     });
 }
-function rawSearch(key, zotero) {
-    let s = new zotero.Search();
+
+function buildRawSearch(s, key) {
     let str = '@' + key;
     s.addCondition('joinMode', 'any');
     s.addCondition('tag', 'is', str);
     s.addCondition('note', 'contains', str);
-    return runSearch(s, zotero);
+    return s;
 }
-
 
 /**
  * Find many items by a (possibly incomplete) parsed easy key.
@@ -135,7 +134,7 @@ function buildSearch(s, query, method) {
     return s;
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch, runSearch, buildSearch];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, easyKeySearch, runSearch, buildSearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
