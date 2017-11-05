@@ -92,8 +92,10 @@ function getItemOrParent(item, zotero) {
  */
 function runSearch(s, zotero) {
     return s.search().then((ids) => {
-        let items = ids.map(zotero.Items.getAsync);
-        let items2 = zotero.Promise.map(items, (item)=>{ return getItemOrParent(item, zotero) });
+        let items = zotero.Items.getAsync(ids);
+        let items2 = zotero.Promise.map(items, (item)=>{
+            return getItemOrParent(item, zotero)
+        });
         return dedupItems(items2, zotero);
     });
 }
