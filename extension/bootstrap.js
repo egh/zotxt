@@ -41,6 +41,7 @@ let easyKeyExporterMetadata = {
 
 const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain';
+const badRequest = 400;
 
 function loadZotero () {
     let callback = function (resolve, reject) {
@@ -290,7 +291,7 @@ function handleResponseFormat(format, style, itemPromises) {
             translatorId = easyKeyExporterMetadata.translatorID;
         } else {
             if (!Zotero.BetterBibTeX) {
-                return [400, textMediaType, 'BetterBibTex not installed.'];
+                return [badRequest, textMediaType, 'BetterBibTex not installed.'];
             } else {
                 translatorId = Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy');
             }
@@ -304,7 +305,7 @@ function handleResponseFormat(format, style, itemPromises) {
                 let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
                 return [200, jsonMediaType, JSON.stringify(keys2, null, '  ')];
             }).catch(function() {
-                return [400];
+                return [badRequest];
             });
         }
     } else {
@@ -357,12 +358,12 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
 
 let completeEndpoint = function (options) {
     if (!options.query.easykey) {
-        return [400, textMediaType, 'Option easykey is required.'];
+        return [badRequest, textMediaType, 'Option easykey is required.'];
     } else {
         let q = cleanQuery(options.query);
         return easyKeySearch(parseEasyKey(q.easykey, zotero), zotero).then(function (items) {
             if (!items) {
-                return [400, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
+                return [badRequest, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {
                 return handleResponseFormat('easykey', null, items);
             }
@@ -376,7 +377,7 @@ const searchEndpoint = function (options) {
         let format = mkFormatter(query.format, query.style);
         return search(query.q, query.method).then(format);
     } else {
-        return [400, textMediaType, 'q param required.'];
+        return [badRequest, textMediaType, 'q param required.'];
     }
 };
 
@@ -395,7 +396,7 @@ let itemsEndpoint = function (options) {
         items = q.key.split(',').map(function (key) {
             let retval = findByKey(key, Zotero);
             if (retval === false) {
-                return [400, textMediaType, 'item with key ' + key + ' not found!'];
+                return [badRequest, textMediaType, 'item with key ' + key + ' not found!'];
             } else {
                 return retval;
             }
@@ -403,11 +404,11 @@ let itemsEndpoint = function (options) {
     } else if (q.easykey) {
         return Promise.all(q.easykey.split(',').map(findByEasyKey))
             .then(format)
-            .catch((ex) => [400, textMediaType, ex.message]);
+            .catch((ex) => [badRequest, textMediaType, ex.message]);
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
         if (!Zotero.BetterBibTeX) {
-            return [400, textMediaType, 'BetterBibTex not installed.'];
+            return [badRequest, textMediaType, 'BetterBibTex not installed.'];
         }
         let results = Zotero.BetterBibTeX.DB.keys.findObjects({citekey: { '$in': keys }, libraryID: null});
         if (results) {
@@ -418,7 +419,7 @@ let itemsEndpoint = function (options) {
     } else if (q.all) {
         return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(format);
     } else {
-        return [400, textMediaType, 'No param supplied!'];
+        return [badRequest, textMediaType, 'No param supplied!'];
     }
 };
 
@@ -433,16 +434,16 @@ let selectEndpoint = function (options) {
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
     } else {
-        return [400, textMediaType, 'No param supplied!'];
+        return [badRequest, textMediaType, 'No param supplied!'];
     }
     return promise.then(function(item) {
         if (item === false) {
-            return [400, textMediaType, 'item with key ' + q.key + ' not found!'];
+            return [badRequest, textMediaType, 'item with key ' + q.key + ' not found!'];
         }
         ZoteroPane.selectItem(item.id);
         return [200, jsonMediaType, JSON.stringify('success', null, '  ')];
     }).catch(function(ex) {
-        return [400, textMediaType, ex.message];
+        return [badRequest, textMediaType, ex.message];
     });
 };
 
