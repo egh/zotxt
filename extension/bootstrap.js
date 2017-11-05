@@ -86,15 +86,6 @@ function runSearch(s) {
     });
 }
 
-function rawSearch(key) {
-    let s = new Zotero.Search();
-    let str = '@' + key;
-    s.addCondition('joinMode', 'any');
-    s.addCondition('tag', 'is', str);
-    s.addCondition('note', 'contains', str);
-    return runSearch(s);
-}
-
 function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, Zotero.getCollections(null));
@@ -155,7 +146,7 @@ function findByEasyKey(key) {
             });
         } else {
             /* first try raw search */
-            return rawSearch(key).then(function(items) {
+            return rawSearch(key, zotero).then(function(items) {
                 if (items.length > 0) {
                     return items;
                 } else {

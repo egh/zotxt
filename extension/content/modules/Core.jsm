@@ -87,7 +87,16 @@ function getItemOrParent(item, zotero) {
     }
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent];
+function rawSearch(key, zotero) {
+    let s = new zotero.Search();
+    let str = '@' + key;
+    s.addCondition('joinMode', 'any');
+    s.addCondition('tag', 'is', str);
+    s.addCondition('note', 'contains', str);
+    return runSearch(s, zotero);
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
