@@ -41,9 +41,9 @@ function cleanQuery(q) {
 
 /* Given a iterable of promises that return an item, return a deduped iterable
  * of promises (based on the id). */
-function dedupItems(items, filter) {
+function dedupItems(items, zotero) {
     let seenIds = new Set([]); // To uniqify results
-    return filter(items, (item) => {
+    return zotero.Promise.filter(items, (item) => {
         if (seenIds.has(item.id)) {
             return false;
         } else {
