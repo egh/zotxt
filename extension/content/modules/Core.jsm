@@ -78,7 +78,16 @@ function makeCslEngine (styleId, zotero) {
     }
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine];
+function getItemOrParent(item, zotero) {
+    // not Regular item or standalone note/attachment
+    if (!item.isRegularItem() && item.parentKey) {
+        return findByKey(item.parentKey, zotero);
+    } else {
+        return item;
+    }
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
