@@ -126,7 +126,16 @@ function easyKeySearch(parsedKey, zotero) {
     return runSearch(s, zotero);
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch, runSearch];
+function buildSearch(s, query, method) {
+    if (!method) { method = 'titleCreatorYear'; }
+    s.addCondition('joinMode', 'all');
+    for (let word of query.split(/(?:\+|\s+)/)) {
+        s.addCondition('quicksearch-' + method, 'contains', word);
+    }
+    return s;
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch, runSearch, buildSearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

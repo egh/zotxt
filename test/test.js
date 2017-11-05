@@ -174,3 +174,33 @@ describe('#core.getItemOrParent()', () => {
         assert.equal(retval, core.getItemOrParent(item, zotero));
     });
 });
+
+describe('#core.buildSearch()', () => {
+    let addCondition, search;
+
+    beforeEach(()=>{
+        addCondition = sinon.stub();
+        search = { addCondition };
+    });
+
+    it("sets joinMode to all ", ()=>{
+        core.buildSearch(search, 'foo', null);
+        sinon.assert.calledWith(addCondition, 'joinMode', 'all');
+    });
+
+    it("searches titleCreatorYear by default", ()=>{
+        core.buildSearch(search, 'foo', null);
+        sinon.assert.calledWith(addCondition, 'quicksearch-titleCreatorYear', 'contains', 'foo');
+    });
+
+    it("uses the method if passed in by default", ()=>{
+        core.buildSearch(search, 'foo', 'test');
+        sinon.assert.calledWith(addCondition, 'quicksearch-test', 'contains', 'foo');
+    });
+
+    it("splits words for search", ()=>{
+        core.buildSearch(search, 'foo bar', null);
+        sinon.assert.calledWith(addCondition, 'quicksearch-titleCreatorYear', 'contains', 'foo');
+        sinon.assert.calledWith(addCondition, 'quicksearch-titleCreatorYear', 'contains', 'bar');
+    });
+});

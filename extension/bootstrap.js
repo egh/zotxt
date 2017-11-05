@@ -185,16 +185,6 @@ function myExport (items, translatorId) {
     return promise;
 }
 
-function search (query, method) {
-    if (!method) { method = 'titleCreatorYear'; }
-    let s = new Zotero.Search();
-    s.addCondition('joinMode', 'all');
-    for (let word of query.split(/(?:\+|\s+)/)) {
-        s.addCondition('quicksearch-' + method, 'contains', word);
-    }
-    return runSearch(s);
-}
-
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
     if (format === 'key') {
@@ -375,7 +365,8 @@ const searchEndpoint = function (options) {
     const query = cleanQuery(options.query);
     if (query.q) {
         let format = mkFormatter(query.format, query.style);
-        return search(query.q, query.method).then(format);
+        let search = buildSearch(new Zotero.Search(), query.q, query.method);
+        return runSearch(search, Zotero).then(format);
     } else {
         return [badRequest, textMediaType, 'q param required.'];
     }
