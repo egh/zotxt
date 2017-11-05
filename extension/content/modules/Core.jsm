@@ -91,6 +91,6 @@ const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, fi
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
-if (process) {
+if (typeof process !== 'undefined') {
     toExport.forEach((s) => { module.exports[s.name] = s; });
 }
