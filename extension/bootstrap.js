@@ -120,18 +120,18 @@ function findByEasyKey(key) {
     if (knownEasyKeys[key]) {
         return new Promise(function (resolve, reject) { return resolve(knownEasyKeys[key]); });;
     } else {
-        let parsedKey = parseEasyKey(key, zotero);
+        let parsedKey = parseEasyKey(key, Zotero);
         if (!parsedKey) {
             return new Promise(function (resolve, reject) {
                 reject({'name': 'EasyKeyError', 'message': 'EasyKey must be of the form DoeTitle2000 or doe:2000title'});
             });
         } else {
             /* first try raw search */
-            return rawSearch(key, zotero).then(function(items) {
+            return rawSearch(key, Zotero).then(function(items) {
                 if (items.length > 0) {
                     return items;
                 } else {
-                    return easyKeySearch(parsedKey, zotero);
+                    return easyKeySearch(parsedKey, Zotero);
                 }
             }).then (function (items) {
                 if (items.length === 0) {
