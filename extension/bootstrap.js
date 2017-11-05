@@ -62,30 +62,6 @@ function loadZotero () {
 
 let knownEasyKeys = {};
 
-/**
- * Returns a promise resolving to an iterable of promises.
- * Sorry, that's just how it is.
- */
-function runSearch(s) {
-    return s.search().then((ids) => {
-        return ids;
-    }).then((ids) => {
-        let idPromises = ids.map((id) => {
-            return Zotero.Items.getAsync(id);
-        });
-        let items = Zotero.Promise.map(idPromises, (item) => {
-            Zotero.debug(item);
-            // not Regular item or standalone note/attachment
-            if (!item.isRegularItem() && item.parentKey) {
-                return findByKey(item.parentKey, Zotero);
-            } else {
-                return item;
-            }
-        });
-        return dedupItems(items, Zotero.Promise.Filter);
-    });
-}
-
 function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, Zotero.getCollections(null));

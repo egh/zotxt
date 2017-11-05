@@ -87,6 +87,16 @@ function getItemOrParent(item, zotero) {
     }
 }
 
+/**
+ * Returns a promise resolving to an iterable.
+ */
+function runSearch(s, zotero) {
+    return s.search().then((ids) => {
+        let items = ids.map(zotero.Items.getAsync);
+        let items2 = zotero.Promise.map(items, (item)=>{ return getItemOrParent(item, zotero) });
+        return dedupItems(items2, zotero);
+    });
+}
 function rawSearch(key, zotero) {
     let s = new zotero.Search();
     let str = '@' + key;
@@ -116,7 +126,7 @@ function easyKeySearch(parsedKey, zotero) {
     return runSearch(s, zotero);
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch, runSearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
