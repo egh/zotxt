@@ -96,7 +96,27 @@ function rawSearch(key, zotero) {
     return runSearch(s, zotero);
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch];
+
+/**
+ * Find many items by a (possibly incomplete) parsed easy key.
+ */
+function easyKeySearch(parsedKey, zotero) {
+    let s = new zotero.Search();
+    /* allow multiple names separated by _ */
+    var splitName = parsedKey.creator.split('_');
+    for (let name of splitName) {
+        s.addCondition('creator', 'contains', name);
+    }
+    if (parsedKey.title != null) {
+        s.addCondition('title', 'contains', parsedKey.title);
+    }
+    if (parsedKey.date != null) {
+        s.addCondition('date', 'is', parsedKey.date);
+    }
+    return runSearch(s, zotero);
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, rawSearch, easyKeySearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

@@ -114,25 +114,6 @@ function collectionSearch(name) {
 }
 
 /**
- * Find many items by a (possibly incomplete) parsed easy key.
- */
-function easyKeySearch(parsedKey) {
-    let s = new Zotero.Search();
-    /* allow multiple names separated by _ */
-    var splitName = parsedKey.creator.split('_');
-    for (let name of splitName) {
-        s.addCondition('creator', 'contains', name);
-    }
-    if (parsedKey.title != null) {
-        s.addCondition('title', 'contains', parsedKey.title);
-    }
-    if (parsedKey.date != null) {
-        s.addCondition('date', 'is', parsedKey.date);
-    }
-    return runSearch(s);
-}
-
-/**
  * Find a single item by its easy key, caching the result.
  */
 function findByEasyKey(key) {
@@ -150,7 +131,7 @@ function findByEasyKey(key) {
                 if (items.length > 0) {
                     return items;
                 } else {
-                    return easyKeySearch(parsedKey);
+                    return easyKeySearch(parsedKey, zotero);
                 }
             }).then (function (items) {
                 if (items.length === 0) {
@@ -402,7 +383,7 @@ let completeEndpoint = function (options) {
         return [400, 'text/plain', 'Option easykey is required.'];
     } else {
         let q = cleanQuery(options.query);
-        return easyKeySearch(parseEasyKey(q.easykey)).then(function (items) {
+        return easyKeySearch(parseEasyKey(q.easykey), zotero).then(function (items) {
             if (!items) {
                 return [400, 'text/plain', 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {
