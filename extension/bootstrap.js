@@ -109,7 +109,7 @@ function findByEasyKey(key) {
                 if (items.length > 0) {
                     return items;
                 } else {
-                    return easyKeySearch(parsedKey, Zotero);
+                    return runSearch(buildEasyKeySearch(new Zotero.Search(), parsedKey), Zotero);
                 }
             }).then (function (items) {
                 if (items.length === 0) {
@@ -351,7 +351,7 @@ let completeEndpoint = function (options) {
         return [badRequest, textMediaType, 'Option easykey is required.'];
     } else {
         let q = cleanQuery(options.query);
-        return easyKeySearch(parseEasyKey(q.easykey, zotero), zotero).then(function (items) {
+        return runSearch(buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero)), Zotero).then(function (items) {
             if (!items) {
                 return [badRequest, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {

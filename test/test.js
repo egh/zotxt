@@ -220,3 +220,52 @@ describe('#core.buildRawSearch()', () => {
         sinon.assert.calledWith(addCondition, 'note', 'contains', '@foo:2016bar');
     });
 });
+
+
+describe('#core.buildEasyKeySearch()', () => {
+    let addCondition, search;
+    const zotero = { Utilities: { XRegExp: xregexp } };
+
+    beforeEach(()=>{
+        addCondition = sinon.stub();
+        search = { addCondition };
+    });
+
+    it("adds all fields if provided", ()=>{
+        const key = core.parseEasyKey('foo:2016bar', zotero);
+        core.buildEasyKeySearch(search, key);
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'foo');
+        sinon.assert.calledWith(addCondition, 'title', 'contains', 'bar');
+        sinon.assert.calledWith(addCondition, 'date', 'is', '2016');
+    });
+
+    it("splits names", ()=>{
+        const key = core.parseEasyKey('foo_bar:2016baz', zotero);
+        core.buildEasyKeySearch(search, key);
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'foo');
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'bar');
+    });
+
+    it("works when date not provided", ()=>{
+        const key = core.parseEasyKey('foo:bar', zotero);
+        core.buildEasyKeySearch(search, key);
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'foo');
+        sinon.assert.calledWith(addCondition, 'title', 'contains', 'bar');
+        sinon.assert.calledTwice(addCondition);
+    });
+
+    it("works when title not provided", ()=>{
+        const key = core.parseEasyKey('foo:2016', zotero);
+        core.buildEasyKeySearch(search, key);
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'foo');
+        sinon.assert.calledWith(addCondition, 'date', 'is', '2016');
+        sinon.assert.calledTwice(addCondition);
+    });
+
+    it("works when date title not provided", ()=>{
+        const key = core.parseEasyKey('foo:', zotero);
+        core.buildEasyKeySearch(search, key);
+        sinon.assert.calledWith(addCondition, 'creator', 'contains', 'foo');
+        sinon.assert.calledOnce(addCondition);
+    });
+});

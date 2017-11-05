@@ -109,8 +109,7 @@ function buildRawSearch(s, key) {
 /**
  * Find many items by a (possibly incomplete) parsed easy key.
  */
-function easyKeySearch(parsedKey, zotero) {
-    let s = new zotero.Search();
+function buildEasyKeySearch(s, parsedKey) {
     /* allow multiple names separated by _ */
     var splitName = parsedKey.creator.split('_');
     for (let name of splitName) {
@@ -122,7 +121,7 @@ function easyKeySearch(parsedKey, zotero) {
     if (parsedKey.date != null) {
         s.addCondition('date', 'is', parsedKey.date);
     }
-    return runSearch(s, zotero);
+    return s;
 }
 
 function buildSearch(s, query, method) {
@@ -134,7 +133,7 @@ function buildSearch(s, query, method) {
     return s;
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, easyKeySearch, runSearch, buildSearch];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
