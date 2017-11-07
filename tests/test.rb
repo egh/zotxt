@@ -346,7 +346,7 @@ class ZotxtTest < MiniTest::Test
     assert_equal "doe:2007why", results[0]
   end
 
-  def test_selected
+  def test_select
     resp = @client.get(@item_url, {"selected" => "t", "format" => "easykey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -62,8 +62,6 @@ function loadZotero () {
     return new Promise(callback);
 }
 
-let knownEasyKeys = {};
-
 function getCollection(name, collections) {
     if (!collections) {
         return getCollection(name, Zotero.getCollections(null));
@@ -99,41 +97,6 @@ function makeEasyKeyError(str) {
 }
 
 /**
- * Find a single item by its easy key, caching the result.
- */
-function findByEasyKey(key) {
-    if (knownEasyKeys[key]) {
-        return Promise.resolve(knownEasyKeys[key]);
-    } else {
-        let parsedKey = parseEasyKey(key, Zotero);
-        if (!parsedKey) {
-            return makeEasyKeyError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
-        } else {
-            /* first try raw search */
-            let search = buildRawSearch(new Zotero.Search(), key);
-            return runSearch(search, Zotero).then(function(items) {
-                if (items.length === 1) {
-                    return knownEasyKeys[key] = items[0];
-                } else if (items.length > 1) {
-                    return makeEasyKeyError('search return multiple items');
-                } else {
-                    let search = buildEasyKeySearch(new Zotero.Search(), parsedKey);
-                    return runSearch(search, Zotero).then (function (items) {
-                        if (items.length === 0) {
-                            return makeEasyKeyError('search failed to return a single item');
-                        } else if (items.length > 1) {
-                            return makeEasyKeyError('search return multiple items');
-                        } else {
-                            return knownEasyKeys[key] = items[0];
-                        }
-                    });
-                }
-            });
-        }
-    }
-}
-
-/**
  * Map the easykeys in the citations to ids.
  */
 function processCitationsGroup (citationGroup) {
@@ -141,7 +104,7 @@ function processCitationsGroup (citationGroup) {
         let retval = {};
         for (let x in citation) {
             if (x === 'easyKey') {
-                retval.id = findByEasyKey(citation[x]).id;
+                retval.id = findByEasyKey(citation[x], Zotero).id;
             } else if (x === 'key') {
                 retval.id = findByKey(citation[x], Zotero).id;
             } else {
@@ -401,7 +364,7 @@ let itemsEndpoint = function (options) {
             }
         });
     } else if (q.easykey) {
-        return Promise.all(q.easykey.split(',').map(findByEasyKey))
+        return Promise.all(q.easykey.split(',').map((key)=>{ return findByEasyKey(key, Zotero); })
             .then(format)
             .catch((ex) => [badRequest, textMediaType, ex.message]);
     } else if (q.betterbibtexkey) {
@@ -429,7 +392,7 @@ let selectEndpoint = function (options) {
     let q = cleanQuery(options.query);
     let promise = null;
     if (q.easykey) {
-        promise = findByEasyKey(q.easykey);
+        promise = findByEasyKey(q.easykey, Zotero);
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
     } else {

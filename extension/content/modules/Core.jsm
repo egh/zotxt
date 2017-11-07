@@ -135,7 +135,44 @@ function buildSearch(s, query, method) {
     return s;
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch];
+let knownEasyKeys = {};
+
+/**
+ * Find a single item by its easy key, caching the result.
+ */
+function findByEasyKey(key, zotero) {
+    if (knownEasyKeys[key]) {
+        return Promise.resolve(knownEasyKeys[key]);
+    } else {
+        let parsedKey = parseEasyKey(key, zotero);
+        if (!parsedKey) {
+            return makeEasyKeyError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
+        } else {
+            /* first try raw search */
+            let search = buildRawSearch(new zotero.Search(), key);
+            return runSearch(search, zotero).then(function(items) {
+                if (items.length === 1) {
+                    return knownEasyKeys[key] = items[0];
+                } else if (items.length > 1) {
+                    return makeEasyKeyError('search return multiple items');
+                } else {
+                    let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
+                    return runSearch(search, zotero).then (function (items) {
+                        if (items.length === 1) {
+                            return knownEasyKeys[key] = items[0];
+                        } else if (items.length > 1) {
+                            return makeEasyKeyError('search return multiple items');
+                        } else {
+                            return makeEasyKeyError('search failed to return a single item');
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
