@@ -158,6 +158,17 @@ function myExport (items, translatorId) {
 }
 
 /**
+ * Build a response based on items and a format parameter.
+ */
+function buildResponse(items, format) {
+    if (format === 'easykey') {
+        return buildEasyKeyResponse(items);
+    } else if (format === 'betterbibtexkey') {
+        return buildBBTKeyResponse(items);
+    }
+}
+
+/**
  * Build a response of a set of citation keys based on a set of items and a
  * translatorId via the Zotero export process.
  */
