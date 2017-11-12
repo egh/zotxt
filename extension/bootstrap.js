@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, jsonStringify */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, jsonStringify, items2key */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -161,7 +161,9 @@ function myExport (items, translatorId) {
  * Build a response based on items and a format parameter.
  */
 function buildResponse(items, format) {
-    if (format === 'easykey') {
+    if (format === 'key') {
+        return [okCode, 'application/json', jsonStringify(items.map(item2key))];
+    } else if (format === 'easykey') {
         return buildEasyKeyResponse(items);
     } else if (format === 'betterbibtexkey') {
         return buildBBTKeyResponse(items);
