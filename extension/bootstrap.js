@@ -262,9 +262,10 @@ let completeEndpoint = function (options) {
 const searchEndpoint = function (options) {
     const query = cleanQuery(options.query);
     if (query.q) {
-        let format = mkFormatter(query.format, query.style);
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
-        return runSearch(search, Zotero).then(format);
+        return runSearch(search, Zotero).then((items)=>{
+            return buildResponse(items, query.format);
+        });
     } else {
         return [badRequestCode, textMediaType, 'q param required.'];
     }
