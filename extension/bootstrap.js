@@ -360,7 +360,7 @@ let completeEndpoint = function (options) {
             if (!items) {
                 return [badRequestCode, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {
-                return handleResponseFormat('easykey', null, items);
+                return buildEasyKeyResponse(items);
             }
         });
     }
