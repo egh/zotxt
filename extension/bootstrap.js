@@ -165,6 +165,10 @@ function buildResponse(items, format) {
         return buildEasyKeyResponse(items);
     } else if (format === 'betterbibtexkey') {
         return buildBBTKeyResponse(items);
+    } else if (format === 'bibtex') {
+        return buildBibTeXResponse(items);
+    } else if (format && format.match(uuidRe)) {
+        return buildExportResponse(items, format);
     }
 }
 
@@ -199,6 +203,18 @@ function buildBBTKeyResponse(items) {
             items,
             Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'));
     }
+}
+
+function buildExportResponse(items, translatorId) {
+    return myExport(items, translatorId).then((data) => {
+        return [okCode, textMediaType, data];
+    }).catch(()=>{
+        return [badRequestCode];
+    });
+}
+
+function buildBibTeXResponse(items) {
+    return buildExportResponse(items, '9cb70025-a888-4a29-a210-93ec52da40d4');
 }
 
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
