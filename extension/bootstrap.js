@@ -270,48 +270,6 @@ const searchEndpoint = function (options) {
     }
 };
 
-let itemsEndpoint = function (options) {
-    const q = cleanQuery(options.query);
-    let items = [];
-    const format = mkFormatter(q.format, q.style);
-    if (q.selected) {
-        let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
-                getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
-        items = ZoteroPane.getSelectedItems();
-        if (!items) { items = []; }
-    } else if (q.collection) {
-        items = collectionSearch(q.collection);
-    } else if (q.key) {
-        items = q.key.split(',').map(function (key) {
-            let retval = findByKey(key, Zotero);
-            if (retval === false) {
-                return [badRequestCode, textMediaType, 'item with key ' + key + ' not found!'];
-            } else {
-                return retval;
-            }
-        });
-    } else if (q.easykey) {
-        return Promise.all(q.easykey.split(',').map((key)=>{ return findByEasyKey(key, Zotero); })
-            .then(format)
-            .catch((ex) => [badRequestCode, textMediaType, ex.message]);
-    } else if (q.betterbibtexkey) {
-        let keys = q.betterbibtexkey.split(',');
-        if (!Zotero.BetterBibTeX) {
-            return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
-        }
-        let results = Zotero.BetterBibTeX.DB.keys.findObjects({citekey: { '$in': keys }, libraryID: null});
-        if (results) {
-            items = results.map(function (result) {
-                return Zotero.Items.get(result.itemID);
-            });
-        }
-    } else if (q.all) {
-        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(format);
-    } else {
-        return [badRequestCode, textMediaType, 'No param supplied!'];
-    }
-};
-
 let selectEndpoint = function (options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
             getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
@@ -351,11 +309,6 @@ function loadEndpoints () {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : searchEndpoint
-            },
-            'items' : {
-                supportedMethods:['GET'],
-                supportedDataType : ['application/x-www-form-urlencoded'],
-                init : itemsEndpoint
             },
             'select' : {
                 supportedMethods:['GET'],
