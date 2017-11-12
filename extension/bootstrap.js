@@ -157,6 +157,39 @@ function myExport (items, translatorId) {
     return promise;
 }
 
+/**
+ * Build a response of a set of citation keys based on a set of items and a
+ * translatorId via the Zotero export process.
+ */
+function buildKeyResponse(items, translatorId) {
+        if (items.length === 0) {
+            return [okCode, 'application/json', jsonStringify([])];
+        } else {
+            return myExport(items, translatorId).then((rawKeys)=>{
+                let keys = rawKeys.split(' ');
+                // remove leading @
+                let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
+                return [okCode, jsonMediaType, jsonStringify(keys2)];
+            }).catch(()=>{
+                return [badRequestCode];
+            });
+        }
+}
+
+function buildEasyKeyResponse(items) {
+    return buildKeyResponse(items, easyKeyExporterMetadata.translatorID);
+}
+
+function buildBBTKeyResponse(items) {
+    if (!Zotero.BetterBibTeX) {
+        return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
+    } else {
+        return buildKeyResponse(
+            items,
+            Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'));
+    }
+}
+
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
     if (format === 'key') {
