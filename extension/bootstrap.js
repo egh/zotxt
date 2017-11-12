@@ -41,7 +41,8 @@ let easyKeyExporterMetadata = {
 
 const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain';
-const badRequest = 400;
+const badRequestCode = 400;
+const okCode = 200;
 
 function loadZotero () {
     let callback = function (resolve, reject) {
@@ -159,7 +160,7 @@ function myExport (items, translatorId) {
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
     if (format === 'key') {
-        return [200, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
+        return [okCode, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
     } else if (format === 'bibliography') {
         let csl = makeCslEngine(style, Zotero);
         let responseData = items.map (function (item) {
@@ -172,7 +173,7 @@ const mkFormatter = (format, style) => (items) => handleResponseFormat(format, s
                     .replace(/(\r\n|\n|\r)/gm,'')
             };
         });
-        return [200, jsonMediaType, JSON.stringify(responseData, null, '  ')];
+        return [okCode, jsonMediaType, JSON.stringify(responseData, null, '  ')];
     } else if (format === 'bibtex' || (format && format.match(uuidRe))) {
         /* return raw export data */
         let translatorId = null;
@@ -252,21 +253,21 @@ function handleResponseFormat(format, style, itemPromises) {
             translatorId = easyKeyExporterMetadata.translatorID;
         } else {
             if (!Zotero.BetterBibTeX) {
-                return [badRequest, textMediaType, 'BetterBibTex not installed.'];
+                return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
             } else {
                 translatorId = Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy');
             }
         }
         if (items.length === 0) {
-            return [200, 'application/json', JSON.stringify([], null, '  ')];
+            return [okCode, 'application/json', JSON.stringify([], null, '  ')];
         } else {
             return myExport(items, translatorId).then(function(rawKeys) {
                 let keys = rawKeys.split(' ');
                 // remove leading @
                 let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
-                return [200, jsonMediaType, JSON.stringify(keys2, null, '  ')];
+                return [okCode, jsonMediaType, JSON.stringify(keys2, null, '  ')];
             }).catch(function() {
-                return [badRequest];
+                return [badRequestCode];
             });
         }
     } else {
@@ -274,7 +275,7 @@ function handleResponseFormat(format, style, itemPromises) {
         if (Zotero.BetterBibTeX) {
             let translatorId = Zotero.BetterBibTeX.Translators.getID('Better CSL JSON');
             return myExport(items, translatorId).then(function (output) {
-                return [200, 'text/plain; charset=UTF-8', output];
+                return [okCode, 'text/plain; charset=UTF-8', output];
             });
         } else {
             let itemGetter = new Zotero.Translate.ItemGetter();
@@ -284,7 +285,7 @@ function handleResponseFormat(format, style, itemPromises) {
             while((item = itemGetter.nextItem())) {
                 responseData.push(Zotero.Utilities.itemToCSLJSON(item));
             }
-            return [200, jsonMediaType, JSON.stringify(responseData, null, '  ')];
+            return [okCode, jsonMediaType, JSON.stringify(responseData, null, '  ')];
         }
     }
     });
@@ -319,12 +320,12 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
 
 let completeEndpoint = function (options) {
     if (!options.query.easykey) {
-        return [badRequest, textMediaType, 'Option easykey is required.'];
+        return [badRequestCode, textMediaType, 'Option easykey is required.'];
     } else {
         let q = cleanQuery(options.query);
         return runSearch(buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero)), Zotero).then(function (items) {
             if (!items) {
-                return [badRequest, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
+                return [badRequestCode, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
             } else {
                 return handleResponseFormat('easykey', null, items);
             }
@@ -339,7 +340,7 @@ const searchEndpoint = function (options) {
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
         return runSearch(search, Zotero).then(format);
     } else {
-        return [badRequest, textMediaType, 'q param required.'];
+        return [badRequestCode, textMediaType, 'q param required.'];
     }
 };
 
@@ -358,7 +359,7 @@ let itemsEndpoint = function (options) {
         items = q.key.split(',').map(function (key) {
             let retval = findByKey(key, Zotero);
             if (retval === false) {
-                return [badRequest, textMediaType, 'item with key ' + key + ' not found!'];
+                return [badRequestCode, textMediaType, 'item with key ' + key + ' not found!'];
             } else {
                 return retval;
             }
@@ -366,11 +367,11 @@ let itemsEndpoint = function (options) {
     } else if (q.easykey) {
         return Promise.all(q.easykey.split(',').map((key)=>{ return findByEasyKey(key, Zotero); })
             .then(format)
-            .catch((ex) => [badRequest, textMediaType, ex.message]);
+            .catch((ex) => [badRequestCode, textMediaType, ex.message]);
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
         if (!Zotero.BetterBibTeX) {
-            return [badRequest, textMediaType, 'BetterBibTex not installed.'];
+            return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
         }
         let results = Zotero.BetterBibTeX.DB.keys.findObjects({citekey: { '$in': keys }, libraryID: null});
         if (results) {
@@ -381,7 +382,7 @@ let itemsEndpoint = function (options) {
     } else if (q.all) {
         return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(format);
     } else {
-        return [badRequest, textMediaType, 'No param supplied!'];
+        return [badRequestCode, textMediaType, 'No param supplied!'];
     }
 };
 
@@ -396,16 +397,16 @@ let selectEndpoint = function (options) {
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
     } else {
-        return [badRequest, textMediaType, 'No param supplied!'];
+        return [badRequestCode, textMediaType, 'No param supplied!'];
     }
     return promise.then(function(item) {
         if (item === false) {
-            return [badRequest, textMediaType, 'item with key ' + q.key + ' not found!'];
+            return [badRequestCode, textMediaType, 'item with key ' + q.key + ' not found!'];
         }
         ZoteroPane.selectItem(item.id);
-        return [200, jsonMediaType, JSON.stringify('success', null, '  ')];
+        return [okCode, jsonMediaType, JSON.stringify('success', null, '  ')];
     }).catch(function(ex) {
-        return [badRequest, textMediaType, ex.message];
+        return [badRequestCode, textMediaType, ex.message];
     });
 };
 
