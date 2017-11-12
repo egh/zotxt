@@ -172,7 +172,11 @@ function findByEasyKey(key, zotero) {
     }
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey];
+function jsonStringify(json) {
+    return JSON.stringify(json, null, '  ');
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, jsonStringify];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

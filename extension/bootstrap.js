@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, jsonStringify */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -160,7 +160,7 @@ function myExport (items, translatorId) {
 const mkFormatter = (format, style) => (items) => handleResponseFormat(format, style, items);
 
     if (format === 'key') {
-        return [okCode, 'application/json', JSON.stringify(items.map(item2key), null, '  ')];
+        return [okCode, 'application/json', jsonStringify(items.map(item2key))];
     } else if (format === 'bibliography') {
         let csl = makeCslEngine(style, Zotero);
         let responseData = items.map (function (item) {
@@ -173,7 +173,7 @@ const mkFormatter = (format, style) => (items) => handleResponseFormat(format, s
                     .replace(/(\r\n|\n|\r)/gm,'')
             };
         });
-        return [okCode, jsonMediaType, JSON.stringify(responseData, null, '  ')];
+        return [okCode, jsonMediaType, jsonStringify(responseData)];
     } else if (format === 'bibtex' || (format && format.match(uuidRe))) {
         /* return raw export data */
         let translatorId = null;
@@ -208,7 +208,7 @@ function handleResponseFormat(format, style, itemPromises) {
             }
         }
         sendResponseCallback(200, jsonMediaType,
-                             JSON.stringify(responseData, null, '  '));
+                             jsonStringify(responseData));
 
     } else if (format === 'paths') {
         let promises = [];
@@ -245,7 +245,7 @@ function handleResponseFormat(format, style, itemPromises) {
         }
         Q.allResolved(promises).then(function () {
             sendResponseCallback(200, jsonMediaType,
-                                 JSON.stringify(responseData, null, '  '));
+                                 jsonStringify(responseData));
         });
     } else if (format === 'easykey' || format === 'betterbibtexkey') {
         let translatorId = null;
@@ -259,13 +259,13 @@ function handleResponseFormat(format, style, itemPromises) {
             }
         }
         if (items.length === 0) {
-            return [okCode, 'application/json', JSON.stringify([], null, '  ')];
+            return [okCode, 'application/json', jsonStringify([])];
         } else {
             return myExport(items, translatorId).then(function(rawKeys) {
                 let keys = rawKeys.split(' ');
                 // remove leading @
                 let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
-                return [okCode, jsonMediaType, JSON.stringify(keys2, null, '  ')];
+                return [okCode, jsonMediaType, jsonStringify(keys2)];
             }).catch(function() {
                 return [badRequestCode];
             });
@@ -285,7 +285,7 @@ function handleResponseFormat(format, style, itemPromises) {
             while((item = itemGetter.nextItem())) {
                 responseData.push(Zotero.Utilities.itemToCSLJSON(item));
             }
-            return [okCode, jsonMediaType, JSON.stringify(responseData, null, '  ')];
+            return [okCode, jsonMediaType, jsonStringify(responseData)];
         }
     }
     });
@@ -310,7 +310,7 @@ let bibliographyEndpoint = function (url, data, sendResponseCallback) {
 		    retval.citationClusters[updated[0]] = updated[1];
 		});
 	    });
-            sendResponseCallback(200, jsonMediaType, JSON.stringify(retval, null, '  '));
+            sendResponseCallback(200, jsonMediaType, jsonStringify(retval));
             return;
         } catch (ex if (ex.name === 'EasyKeyError')) {
             sendResponseCallback(400, textMediaType, ex.message);
@@ -404,7 +404,7 @@ let selectEndpoint = function (options) {
             return [badRequestCode, textMediaType, 'item with key ' + q.key + ' not found!'];
         }
         ZoteroPane.selectItem(item.id);
-        return [okCode, jsonMediaType, JSON.stringify('success', null, '  ')];
+        return [okCode, jsonMediaType, jsonStringify('success')];
     }).catch(function(ex) {
         return [badRequestCode, textMediaType, ex.message];
     });
