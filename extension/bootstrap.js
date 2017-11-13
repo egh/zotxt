@@ -171,6 +171,18 @@ function buildResponse(items, format) {
         return buildBibTeXResponse(items);
     } else if (format && format.match(uuidRe)) {
         return buildExportResponse(items, format);
+    } else {
+        return buildJsonResponse(items);
+    }
+}
+
+function buildJsonResponse(items) {
+    /* Use BetterBibTeX JSON if available */
+    if (Zotero.BetterBibTeX) {
+        let translatorId = Zotero.BetterBibTeX.Translators.getID('Better CSL JSON');
+        return buildExportResponse(items, translatorId);
+    } else {
+        return buildExportResponse(items, 'bc03b4fe-436d-4a1f-ba59-de4d2d7a63f7');
     }
 }
 
