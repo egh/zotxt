@@ -309,6 +309,15 @@ let selectEndpoint = function (options) {
     });
 };
 
+let itemsEndpoint = function (options) {
+    const q = cleanQuery(options.query);
+    let items = [];
+    if (q.selected) {
+        items = Zotero.getActiveZoteroPane().getSelectedItems();
+    }
+    return buildResponse(items, q.format);
+};
+
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
@@ -329,7 +338,13 @@ function loadEndpoints () {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : selectEndpoint
+            },
+            'items' : {
+                supportedMethods:['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : itemsEndpoint
             }
+
         };
         for (let e in endpoints) {
             let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
