@@ -313,9 +313,14 @@ let itemsEndpoint = function (options) {
     const q = cleanQuery(options.query);
     let items = [];
     if (q.selected) {
-        items = Zotero.getActiveZoteroPane().getSelectedItems();
+        return buildResponse(Zotero.getActiveZoteroPane().getSelectedItems(), q.format);
+    } else if (q.all) {
+        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then((items)=>{
+            return buildResponse(items, q.format);
+        });
+    } else {
+        return [badRequestCode, textMediaType, 'No param supplied!'];
     }
-    return buildResponse(items, q.format);
 };
 
 /**
