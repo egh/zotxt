@@ -138,7 +138,7 @@ function myExport (items, translatorId) {
     let translation = new Zotero.Translate.Export();
     translation.setItems(items);
     translation.setTranslator(translatorId);
-    if (Zotero.BetterBibTeX && (translatorId === Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'))) {
+    if (Zotero.BetterBibTeX && (translatorId === 'a515a220-6fef-45ea-9842-8025dfebcc8f')) {
       translation.setDisplayOptions({quickCopyMode: 'pandoc'});
     }
     /* I don't understand why Zotero still has `setHandler` now that we are in
@@ -179,8 +179,7 @@ function buildResponse(items, format) {
 function buildJsonResponse(items) {
     /* Use BetterBibTeX JSON if available */
     if (Zotero.BetterBibTeX) {
-        let translatorId = Zotero.BetterBibTeX.Translators.getID('Better CSL JSON');
-        return buildExportResponse(items, translatorId);
+        return buildExportResponse(items, 'f4b52ab0-f878-4556-85a0-c7aeedd09dfc');
     } else {
         return buildExportResponse(items, 'bc03b4fe-436d-4a1f-ba59-de4d2d7a63f7');
     }
@@ -213,9 +212,7 @@ function buildBBTKeyResponse(items) {
     if (!Zotero.BetterBibTeX) {
         return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
     } else {
-        return buildKeyResponse(
-            items,
-            Zotero.BetterBibTeX.Translators.getID('BetterBibTeX Quick Copy'));
+        return buildKeyResponse(items, 'a515a220-6fef-45ea-9842-8025dfebcc8f');
     }
 }
 
