@@ -101,11 +101,20 @@ describe('#core.findByKey()', () => {
 
     it("calls getByLibraryAndKeyAsync when a key without a / is passed in", ()=>{
         getByLibraryAndKeyAsync.reset();
-        const key = 'foo_bar';
+        const key = 'foo-bar';
         core.findByKey(key, zotero);
         assert(parseLibraryKey.notCalled);
         assert(getByLibraryAndKeyAsync.calledOnce);
         assert(getByLibraryAndKeyAsync.calledWith(1, key));
+    });
+
+    it("calls getByLibraryAndKeyAsync when a key with a _ is passed in", ()=>{
+        getByLibraryAndKeyAsync.reset();
+        const key = '3_bar';
+        core.findByKey(key, zotero);
+        assert(parseLibraryKey.notCalled);
+        assert(getByLibraryAndKeyAsync.calledOnce);
+        assert(getByLibraryAndKeyAsync.calledWith(3, 'bar'));
     });
 
     it("fetches the library id and calls getByLibraryAndKeyAsync when a key with a / is used", ()=>{

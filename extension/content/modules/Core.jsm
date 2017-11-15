@@ -61,6 +61,9 @@ function findByKey(key, zotero) {
     if (key.indexOf('/') !== -1) {
         let lkh = zotero.Items.parseLibraryKey(key);
         return zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key);
+    } else if (key.indexOf('_') !== -1) {
+        let [libraryId, key2] = key.split('_');
+        return zotero.Items.getByLibraryAndKeyAsync(parseInt(libraryId), key2);
     } else {
         return zotero.Items.getByLibraryAndKeyAsync(1, key);
     }
