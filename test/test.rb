@@ -48,14 +48,14 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "json"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({'id'=>"http://zotero.org/users/1254/items/#{@doe_first_book_key[2..-1]}",
+    assert_equal({'id'=>"DoeFirstBook2005",
                   'type'=>'book',
                   'title'=>'First Book',
                   'publisher'=>'Cambridge University Press',
-                  'publisher-place'=>'Cambridge',
-                  'event-place'=>'Cambridge',
                   'author'=>[{'family'=>'Doe', 'given'=>'John'}],
-                  'issued'=>{'date-parts'=>[['2005']]}}, i[0])
+                  'issued'=>{'date-parts'=>[[2005]]},
+                  'publisher-place'=>'Cambridge'
+                 }, i[0])
   end
 
   def test_items_easykey_paths_format
@@ -308,16 +308,17 @@ class ZotxtTest < MiniTest::Test
   def test_format_bibtex
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "bibtex"})
     assert_equal 200, resp.status
-    assert_equal("""
+    assert_match(
+      Regexp.new(
+        Regexp.quote("""
 @article{doe_article_2006,
 	title = {Article},
 	volume = {6},
 	journal = {Journal of Generic Studies},
 	author = {Doe, John},
 	year = {2006},
-	pages = {33--34},
-	file = {doe:/home/egh/.mozilla/firefox/xmv76vsh.default/zotero/storage/QWFHQ73F/doe:text/plain}
-}""", resp.body)
+	pages = {33--34}""")),
+      resp.body)
   end
 
   def test_format_bibliography
@@ -383,14 +384,14 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "json"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({"id"=>"http://zotero.org/users/1254/items/4T8MCITQ",
+    assert_equal({"id"=>"DoeArticle2006",
       "type"=>"article-journal",
       "title"=>"Article",
       "container-title"=>"Journal of Generic Studies",
       "page"=>"33-34",
       "volume"=>"6",
       "author"=>[{"family"=>"Doe", "given"=>"John"}],
-      "issued"=>{"date-parts"=>[["2006"]]}
+      "issued"=>{"date-parts"=>[[2006]]}
                    }, results[0])
   end
 
