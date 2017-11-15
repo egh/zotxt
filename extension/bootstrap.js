@@ -314,6 +314,14 @@ let itemsEndpoint = function (options) {
     let items = [];
     if (q.selected) {
         return buildResponse(Zotero.getActiveZoteroPane().getSelectedItems(), q.format);
+    } else if (q.key) {
+        let keys = q.key.split(',');
+        return Promise.all(
+            keys.map((key)=>{
+                return findByKey(key, Zotero);
+            })).then((items)=>{
+                return buildResponse(items, q.format);
+            });
     } else if (q.easykey) {
         let keys = q.easykey.split(',');
         return Promise.all(
