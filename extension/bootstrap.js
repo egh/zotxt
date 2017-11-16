@@ -194,7 +194,7 @@ function buildKeyResponse(items, translatorId) {
             return [okCode, 'application/json', jsonStringify([])];
         } else {
             return myExport(items, translatorId).then((rawKeys)=>{
-                let keys = rawKeys.split(' ');
+                let keys = rawKeys.split(/[ ,]/);
                 // remove leading @
                 let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
                 return [okCode, jsonMediaType, jsonStringify(keys2)];
