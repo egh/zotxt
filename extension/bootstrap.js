@@ -135,15 +135,12 @@ function extractIds (citationGroups) {
 }
 
 function myExport (items, translatorId) {
-    let translation = new Zotero.Translate.Export();
-    translation.setItems(items);
-    translation.setTranslator(translatorId);
-    if (Zotero.BetterBibTeX && (translatorId === 'a515a220-6fef-45ea-9842-8025dfebcc8f')) {
-      translation.setDisplayOptions({quickCopyMode: 'pandoc'});
-    }
-    /* I don't understand why Zotero still has `setHandler` now that we are in
-     * promise-land, but OK */
     let callback = function (resolve, reject) {
+        let translation = new Zotero.Translate.Export();
+        translation.setItems(items);
+        translation.setTranslator(translatorId);
+        /* I don't understand why Zotero still has `setHandler` now that we are in
+         * promise-land, but OK */
         translation.setHandler("done", function (obj, worked) {
             if (worked) {
                 resolve(obj.string);
@@ -151,9 +148,12 @@ function myExport (items, translatorId) {
                 reject();
             }
         });
+        if (translatorId === 'a515a220-6fef-45ea-9842-8025dfebcc8f') {
+            translation.setDisplayOptions({quickCopyMode: 'citekeys'});
+        }
+        translation.translate();
     };
     let promise = new Promise(callback);
-    translation.translate();
     return promise;
 }
 
