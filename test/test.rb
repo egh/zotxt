@@ -358,7 +358,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "betterbibtexkey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal "doe_article_2006", results[0]
+    assert_equal "DoeArticle2006", results[0]
   end
 
   def test_format_export_uuid
