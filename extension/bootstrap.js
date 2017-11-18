@@ -159,7 +159,7 @@ function myExport (items, translatorId) {
 /**
  * Build a response based on items and a format parameter.
  */
-function buildResponse(items, format) {
+function buildResponse(items, format, style) {
     if (format === 'key') {
         return [okCode, 'application/json', jsonStringify(items.map(item2key))];
     } else if (format === 'easykey') {
@@ -168,6 +168,8 @@ function buildResponse(items, format) {
         return buildBBTKeyResponse(items);
     } else if (format === 'bibtex') {
         return buildBibTeXResponse(items);
+    } else if (format === 'bibliography') {
+        return buildBibliographyResponse(items, style);
     } else if (format && format.match(uuidRe)) {
         return buildExportResponse(items, format);
     } else {
@@ -227,6 +229,20 @@ function buildBibTeXResponse(items) {
     return buildExportResponse(items, '9cb70025-a888-4a29-a210-93ec52da40d4');
 }
 
+function buildBibliographyResponse(items, style) {
+    let csl = makeCslEngine(style, Zotero);
+    let responseData = items.map ((item)=>{
+        csl.updateItems([item.id], true);
+        return {
+            'key': ((item.libraryID || '0') + '_' + item.key),
+            'html': Zotero.Cite.makeFormattedBibliography(csl, 'html'),
+            // strip newlines
+            'text': Zotero.Cite.makeFormattedBibliography(csl, 'text').replace(/(\r\n|\n|\r)/gm,'')
+            };
+    });
+    return [okCode, jsonMediaType, jsonStringify(responseData)];
+}
+
 let bibliographyEndpoint = function (options) {
     let cslEngine = makeCslEngine(options.data.styleId, Zotero);
     if (!cslEngine) {
@@ -274,7 +290,7 @@ const searchEndpoint = function (options) {
     if (query.q) {
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
         return runSearch(search, Zotero).then((items)=>{
-            return buildResponse(items, query.format);
+            return buildResponse(items, query.format, query.style);
         });
     } else {
         return [badRequestCode, textMediaType, 'q param required.'];
