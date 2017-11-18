@@ -199,8 +199,6 @@ function buildKeyResponse(items, translatorId) {
                 // remove leading @
                 let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
                 return [okCode, jsonMediaType, jsonStringify(keys2)];
-            }).catch(()=>{
-                return [badRequestCode];
             });
         }
 }
@@ -220,8 +218,6 @@ function buildBBTKeyResponse(items) {
 function buildExportResponse(items, translatorId) {
     return myExport(items, translatorId).then((data) => {
         return [okCode, textMediaType, data];
-    }).catch(()=>{
-        return [badRequestCode];
     });
 }
 
@@ -243,34 +239,38 @@ function buildBibliographyResponse(items, style) {
     return [okCode, jsonMediaType, jsonStringify(responseData)];
 }
 
-let bibliographyEndpoint = function (options) {
+function handleErrors(f) {
+    return (...args)=>{
+        return f(...args).catch((ex)=>{
+            return [500, textMediaType, ex.message];
+        });
+    };
+}
+
+let bibliographyEndpoint = handleErrors((options)=>{
     let cslEngine = makeCslEngine(options.data.styleId, Zotero);
     if (!cslEngine) {
         return [badRequestCode, textMediaType, 'No style found.'];
     } else {
         //zotero.localItems = {};
         cslEngine.setOutputFormat('html');
-        try {
-            let groups = options.data.citationGroups.map(processCitationsGroup);
-            return Promise.all(groups).then((citationGroups)=>{
-                cslEngine.updateItems(extractIds(citationGroups));
-                let retval = {};
-                retval.bibliography = cslEngine.makeBibliography();
-                retval.citationClusters = [];
-                citationGroups.map (function (citationGroup) {
-		            cslEngine.appendCitationCluster(citationGroup).map(function(updated) {
-		                retval.citationClusters[updated[0]] = updated[1];
-		            });
-	            });
-                return [okCode, jsonMediaType, jsonStringify(retval)];
-            });
-        } catch (ex if (ex.name === 'EasyKeyError')) {
-            return [badRequestCode, textMediaType, ex.message];
-        }
+        let groups = options.data.citationGroups.map(processCitationsGroup);
+        return Promise.all(groups).then((citationGroups)=>{
+            cslEngine.updateItems(extractIds(citationGroups));
+            let retval = {};
+            retval.bibliography = cslEngine.makeBibliography();
+            retval.citationClusters = [];
+            citationGroups.map (function (citationGroup) {
+		        cslEngine.appendCitationCluster(citationGroup).map(function(updated) {
+		            retval.citationClusters[updated[0]] = updated[1];
+		        });
+	        });
+            return [okCode, jsonMediaType, jsonStringify(retval)];
+        });
     }
-};
+});
 
-let completeEndpoint = function (options) {
+let completeEndpoint = handleErrors((options)=>{
     if (!options.query.easykey) {
         return [badRequestCode, textMediaType, 'Option easykey is required.'];
     } else {
@@ -283,9 +283,9 @@ let completeEndpoint = function (options) {
             }
         });
     }
-};
+});
 
-const searchEndpoint = function (options) {
+const searchEndpoint = handleErrors((options)=>{
     const query = cleanQuery(options.query);
     if (query.q) {
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
@@ -295,9 +295,9 @@ const searchEndpoint = function (options) {
     } else {
         return [badRequestCode, textMediaType, 'q param required.'];
     }
-};
+});
 
-let selectEndpoint = function (options) {
+let selectEndpoint = handleErrors((options)=>{
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
             getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     ZoteroPane.show();
@@ -316,12 +316,10 @@ let selectEndpoint = function (options) {
         }
         ZoteroPane.selectItem(item.id);
         return [okCode, jsonMediaType, jsonStringify('success')];
-    }).catch(function(ex) {
-        return [badRequestCode, textMediaType, ex.message];
     });
-};
+});
 
-let itemsEndpoint = function (options) {
+let itemsEndpoint = handleErrors((options)=>{
     const q = cleanQuery(options.query);
     let items = [];
     if (q.selected) {
@@ -349,7 +347,7 @@ let itemsEndpoint = function (options) {
     } else {
         return [badRequestCode, textMediaType, 'No param supplied!'];
     }
-};
+});
 
 /**
  * Function to load our endpoints into the Zotero connector server.
