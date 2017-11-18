@@ -98,17 +98,20 @@ function makeEasyKeyError(str) {
 }
 
 function processCitationItem (citation) {
-    let retval = {};
-    for (let x in citation) {
-        if (x === 'easyKey') {
-            retval.id = findByEasyKey(citation[x], Zotero).id;
-        } else if (x === 'key') {
-            retval.id = findByKey(citation[x], Zotero).id;
-        } else {
-            retval[x] = citation[x];
-        }
+    let cloneButSetId = (item)=>{
+        let retval = Object.assign({}, citation);
+        retval.id = item.id;
+        delete(retval.easyKey);
+        delete(retval.key);
+        return retval;
+    };
+    if ('easyKey' in citation) {
+        return findByEasyKey(citation.easyKey, Zotero).then(cloneButSetId);
+    } else if ('key' in citation) {
+        return findByKey(citation.key, Zotero).then(cloneButSetId);
+    } else {
+        return Promise.resolve(citation);
     }
-    return retval;
 }
 
 /**
@@ -116,10 +119,12 @@ function processCitationItem (citation) {
  */
 function processCitationsGroup (citationGroup) {
     let citationItems = citationGroup.citationItems.map(processCitationItem);
-    return {
-        'properties' : citationGroup.properties,
-        'citationItems' : citationItems
-    };
+    return Promise.all(citationItems).then((items)=>{
+        return {
+            'properties': citationGroup.properties,
+            'citationItems': items
+        };
+    });
 }
 
 /**
@@ -229,29 +234,29 @@ function buildBibTeXResponse(items) {
     return buildExportResponse(items, '9cb70025-a888-4a29-a210-93ec52da40d4');
 }
 
-let bibliographyEndpoint = function (url, data, sendResponseCallback) {
-    let cslEngine = makeCslEngine(data.styleId, Zotero);
+let bibliographyEndpoint = function (options) {
+    let cslEngine = makeCslEngine(options.data.styleId, Zotero);
     if (!cslEngine) {
-        sendResponseCallback(400, textMediaType, 'No style found.');
-        return;
+        return [badRequestCode, textMediaType, 'No style found.'];
     } else {
         //zotero.localItems = {};
         cslEngine.setOutputFormat('html');
         try {
-            let citationGroups = data.citationGroups.map(processCitationsGroup);
-            cslEngine.updateItems(extractIds(citationGroups));
-            let retval = {};
-            retval.bibliography = cslEngine.makeBibliography();
-            retval.citationClusters = [];
-            citationGroups.map (function (citationGroup) {
-		cslEngine.appendCitationCluster(citationGroup).map(function(updated) {
-		    retval.citationClusters[updated[0]] = updated[1];
-		});
-	    });
-            sendResponseCallback(200, jsonMediaType, jsonStringify(retval));
-            return;
+            let groups = options.data.citationGroups.map(processCitationsGroup);
+            return Promise.all(groups).then((citationGroups)=>{
+                cslEngine.updateItems(extractIds(citationGroups));
+                let retval = {};
+                retval.bibliography = cslEngine.makeBibliography();
+                retval.citationClusters = [];
+                citationGroups.map (function (citationGroup) {
+		            cslEngine.appendCitationCluster(citationGroup).map(function(updated) {
+		                retval.citationClusters[updated[0]] = updated[1];
+		            });
+	            });
+                return [okCode, jsonMediaType, jsonStringify(retval)];
+            });
         } catch (ex if (ex.name === 'EasyKeyError')) {
-            sendResponseCallback(400, textMediaType, ex.message);
+            return [badRequestCode, textMediaType, ex.message];
         }
     }
 };
@@ -347,6 +352,11 @@ function loadEndpoints () {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : completeEndpoint
+            },
+            'bibliography' : {
+                supportedMethods: ['POST'],
+                supportedDataType: ['application/x-www-form-urlencoded'],
+                init: bibliographyEndpoint
             },
             'search' : {
                 supportedMethods: ['GET'],
