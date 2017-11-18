@@ -242,7 +242,7 @@ function buildBibliographyResponse(items, style) {
 function handleErrors(f) {
     return (...args)=>{
         return f(...args).catch((ex)=>{
-            return [500, textMediaType, ex.message];
+            return [500, textMediaType, (ex && ex.message)];
         });
     };
 }
@@ -307,6 +307,8 @@ let selectEndpoint = handleErrors((options)=>{
         promise = findByEasyKey(q.easykey, Zotero);
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
+    } else if (q.betterbibtexkey) {
+        promise = findByBBTKey(q.betterbibtexkey, Zotero);
     } else {
         return [badRequestCode, textMediaType, 'No param supplied!'];
     }
@@ -337,6 +339,14 @@ let itemsEndpoint = handleErrors((options)=>{
         return Promise.all(
             keys.map((key) => {
                 return findByEasyKey(key, Zotero);
+            })).then((items)=>{
+                return buildResponse(items, q.format);
+            });
+    } else if (q.betterbibtexkey) {
+        let keys = q.betterbibtexkey.split(',');
+        return Promise.all(
+            keys.map((key) => {
+                return findByBBTKey(key, Zotero);
             })).then((items)=>{
                 return buildResponse(items, q.format);
             });

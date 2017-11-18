@@ -114,14 +114,14 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_betterbibtexkey
-    resp = @client.get(@item_url, {"betterbibtexkey" => "doe_first_2005", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "DoeFirstBook2005", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key], i
   end
 
   def test_betterbibtexkey_two_items
-    resp = @client.get(@item_url, {"betterbibtexkey" => "doe_first_2005,doe_article_2006", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "DoeFirstBook2005,DoeArticle2006", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key,@doe_article_key].sort, i.sort
