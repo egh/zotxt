@@ -138,6 +138,13 @@ function buildSearch(s, query, method) {
     return s;
 }
 
+function makeEasyKeyError(str) {
+    return Promise.reject({
+        name: 'EasyKeyError',
+        message: str
+    });
+}
+
 let knownEasyKeys = {};
 
 /**

@@ -90,13 +90,6 @@ function collectionSearch(name) {
     }
 }
 
-function makeEasyKeyError(str) {
-    return Promise.reject({
-        name: 'EasyKeyError',
-        message: str
-    });
-}
-
 function processCitationItem (citation) {
     let cloneButSetId = (item)=>{
         let retval = Object.assign({}, citation);
