@@ -97,23 +97,24 @@ function makeEasyKeyError(str) {
     });
 }
 
+function processCitationItem (citation) {
+    let retval = {};
+    for (let x in citation) {
+        if (x === 'easyKey') {
+            retval.id = findByEasyKey(citation[x], Zotero).id;
+        } else if (x === 'key') {
+            retval.id = findByKey(citation[x], Zotero).id;
+        } else {
+            retval[x] = citation[x];
+        }
+    }
+    return retval;
+}
+
 /**
  * Map the easykeys in the citations to ids.
  */
 function processCitationsGroup (citationGroup) {
-    function processCitationItem (citation) {
-        let retval = {};
-        for (let x in citation) {
-            if (x === 'easyKey') {
-                retval.id = findByEasyKey(citation[x], Zotero).id;
-            } else if (x === 'key') {
-                retval.id = findByKey(citation[x], Zotero).id;
-            } else {
-                retval[x] = citation[x];
-            }
-        }
-        return retval;
-    }
     let citationItems = citationGroup.citationItems.map(processCitationItem);
     return {
         'properties' : citationGroup.properties,
