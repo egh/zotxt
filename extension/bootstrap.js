@@ -400,11 +400,6 @@ let startupObserver = {
             Components.utils.import('resource://gre/modules/FileUtils.jsm');
             Components.utils.import('resource://gre/modules/NetUtil.jsm');
 
-            /* turn on http server if it is not on */
-            /* TODO turn this off when uninstalled? */
-            let prefs = Components.classes['@mozilla.org/preferences-service;1']
-                .getService(Components.interfaces.nsIPrefService).getBranch('extensions.zotero.');
-            prefs.setBoolPref('httpServer.enabled', true);
 
             /* load exporters */
             // installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
@@ -448,12 +443,7 @@ function install(data, reason) {
     Components.utils.import('resource://gre/modules/FileUtils.jsm');
     Components.utils.import('resource://gre/modules/NetUtil.jsm');
 
-    /* turn on http server if it is not on */
-    /* TODO turn this off when uninstalled? */
     loadZotero().then(function () {
-        let prefs = Components.classes['@mozilla.org/preferences-service;1']
-            .getService(Components.interfaces.nsIPrefService).getBranch('extensions.zotero.');
-        prefs.setBoolPref('httpServer.enabled', true);
         loadEndpoints();
 
         /* load exporters */
