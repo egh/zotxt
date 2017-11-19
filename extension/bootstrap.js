@@ -16,28 +16,27 @@
 /* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError */
 'use strict';
 
-Components.utils.import('resource://gre/modules/Services.jsm');
-
 var Zotero;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
-var timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
 
-let easyKeyExporterMetadata = {
-    'translatorID':'9d774afe-a51d-4055-a6c7-23bc96d19fe7',
-    'label': 'Easy Citekey',
-    'creator': 'Erik Hetzner',
-    'target': 'txt',
-    'minVersion': '2.1.9',
-    'maxVersion': '',
-    'priority': 200,
-    'inRepository': false,
-    'translatorType': 2,
-    'browserSupport': 'gcs',
-    'displayOptions': {
-        'Alternate (@DoeTitle2000)': false
-    },
-    'lastUpdated':'2013-07-15 07:03:17'
-};
+function makeEasyKeyExporterMetadata() {
+    return {
+        'translatorID':'9d774afe-a51d-4055-a6c7-23bc96d19fe7',
+        'label': 'Easy Citekey',
+        'creator': 'Erik Hetzner',
+        'target': 'txt',
+        'minVersion': '2.1.9',
+        'maxVersion': '',
+        'priority': 200,
+        'inRepository': false,
+        'translatorType': 2,
+        'browserSupport': 'gcs',
+        'displayOptions': {
+            'Alternate (@DoeTitle2000)': false
+        },
+        'lastUpdated':'2013-07-15 07:03:17'
+    };
+}
 
 const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain';
@@ -48,6 +47,7 @@ function loadZotero () {
     let callback = function (resolve, reject) {
         if (!Zotero) {
             if (!("@zotero.org/Zotero;1" in Components.classes)) {
+                let timer = Components.classes["@mozilla.org/timer;1"].createInstanceComponents.interfaces.nsITimer;
                 return timer.initWithCallback(function () {
                     return callback(resolve, reject);
                 }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
@@ -187,7 +187,7 @@ function buildKeyResponse(items, translatorId) {
 }
 
 function buildEasyKeyResponse(items) {
-    return buildKeyResponse(items, easyKeyExporterMetadata.translatorID);
+    return buildKeyResponse(items, makeEasyKeyExporterMetadata().translatorID);
 }
 
 function buildBBTKeyResponse(items) {
@@ -234,7 +234,7 @@ function handleErrors(f) {
     };
 }
 
-let bibliographyEndpoint = handleErrors((options)=>{
+function bibliographyEndpoint(options) {
     let cslEngine = makeCslEngine(options.data.styleId, Zotero);
     if (!cslEngine) {
         return makeClientError('No style found.');
@@ -255,9 +255,9 @@ let bibliographyEndpoint = handleErrors((options)=>{
             return [okCode, jsonMediaType, jsonStringify(retval)];
         });
     }
-});
+}
 
-let completeEndpoint = handleErrors((options)=>{
+function completeEndpoint(options) {
     if (!options.query.easykey) {
         return makeClientError('Option easykey is required.');
     } else {
@@ -270,9 +270,9 @@ let completeEndpoint = handleErrors((options)=>{
             }
         });
     }
-});
+}
 
-const searchEndpoint = handleErrors((options)=>{
+function searchEndpoint(options) {
     const query = cleanQuery(options.query);
     if (query.q) {
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
@@ -282,9 +282,9 @@ const searchEndpoint = handleErrors((options)=>{
     } else {
         return makeClientError('q param required.');
     }
-});
+}
 
-let selectEndpoint = handleErrors((options)=>{
+function selectEndpoint(options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
             getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     ZoteroPane.show();
@@ -306,9 +306,9 @@ let selectEndpoint = handleErrors((options)=>{
         ZoteroPane.selectItem(item.id);
         return [okCode, jsonMediaType, jsonStringify('success')];
     });
-});
+}
 
-let itemsEndpoint = handleErrors((options)=>{
+function itemsEndpoint(options) {
     const q = cleanQuery(options.query);
     let items = [];
     if (q.selected) {
@@ -349,7 +349,7 @@ let itemsEndpoint = handleErrors((options)=>{
     } else {
         return makeClientError('No param supplied!');
     }
-});
+}
 
 /**
  * Function to load our endpoints into the Zotero connector server.
@@ -360,27 +360,27 @@ function loadEndpoints () {
             'complete' : {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : completeEndpoint
+                init : handleErrors(completeEndpoint)
             },
             'bibliography' : {
                 supportedMethods: ['POST'],
                 supportedDataType: ['application/x-www-form-urlencoded'],
-                init: bibliographyEndpoint
+                init: handleErrors(bibliographyEndpoint)
             },
             'search' : {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : searchEndpoint
+                init : handleErrors(searchEndpoint)
             },
             'select' : {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : selectEndpoint
+                init : handleErrors(selectEndpoint)
             },
             'items' : {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : itemsEndpoint
+                init : handleErrors(itemsEndpoint)
             }
 
         };
@@ -391,35 +391,34 @@ function loadEndpoints () {
     });
 }
 
+function makeStartupObserver() {
+    return {
+        'observe': function(subject, topic, data) {
+            loadZotero().then(function () {
+                Components.utils.import('resource://gre/modules/FileUtils.jsm');
+                Components.utils.import('resource://gre/modules/NetUtil.jsm');
 
-let startupObserver = {
-    'observe': function(subject, topic, data) {
-        loadZotero().then(function () {
-            Components.utils.import('resource://gre/modules/FileUtils.jsm');
-            Components.utils.import('resource://gre/modules/NetUtil.jsm');
 
+                /* load exporters */
+                // installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
 
-            /* load exporters */
-            // installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
-
-            loadEndpoints();
-        });
-    }
-};
+                loadEndpoints();
+            });
+        }
+    };
+}
 
 function startup(data, reason) {
+    Components.utils.import('resource://gre/modules/Services.jsm');
     const observerService = Components.classes['@mozilla.org/observer-service;1'].
           getService(Components.interfaces.nsIObserverService);
     /* wait until after zotero is loaded */
-    observerService.addObserver(startupObserver, 'final-ui-startup', false);
     Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
+    observerService.addObserver(makeStartupObserver(), 'final-ui-startup', false);
 }
 
 
 function shutdown (data, reason) {
-    const observerService = Components.classes['@mozilla.org/observer-service;1'].
-          getService(Components.interfaces.nsIObserverService);
-    observerService.removeObserver(startupObserver, 'final-ui-startup');
 }
 
 function uninstall(data, reason) {
@@ -449,6 +448,6 @@ function install(data, reason) {
         loadEndpoints();
 
         /* load exporters */
-        installTranslator(easyKeyExporterMetadata, 'EasyKeyExporter.js');
+        installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
     });
 }
