@@ -391,8 +391,6 @@ function loadEndpoints () {
     });
 }
 
-let observerService = Components.classes['@mozilla.org/observer-service;1'].
-        getService(Components.interfaces.nsIObserverService);
 
 let startupObserver = {
     'observe': function(subject, topic, data) {
@@ -410,6 +408,8 @@ let startupObserver = {
 };
 
 function startup(data, reason) {
+    const observerService = Components.classes['@mozilla.org/observer-service;1'].
+          getService(Components.interfaces.nsIObserverService);
     /* wait until after zotero is loaded */
     observerService.addObserver(startupObserver, 'final-ui-startup', false);
     Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
@@ -417,6 +417,8 @@ function startup(data, reason) {
 
 
 function shutdown (data, reason) {
+    const observerService = Components.classes['@mozilla.org/observer-service;1'].
+          getService(Components.interfaces.nsIObserverService);
     observerService.removeObserver(startupObserver, 'final-ui-startup');
 }
 
