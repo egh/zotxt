@@ -138,9 +138,9 @@ function buildSearch(s, query, method) {
     return s;
 }
 
-function makeEasyKeyError(str) {
+function makeClientError(str) {
     return Promise.reject({
-        name: 'EasyKeyError',
+        name: 'ClientError',
         message: str
     });
 }
@@ -156,7 +156,7 @@ function findByEasyKey(key, zotero) {
     } else {
         let parsedKey = parseEasyKey(key, zotero);
         if (!parsedKey) {
-            return makeEasyKeyError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
+            return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
         } else {
             /* first try raw search */
             let search = buildRawSearch(new zotero.Search(), key);
@@ -164,16 +164,16 @@ function findByEasyKey(key, zotero) {
                 if (items.length === 1) {
                     return knownEasyKeys[key] = items[0];
                 } else if (items.length > 1) {
-                    return makeEasyKeyError('search return multiple items');
+                    return makeClientError('search return multiple items');
                 } else {
                     let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
                     return runSearch(search, zotero).then (function (items) {
                         if (items.length === 1) {
                             return knownEasyKeys[key] = items[0];
                         } else if (items.length > 1) {
-                            return makeEasyKeyError('search return multiple items');
+                            return makeClientError('search return multiple items');
                         } else {
-                            return makeEasyKeyError('search failed to return a single item');
+                            return makeClientError('search failed to return a single item');
                         }
                     });
                 }
@@ -192,7 +192,7 @@ function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
