@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError */
 'use strict';
 
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -209,7 +209,7 @@ function buildEasyKeyResponse(items) {
 
 function buildBBTKeyResponse(items) {
     if (!Zotero.BetterBibTeX) {
-        return [badRequestCode, textMediaType, 'BetterBibTex not installed.'];
+        return makeClientError('BetterBibTex not installed.');
     } else {
         return buildKeyResponse(items, 'a515a220-6fef-45ea-9842-8025dfebcc8f');
     }
@@ -242,10 +242,10 @@ function buildBibliographyResponse(items, style) {
 function handleErrors(f) {
     return (...args)=>{
         return f(...args).catch((ex)=>{
-            if (ex.name === 'ClientError') {
+            if (ex instanceof ClientError) {
                 return [badRequestCode, textMediaType, ex.message];
             } else {
-                return [500, textMediaType, (ex && ex.message)];
+                return [500, textMediaType, (ex && (ex.message + ex.stack))];
             }
         });
     };
@@ -254,7 +254,7 @@ function handleErrors(f) {
 let bibliographyEndpoint = handleErrors((options)=>{
     let cslEngine = makeCslEngine(options.data.styleId, Zotero);
     if (!cslEngine) {
-        return [badRequestCode, textMediaType, 'No style found.'];
+        return makeClientError('No style found.');
     } else {
         //zotero.localItems = {};
         cslEngine.setOutputFormat('html');
@@ -276,12 +276,12 @@ let bibliographyEndpoint = handleErrors((options)=>{
 
 let completeEndpoint = handleErrors((options)=>{
     if (!options.query.easykey) {
-        return [badRequestCode, textMediaType, 'Option easykey is required.'];
+        return makeClientError('Option easykey is required.');
     } else {
         let q = cleanQuery(options.query);
         return runSearch(buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero)), Zotero).then(function (items) {
             if (!items) {
-                return [badRequestCode, textMediaType, 'EasyKey must be of the form DoeTitle2000 or doe:2000title'];
+                return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
             } else {
                 return buildEasyKeyResponse(items);
             }
@@ -297,7 +297,7 @@ const searchEndpoint = handleErrors((options)=>{
             return buildResponse(items, query.format, query.style);
         });
     } else {
-        return [badRequestCode, textMediaType, 'q param required.'];
+        return makeClientError('q param required.');
     }
 });
 
@@ -314,11 +314,11 @@ let selectEndpoint = handleErrors((options)=>{
     } else if (q.betterbibtexkey) {
         promise = findByBBTKey(q.betterbibtexkey, Zotero);
     } else {
-        return [badRequestCode, textMediaType, 'No param supplied!'];
+        return makeClientError('No param supplied!');
     }
     return promise.then(function(item) {
         if (item === false) {
-            return [badRequestCode, textMediaType, 'item with key ' + q.key + ' not found!'];
+            return makeClientError('item with key ' + q.key + ' not found!');
         }
         ZoteroPane.selectItem(item.id);
         return [okCode, jsonMediaType, jsonStringify('success')];
@@ -359,7 +359,7 @@ let itemsEndpoint = handleErrors((options)=>{
             return buildResponse(items, q.format);
         });
     } else {
-        return [badRequestCode, textMediaType, 'No param supplied!'];
+        return makeClientError('No param supplied!');
     }
 });
 

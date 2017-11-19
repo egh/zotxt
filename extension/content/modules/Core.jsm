@@ -138,11 +138,17 @@ function buildSearch(s, query, method) {
     return s;
 }
 
+
+function ClientError(message) {
+    this.name = 'ClientError';
+    this.message = message;
+    this.stack = (new Error()).stack;
+}
+
+ClientError.prototype = new Error;
+
 function makeClientError(str) {
-    return Promise.reject({
-        name: 'ClientError',
-        message: str
-    });
+    return Promise.reject(new ClientError(str));
 }
 
 let knownEasyKeys = {};
@@ -192,7 +198,7 @@ function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
