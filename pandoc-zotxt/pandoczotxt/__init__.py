@@ -57,7 +57,7 @@ def extractCites(key, value, format, meta):
 
 def fetchItem(keytype, key):
     keyenc = key.encode('utf8')
-    url = "http://localhost:23119/zotxt/items?%s=%s" % (keytype, urllib.quote_plus(keyenc))
+    url = "http://127.0.0.1:23119/zotxt/items?%s=%s" % (keytype, urllib.quote_plus(keyenc))
     try:
         data = json.load(urllib2.urlopen(url))
         if len(data) == 0:

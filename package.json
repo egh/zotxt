@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "test": "mocha"
+    },
+    "dependencies": {
+        "bluebird": "^3.5.1",
+        "mocha": "^4.0.1",
+        "sinon": "^4.0.2",
+        "xregexp": "^3.2.0"
+    }
+}

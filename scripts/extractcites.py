@@ -35,7 +35,7 @@ for key in known_keys:
     try:
         q = {'easykey' : key.encode('utf8')}
         encq = urllib.urlencode(q)
-        cite = json.load(urllib2.urlopen("http://localhost:23119/zotxt/items?" + encq))[0]
+        cite = json.load(urllib2.urlopen("http://127.0.0.1:23119/zotxt/items?" + encq))[0]
         cite["id"] = key
         cites.append(cite)
     except urllib2.HTTPError, e:

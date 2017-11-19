@@ -3,4 +3,6 @@ pandoc-zotxt/build/
 pandoc-zotxt/dist/
 pandoc-zotxt/pandoc_zotxt.egg-info/
 pandoc-zotxt/venv/
-zotxt.xpi
+zotxt*.xpi
+node_modules
+.signatures.json

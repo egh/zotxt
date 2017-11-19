@@ -57,12 +57,12 @@ look for keys in a note or tag before resolving the item otherwise.
 Zotxt API
 ---------
 
-The Zotxt API is exposed via ``http://localhost:23119/zotxt/``. To
+The Zotxt API is exposed via ``http://127.0.0.1:23119/zotxt/``. To
 retrieve an item, use the ``items`` endpoint with different
 parameters. you can query using the params ``easykey``, ``key``,
 ``selected=t``, ``all=t``, or ``collection``. For example:
 
-  http://localhost:23119/zotxt/items?easykey=roe-doe:2015hyphens
+  http://127.0.0.1:23119/zotxt/items?easykey=roe-doe:2015hyphens
 
 For ``collection`` or ``key``, provide the Zotero key (e.g.
 ``0_VWYXZ1A1``)
@@ -73,13 +73,13 @@ parameter, including ``easykey`` (an array of easykeys),
 array of Zotero keys), ``bibtex``, ``bibliography`` (see also the
 ``style`` parameter). For example:
 
-  http://localhost:23119/zotxt/items?easykey=roe-doe:2015hyphens&format=easykey
+  http://127.0.0.1:23119/zotxt/items?easykey=roe-doe:2015hyphens&format=easykey
 
 To search, use the ``search`` endpoint with the ``q`` parameter. This
 uses the title/creator/year quick search. You can use the ``format``
 param as in the ``items`` endpoint. For example:
 
-  http://localhost:23119/zotxt/search?q=doe&format=easykey
+  http://127.0.0.1:23119/zotxt/search?q=doe&format=easykey
 
 You can supply an argument to the ``method`` parameter to change the
 quicksearch version, either ``titleCreatorYear`` (the default),
