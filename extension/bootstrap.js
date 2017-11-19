@@ -63,31 +63,14 @@ function loadZotero () {
     return new Promise(callback);
 }
 
-function getCollection(name, collections) {
-    if (!collections) {
-        return getCollection(name, Zotero.getCollections(null));
-    } else {
-        for (let collection of collections) {
-            if (collection.name === name) {
-                return collection;
-            } else {
-                if (collection.hasChildCollections) {
-                    let retval = getCollection(name, Zotero.getCollections(collection.id));
-                    if (retval) return retval;
-                }
-            }
-        }
-        return null;
-    }
-}
-
 function collectionSearch(name) {
-    let collection = getCollection(name);
-    if (!collection) {
-        return [];
-    } else {
-        return collection.getChildItems();
+    let collections = Zotero.Collections.getByLibrary(Zotero.Libraries.userLibraryID, true);
+    for (let collection of collections) {
+        if (collection.name === name) {
+            return Promise.resolve(collection.getChildItems());
+        }
     }
+    return makeClientError('Collection not found.');
 }
 
 function processCitationItem (citation) {
@@ -354,7 +337,12 @@ let itemsEndpoint = handleErrors((options)=>{
             })).then((items)=>{
                 return buildResponse(items, q.format);
             });
-    } else if (q.all) {
+    } else if (q.collection)
+        return collectionSearch(q.collection).then((items)=>{
+            Zotero.debug(items);
+            return buildResponse(items, q.format);
+        });
+    else if (q.all) {
         return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then((items)=>{
             return buildResponse(items, q.format);
         });

@@ -301,7 +301,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_collection_search
-    resp = @client.get(@item_url, {"collection" => "My%20citations"})
+    resp = @client.get(@item_url, {"collection" => "My citations"})
     assert_equal 200, resp.status
   end
 
