@@ -162,7 +162,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_items_bad_key
-    resp = @client.get(@item_url, {"key" => "0_ZBZQ4KMXXXX", "format" => "key"})
+    resp = @client.get(@item_url, {"key" => "1_ZBZQ4KMXXXX", "format" => "key"})
     assert_equal 400, resp.status
   end
 
@@ -297,7 +297,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"easykey" => "doe:2015duplicated", "format" => "key"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal "0_UCA4RC22", results[0]
+    assert_equal "1_UCA4RC22", results[0]
   end
 
   def test_collection_search
@@ -428,7 +428,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@search_url, {"q" => "standalone", "method" => "everything", "format" => "key"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert !results.index('0_DAU3K5SU').nil?
+    assert !results.index('1_DAU3K5SU').nil?
   end
 
   def test_select
@@ -437,7 +437,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@select_url, {"easykey" => "doe:2006article"})
     assert_equal 200, resp.status
     # bad key
-    resp = @client.get(@select_url, {"key" => "0_4T8MCITQXXX"})
+    resp = @client.get(@select_url, {"key" => "1_4T8MCITQXXX"})
     assert_equal 400, resp.status
     resp = @client.get(@select_url, {"easykey" => "XXX"})
     assert_equal 400, resp.status
