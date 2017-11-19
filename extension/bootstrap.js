@@ -242,7 +242,11 @@ function buildBibliographyResponse(items, style) {
 function handleErrors(f) {
     return (...args)=>{
         return f(...args).catch((ex)=>{
-            return [500, textMediaType, (ex && ex.message)];
+            if (ex.name === 'ClientError') {
+                return [badRequestCode, textMediaType, ex.message];
+            } else {
+                return [500, textMediaType, (ex && ex.message)];
+            }
         });
     };
 }
