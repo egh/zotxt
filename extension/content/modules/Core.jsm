@@ -58,14 +58,21 @@ function item2key(item) {
 }
 
 function findByKey(key, zotero) {
+    let rejectIfUndefined = (item)=>{
+        if (!item) {
+            return makeClientError('Item not found.');
+        } else {
+            return item;
+        }
+    };
     if (key.indexOf('/') !== -1) {
         let lkh = zotero.Items.parseLibraryKey(key);
-        return zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key);
+        return zotero.Items.getByLibraryAndKeyAsync(lkh.libraryID, lkh.key).then(rejectIfUndefined);
     } else if (key.indexOf('_') !== -1) {
         let [libraryId, key2] = key.split('_');
-        return zotero.Items.getByLibraryAndKeyAsync(parseInt(libraryId), key2);
+        return zotero.Items.getByLibraryAndKeyAsync(parseInt(libraryId), key2).then(rejectIfUndefined);
     } else {
-        return zotero.Items.getByLibraryAndKeyAsync(1, key);
+        return zotero.Items.getByLibraryAndKeyAsync(1, key).then(rejectIfUndefined);
     }
 }
 
