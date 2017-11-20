@@ -178,16 +178,16 @@ function buildJsonResponse(items) {
  * translatorId via the Zotero export process.
  */
 function buildKeyResponse(items, translatorId) {
-        if (items.length === 0) {
-            return [okCode, 'application/json', jsonStringify([])];
-        } else {
-            return myExport(items, translatorId).then((rawKeys)=>{
-                let keys = rawKeys.split(/[ ,]/);
-                // remove leading @
-                let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
-                return [okCode, jsonMediaType, jsonStringify(keys2)];
-            });
-        }
+    if (items.length === 0) {
+        return [okCode, 'application/json', jsonStringify([])];
+    } else {
+        return myExport(items, translatorId).then((rawKeys)=>{
+            let keys = rawKeys.split(/[ ,]/);
+            // remove leading @
+            let keys2 = keys.map(function(key) { return key.replace(/[\[\]@]/g, ''); });
+            return [okCode, jsonMediaType, jsonStringify(keys2)];
+        });
+    }
 }
 
 function buildEasyKeyResponse(items) {
@@ -221,28 +221,28 @@ function buildBibliographyResponse(items, style) {
             'html': Zotero.Cite.makeFormattedBibliography(csl, 'html'),
             // strip newlines
             'text': Zotero.Cite.makeFormattedBibliography(csl, 'text').replace(/(\r\n|\n|\r)/gm,'')
-            };
+        };
     });
     return [okCode, jsonMediaType, jsonStringify(responseData)];
 }
 
 function buildQuickBibResponse(items) {
-  let responseData = [];
-  for (let item of items) {
-    if (item.isRegularItem()) {
-      let creators = item.getCreators();
-      let creatorString = "";
-      if (creators.length > 0) {
-        creatorString = creators[0].lastName + ', ' + creators[0].firstName;
-      }
-      if (creators.length > 1) {
-        creatorString += ", et al.";
-      }
-      responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
-                         'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
+    let responseData = [];
+    for (let item of items) {
+        if (item.isRegularItem()) {
+            let creators = item.getCreators();
+            let creatorString = "";
+            if (creators.length > 0) {
+                creatorString = creators[0].lastName + ', ' + creators[0].firstName;
+            }
+            if (creators.length > 1) {
+                creatorString += ", et al.";
+            }
+            responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
+                               'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
+        }
     }
-  }
-  return [200, jsonMediaType, jsonStringify(responseData)];
+    return [200, jsonMediaType, jsonStringify(responseData)];
 };
 
 function buildPathsResponse(items) {
@@ -332,7 +332,7 @@ function searchEndpoint(options) {
 
 function selectEndpoint(options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
-            getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
+        getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     ZoteroPane.show();
     let q = cleanQuery(options.query);
     let promise = null;
