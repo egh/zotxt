@@ -256,7 +256,17 @@ function buildPathsResponse(items) {
         return Zotero.Promise.filter(attachments, (attachment)=>{
             return attachment.isAttachment();
         }).then ((attachments)=>{
-            return attachments.map((a)=> { return a.getFilePathAsync(); });
+            return attachments.map((a)=> {
+                return a.getFilePathAsync().then((path)=>{
+                    if (path) {
+                        return path;
+                    } else {
+                        return Zotero.Sync.Runner.downloadFile(a).then((_)=>{
+                            return a.getFilePathAsync();
+                        });
+                    }
+                });
+            });
         }).then((paths)=>{
             return Promise.all(paths).then((paths)=>{
                 return { 'key': ((item.libraryID || '0') + '_' + item.key), 'paths': paths };
