@@ -242,7 +242,7 @@ function buildQuickBibResponse(items) {
                                'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
         }
     }
-    return [200, jsonMediaType, jsonStringify(responseData)];
+    return [okCode, jsonMediaType, jsonStringify(responseData)];
 };
 
 function buildPathsResponse(items) {
