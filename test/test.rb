@@ -333,6 +333,14 @@ class ZotxtTest < MiniTest::Test
                    "key"=>@doe_article_key}, results[0])
   end
 
+
+  def test_format_quickbib
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "quickBib"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal({ "key" => "1_4T8MCITQ", "quickBib" => "Doe, John - 2006 - Article"}, results[0])
+  end
+
   def test_format_easykey
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "easykey"})
     assert_equal 200, resp.status

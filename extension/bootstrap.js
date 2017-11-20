@@ -153,6 +153,8 @@ function buildResponse(items, format, style) {
         return buildBibTeXResponse(items);
     } else if (format === 'bibliography') {
         return buildBibliographyResponse(items, style);
+    } else if (format === 'quickBib') {
+        return buildQuickBibResponse(items, style);
     } else if (format && format.match(uuidRe)) {
         return buildExportResponse(items, format);
     } else {
@@ -221,6 +223,25 @@ function buildBibliographyResponse(items, style) {
     });
     return [okCode, jsonMediaType, jsonStringify(responseData)];
 }
+
+function buildQuickBibResponse(items) {
+  let responseData = [];
+  for (let item of items) {
+    if (item.isRegularItem()) {
+      let creators = item.getCreators();
+      let creatorString = "";
+      if (creators.length > 0) {
+        creatorString = creators[0].lastName + ', ' + creators[0].firstName;
+      }
+      if (creators.length > 1) {
+        creatorString += ", et al.";
+      }
+      responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
+                         'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
+    }
+  }
+  return [200, jsonMediaType, jsonStringify(responseData)];
+};
 
 function handleErrors(f) {
     return (...args)=>{
