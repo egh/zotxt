@@ -155,6 +155,8 @@ function buildResponse(items, format, style) {
         return buildBibliographyResponse(items, style);
     } else if (format === 'quickBib') {
         return buildQuickBibResponse(items, style);
+    } else if (format === 'paths') {
+        return buildPathsResponse(items, style);
     } else if (format && format.match(uuidRe)) {
         return buildExportResponse(items, format);
     } else {
@@ -242,6 +244,29 @@ function buildQuickBibResponse(items) {
   }
   return [200, jsonMediaType, jsonStringify(responseData)];
 };
+
+function buildPathsResponse(items) {
+    let regularItems = items.filter((item)=>{
+        return item.isRegularItem();
+    });
+    let itemsWithPaths = regularItems.map((item)=>{
+        let attachments = item.getAttachments(false).map((attachmentId)=>{
+            return Zotero.Items.get(attachmentId);
+        });
+        return Zotero.Promise.filter(attachments, (attachment)=>{
+            return attachment.isAttachment();
+        }).then ((attachments)=>{
+            return attachments.map((a)=> { return a.getFilePathAsync(); });
+        }).then((paths)=>{
+            return Promise.all(paths).then((paths)=>{
+                return { 'key': ((item.libraryID || '0') + '_' + item.key), 'paths': paths };
+            });
+        });
+    });
+    return Promise.all(itemsWithPaths).then((responseData)=>{
+        return [okCode, jsonMediaType, jsonStringify(responseData)];
+    });
+}
 
 function handleErrors(f) {
     return (...args)=>{

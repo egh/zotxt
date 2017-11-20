@@ -64,7 +64,7 @@ class ZotxtTest < MiniTest::Test
     i = JSON.parse(resp.body)
     assert_equal(@doe_article_key, i[0]['key'])
     # assert_match not working?
-    assert(i[0]['paths'][0] =~ %r{zotero/storage/QWFHQ73F/doe$})
+    assert(i[0]['paths'][0] =~ %r{storage/QWFHQ73F/doe$})
 
     # should be fetched afer deletion
     File.unlink(i[0]['paths'][0])
@@ -73,7 +73,7 @@ class ZotxtTest < MiniTest::Test
     i = JSON.parse(resp.body)
     assert_equal(@doe_article_key, i[0]['key'])
     # assert_match not working?
-    assert(i[0]['paths'][0] =~ %r{zotero/storage/QWFHQ73F/doe$}, 'no path')
+    assert(i[0]['paths'][0] =~ %r{storage/QWFHQ73F/doe$}, 'no path')
   end
 
   def test_items_easykey_two_word
@@ -332,7 +332,6 @@ class ZotxtTest < MiniTest::Test
 </div>""",
                    "key"=>@doe_article_key}, results[0])
   end
-
 
   def test_format_quickbib
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "quickBib"})
