@@ -450,6 +450,6 @@ class ZotxtTest < MiniTest::Test
 
   def test_python
     out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt`
-    assert_equal "<p><span class=\"citation\">@hüning:2012foo</span></p>\n", out
+    assert_equal "<p><span class=\"citation\" data-cites=\"hüning:2012foo\">@hüning:2012foo</span></p>\n", out
   end
 end
