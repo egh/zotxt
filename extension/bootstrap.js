@@ -395,7 +395,6 @@ function itemsEndpoint(options) {
             });
     } else if (q.collection)
         return collectionSearch(q.collection).then((items)=>{
-            Zotero.debug(items);
             return buildResponse(items, q.format);
         });
     else if (q.all) {
