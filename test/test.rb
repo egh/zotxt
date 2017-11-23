@@ -253,6 +253,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_all
+    skip("Too slow, times out")
     resp = @client.get(@item_url, {"all" => "all", "format" => "key"})
     assert_equal 200, resp.status
   end
@@ -376,6 +377,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_format_export_bad_uuid
+    skip("Times out in Zotero 5")
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "248bebf1-46ab-dead-beef-ec3d2960d0cd"})
     assert_equal 400, resp.status
   end
