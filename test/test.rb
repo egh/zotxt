@@ -403,10 +403,6 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_completion
-    resp = @client.get(@complete_url, {"easykey" => "doe"})
-    results = JSON.parse(resp.body)
-    assert (results.size > 4)
-
     resp = @client.get(@complete_url, {"easykey" => "doe:"})
     results = JSON.parse(resp.body)
     assert (results.size > 4)
