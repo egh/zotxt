@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
 'use strict';
 
 var Zotero;
@@ -143,25 +143,27 @@ function myExport (items, translatorId) {
  * Build a response based on items and a format parameter.
  */
 function buildResponse(items, format, style) {
-    if (format === 'key') {
-        return [okCode, 'application/json', jsonStringify(items.map(item2key))];
-    } else if (format === 'easykey') {
-        return buildEasyKeyResponse(items);
-    } else if (format === 'betterbibtexkey') {
-        return buildBBTKeyResponse(items);
-    } else if (format === 'bibtex') {
-        return buildBibTeXResponse(items);
-    } else if (format === 'bibliography') {
-        return buildBibliographyResponse(items, style);
-    } else if (format === 'quickBib') {
-        return buildQuickBibResponse(items, style);
-    } else if (format === 'paths') {
-        return buildPathsResponse(items, style);
-    } else if (format && format.match(uuidRe)) {
-        return buildExportResponse(items, format);
-    } else {
-        return buildJsonResponse(items);
-    }
+    return ensureLoaded(items, Zotero).then((items)=>{
+        if (format === 'key') {
+            return [okCode, 'application/json', jsonStringify(items.map(item2key))];
+        } else if (format === 'easykey') {
+            return buildEasyKeyResponse(items);
+        } else if (format === 'betterbibtexkey') {
+            return buildBBTKeyResponse(items);
+        } else if (format === 'bibtex') {
+            return buildBibTeXResponse(items);
+        } else if (format === 'bibliography') {
+            return buildBibliographyResponse(items, style);
+        } else if (format === 'quickBib') {
+            return buildQuickBibResponse(items, style);
+        } else if (format === 'paths') {
+            return buildPathsResponse(items, style);
+        } else if (format && format.match(uuidRe)) {
+            return buildExportResponse(items, format);
+        } else {
+            return buildJsonResponse(items);
+        }
+    });
 }
 
 function buildJsonResponse(items) {
@@ -318,11 +320,12 @@ function completeEndpoint(options) {
         return makeClientError('Option easykey is required.');
     } else {
         let q = cleanQuery(options.query);
-        return runSearch(buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero)), Zotero).then(function (items) {
+        let search = buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero));
+        return runSearch(search, Zotero).then((items)=>{
             if (!items) {
                 return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
             } else {
-                return buildEasyKeyResponse(items);
+                return buildResponse(items, 'easykey');
             }
         });
     }

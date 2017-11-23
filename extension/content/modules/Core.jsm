@@ -53,6 +53,14 @@ function dedupItems(items, zotero) {
     });
 };
 
+function ensureLoaded(items, zotero) {
+    return zotero.Promise.map(items, (item)=>{
+        return item.loadAllData().then(()=> {
+            return item;
+        });
+    });
+}
+
 function item2key(item) {
     return ((item.libraryID || '1') + '_' + item.key);
 }
@@ -205,7 +213,7 @@ function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
