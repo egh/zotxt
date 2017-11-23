@@ -189,6 +189,11 @@ function findByEasyKey(key, zotero) {
                 } else {
                     let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
                     return runSearch(search, zotero).then (function (items) {
+                        if (items.length > 1) {
+                            // hack to ignore group library duplicates
+                            // remove all items not in the local library
+                            items = items.filter(function (item) { return item.libraryID === zotero.Libraries.userLibraryID; });
+                        }
                         if (items.length === 1) {
                             return knownEasyKeys[key] = items[0];
                         } else if (items.length > 1) {
