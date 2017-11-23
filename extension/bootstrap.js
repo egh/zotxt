@@ -39,7 +39,7 @@ function makeEasyKeyExporterMetadata() {
 }
 
 const jsonMediaType = 'application/json; charset=UTF-8';
-const textMediaType = 'text/plain';
+const textMediaType = 'text/plain; charset=UTF-8';
 const badRequestCode = 400;
 const okCode = 200;
 
