@@ -370,10 +370,10 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_format_export_uuid
-    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "248bebf1-46ab-4067-9f93-ec3d2960d0cd"})
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "9d774afe-a51d-4055-a6c7-23bc96d19fe7"})
     assert_equal 200, resp.status
     assert_equal 'text/plain; charset=UTF-8', resp.content_type
-    assert_equal "{ | Doe, 2006 | | |zu:1254:#{@doe_article_key[2..-1]}}", resp.body
+    assert_equal "@doe:2006article", resp.body
   end
 
   def test_format_export_bad_uuid
