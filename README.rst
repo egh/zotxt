@@ -5,18 +5,21 @@
 zotxt is a Zotero extension for supporting utilities that deal with
 plain text files (e.g., markdown, reStructuredText, latex, etc.)
 
-You can build yourself using ``make``, or you can download from the
-Mozilla addons site:
+zotxt is compatible with Zotero 5. Older versions were compatible with Zotero 4,
+but these are no longer supported.
 
-  https://addons.mozilla.org/en-US/firefox/addon/zotxt/
+Installation
+------------
 
-Installing in Zotero standalone
-------------------------
-
-1. In Firefox, go to https://addons.mozilla.org/en-US/firefox/addon/zotxt/
-2. Click right on "Add to Firefox" and save the xpi file.
+1. Visit https://github.com/egh/zotxt/releases
+2. Download the latest ``.xpi`` file.
 3. Start Zotero standalone.
-4. In Zotero, select Tools -> Add-ons -> Gear (upper right) -> Install Add-On from file, and install this xpi file.
+4. In Zotero, select Tools -> Add-ons -> Gear (upper right) -> Install Add-On
+   from file, and install the downloaded xpi file.
+
+It is recommended that you also install `Better BibTeX for Zotero
+<https://github.com/retorquere/zotero-better-bibtex/wiki/Installation>`_, which
+provides excellent citation key management.
 
 Writing with pandoc (1.12 or later)
 -----------------------------------
