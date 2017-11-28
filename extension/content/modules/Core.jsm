@@ -166,45 +166,39 @@ function makeClientError(str) {
     return Promise.reject(new ClientError(str));
 }
 
-let knownEasyKeys = {};
-
 /**
  * Find a single item by its easy key, caching the result.
  */
 function findByEasyKey(key, zotero) {
-    if (knownEasyKeys[key]) {
-        return Promise.resolve(knownEasyKeys[key]);
+    let parsedKey = parseEasyKey(key, zotero);
+    if (!parsedKey) {
+        return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
     } else {
-        let parsedKey = parseEasyKey(key, zotero);
-        if (!parsedKey) {
-            return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
-        } else {
-            /* first try raw search */
-            let search = buildRawSearch(new zotero.Search(), key);
-            return runSearch(search, zotero).then(function(items) {
-                if (items.length === 1) {
-                    return knownEasyKeys[key] = items[0];
-                } else if (items.length > 1) {
-                    return makeClientError('search return multiple items');
-                } else {
-                    let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
-                    return runSearch(search, zotero).then (function (items) {
-                        if (items.length > 1) {
-                            // hack to ignore group library duplicates
-                            // remove all items not in the local library
-                            items = items.filter(function (item) { return item.libraryID === zotero.Libraries.userLibraryID; });
-                        }
-                        if (items.length === 1) {
-                            return knownEasyKeys[key] = items[0];
-                        } else if (items.length > 1) {
-                            return makeClientError('search return multiple items');
-                        } else {
-                            return makeClientError('search failed to return a single item');
-                        }
-                    });
-                }
-            });
-        }
+        /* first try raw search */
+        let search = buildRawSearch(new zotero.Search(), key);
+        return runSearch(search, zotero).then(function(items) {
+            if (items.length === 1) {
+                return items[0];
+            } else if (items.length > 1) {
+                return makeClientError('search return multiple items');
+            } else {
+                let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
+                return runSearch(search, zotero).then (function (items) {
+                    if (items.length > 1) {
+                        // hack to ignore group library duplicates
+                        // remove all items not in the local library
+                        items = items.filter(function (item) { return item.libraryID === zotero.Libraries.userLibraryID; });
+                    }
+                    if (items.length === 1) {
+                        return items[0];
+                    } else if (items.length > 1) {
+                        return makeClientError('search return multiple items');
+                    } else {
+                        return makeClientError('search failed to return a single item');
+                    }
+                });
+            }
+        });
     }
 }
 
