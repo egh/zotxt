@@ -48,7 +48,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "json"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({'id'=>"DoeFirstBook2005",
+    assert_equal({'id'=>"doe:2005first",
                   'type'=>'book',
                   'title'=>'First Book',
                   'publisher'=>'Cambridge University Press',
@@ -114,14 +114,14 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_betterbibtexkey
-    resp = @client.get(@item_url, {"betterbibtexkey" => "DoeFirstBook2005", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key], i
   end
 
   def test_betterbibtexkey_two_items
-    resp = @client.get(@item_url, {"betterbibtexkey" => "DoeFirstBook2005,DoeArticle2006", "format" => "key"})
+    resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first,doe:2006article", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key,@doe_article_key].sort, i.sort
@@ -366,7 +366,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "betterbibtexkey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal "DoeArticle2006", results[0]
+    assert_equal "doe:2006article", results[0]
   end
 
   def test_format_export_uuid
@@ -393,7 +393,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "json"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({"id"=>"DoeArticle2006",
+    assert_equal({"id"=>"doe:2006article",
       "type"=>"article-journal",
       "title"=>"Article",
       "container-title"=>"Journal of Generic Studies",
