@@ -95,12 +95,15 @@ describe('#core.item2key()', () => {
 });
 
 describe('#core.findByKey()', () => {
-    let getByLibraryAndKeyAsync = sinon.spy();
-    let parseLibraryKey = sinon.stub().returns({ libraryID: 2, key: 'bar' });
-    let zotero = { Items : { getByLibraryAndKeyAsync, parseLibraryKey } };
+    let getByLibraryAndKeyAsync, parseLibraryKey, zotero;
+
+    beforeEach(()=>{
+        getByLibraryAndKeyAsync = sinon.stub().returns(Promise.resolve(true));
+        parseLibraryKey = sinon.stub().returns({ libraryID: 2, key: 'bar' });
+        zotero =  { Items : { getByLibraryAndKeyAsync, parseLibraryKey } };
+    });
 
     it("calls getByLibraryAndKeyAsync when a key without a / is passed in", ()=>{
-        getByLibraryAndKeyAsync.reset();
         const key = 'foo-bar';
         core.findByKey(key, zotero);
         assert(parseLibraryKey.notCalled);
@@ -109,7 +112,6 @@ describe('#core.findByKey()', () => {
     });
 
     it("calls getByLibraryAndKeyAsync when a key with a _ is passed in", ()=>{
-        getByLibraryAndKeyAsync.reset();
         const key = '3_bar';
         core.findByKey(key, zotero);
         assert(parseLibraryKey.notCalled);
@@ -118,7 +120,6 @@ describe('#core.findByKey()', () => {
     });
 
     it("fetches the library id and calls getByLibraryAndKeyAsync when a key with a / is used", ()=>{
-        getByLibraryAndKeyAsync.reset();
         const key = 'foo/bar';
         core.findByKey(key, zotero);
         assert(parseLibraryKey.calledOnce);
@@ -177,10 +178,10 @@ describe('#core.getItemOrParent()', () => {
         const isRegularItem = sinon.stub().returns(false);
         const parentKey = "foo_bar";
         const item = { isRegularItem, parentKey };
-        const getByLibraryAndKeyAsync = sinon.stub().returns(retval);
+        const getByLibraryAndKeyAsync = sinon.stub().returns(Promise.resolve(retval));
         const Items = { getByLibraryAndKeyAsync };
         const zotero = { Items };
-        assert.equal(retval, core.getItemOrParent(item, zotero));
+        core.getItemOrParent(item, zotero).then((item)=> { assert.equal(retval, item); });
     });
 });
 
