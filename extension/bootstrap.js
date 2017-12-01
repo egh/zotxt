@@ -370,40 +370,31 @@ function selectEndpoint(options) {
 function itemsEndpoint(options) {
     const q = cleanQuery(options.query);
     let items = [];
+    let responder = (items) => { return buildResponse(items, q.format, q.style); };
     if (q.selected) {
-        return buildResponse(Zotero.getActiveZoteroPane().getSelectedItems(), q.format);
+        return responder(Zotero.getActiveZoteroPane().getSelectedItems());
     } else if (q.key) {
         let keys = q.key.split(',');
         return Promise.all(
             keys.map((key)=>{
                 return findByKey(key, Zotero);
-            })).then((items)=>{
-                return buildResponse(items, q.format);
-            });
+            })).then(responder);
     } else if (q.easykey) {
         let keys = q.easykey.split(',');
         return Promise.all(
             keys.map((key) => {
                 return findByEasyKey(key, Zotero);
-            })).then((items)=>{
-                return buildResponse(items, q.format);
-            });
+            })).then(responder);
     } else if (q.betterbibtexkey) {
         let keys = q.betterbibtexkey.split(',');
         return Promise.all(
             keys.map((key) => {
                 return findByBBTKey(key, Zotero);
-            })).then((items)=>{
-                return buildResponse(items, q.format);
-            });
+            })).then(responder);
     } else if (q.collection)
-        return collectionSearch(q.collection).then((items)=>{
-            return buildResponse(items, q.format);
-        });
+        return collectionSearch(q.collection).then(responder);
     else if (q.all) {
-        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then((items)=>{
-            return buildResponse(items, q.format);
-        });
+        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(responder);
     } else {
         return makeClientError('No param supplied!');
     }

@@ -161,6 +161,13 @@ class ZotxtTest < MiniTest::Test
     assert_equal @doe_first_book_key, i[0]
   end
 
+  def test_items_style_param
+    resp = @client.get(@item_url, {"key" => @doe_first_book_key, "format" => "bibliography", "style" => "ieee" })
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal "[1]J. Doe, First Book. Cambridge: Cambridge University Press, 2005.", i[0]["text"]
+  end
+
   def test_items_bad_key
     resp = @client.get(@item_url, {"key" => "1_ZBZQ4KMXXXX", "format" => "key"})
     assert_equal 400, resp.status
@@ -427,6 +434,13 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal @doe_article_key, results[0]
+  end
+
+  def test_search_style_param
+    resp = @client.get(@search_url, {"q" => "doe first book", "format" => "bibliography", "style" => "ieee"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal "[1]J. Doe, First Book. Cambridge: Cambridge University Press, 2005.", i[0]["text"]
   end
 
   def test_search_everything_standalone_note
