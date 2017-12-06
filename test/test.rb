@@ -119,6 +119,11 @@ class ZotxtTest < MiniTest::Test
     assert_equal "doe:2005ambiguous returned multiple items", resp.body
   end
 
+  def test_items_easykey_bad
+    resp = @client.get(@item_url, {"easykey" => "doe:2005foobar"})
+    assert_equal 400, resp.status
+    assert_equal "doe:2005foobar had no results", resp.body
+  end
   def test_betterbibtexkey
     resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first", "format" => "key"})
     assert_equal 200, resp.status

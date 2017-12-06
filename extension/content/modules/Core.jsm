@@ -194,7 +194,7 @@ function findByEasyKey(key, zotero) {
                     } else if (items.length > 1) {
                         return makeClientError(`${key} returned multiple items`);
                     } else {
-                        return makeClientError('search failed to return a single item');
+                        return makeClientError(`${key} had no results`);
                     }
                 });
             }
