@@ -172,7 +172,7 @@ function makeClientError(str) {
 function findByEasyKey(key, zotero) {
     let parsedKey = parseEasyKey(key, zotero);
     if (!parsedKey) {
-        return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
+        return makeClientError(`${key} must be of the form DoeTitle2000 or doe:2000title`);
     } else {
         /* first try raw search */
         let search = buildRawSearch(new zotero.Search(), key);
