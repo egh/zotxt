@@ -180,7 +180,7 @@ function findByEasyKey(key, zotero) {
             if (items.length === 1) {
                 return items[0];
             } else if (items.length > 1) {
-                return makeClientError('search return multiple items');
+                return makeClientError(`${key} returned multiple items`);
             } else {
                 let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
                 return runSearch(search, zotero).then (function (items) {
@@ -192,7 +192,7 @@ function findByEasyKey(key, zotero) {
                     if (items.length === 1) {
                         return items[0];
                     } else if (items.length > 1) {
-                        return makeClientError('search return multiple items');
+                        return makeClientError(`${key} returned multiple items`);
                     } else {
                         return makeClientError('search failed to return a single item');
                     }

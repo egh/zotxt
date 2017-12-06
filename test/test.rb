@@ -106,11 +106,17 @@ class ZotxtTest < MiniTest::Test
     assert_equal @doe_first_book_key, i[0]
   end
 
-  def test_easykey_two_items
+  def test_items_easykey_two_items
     resp = @client.get(@item_url, {"easykey" => "doe:2005book,roe-doe:2015hyphens", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key, @roe_doe_hyphens_key].sort, i.sort
+  end
+
+  def test_items_easykey_ambiguous
+    resp = @client.get(@item_url, {"easykey" => "doe:2005ambiguous"})
+    assert_equal 400, resp.status
+    assert_equal "doe:2005ambiguous returned multiple items", resp.body
   end
 
   def test_betterbibtexkey
@@ -220,7 +226,7 @@ class ZotxtTest < MiniTest::Test
     header = { 'Content-Type' => 'application/json' }
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
     assert_equal 400, resp.status
-    assert_equal "search return multiple items", resp.body
+    assert_equal "doe:2005ambiguous returned multiple items", resp.body
   end
 
   def test_ambiguous_bibliography
