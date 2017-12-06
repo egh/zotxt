@@ -12,7 +12,7 @@ with open(path.join(here, '..', 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pandoc-zotxt',
-    version='0.1.35',
+    version='5.0.2',
     description='Pandoc filter for interacting with Zotero via zotxt.',
     long_description=long_description,
     classifiers=[
