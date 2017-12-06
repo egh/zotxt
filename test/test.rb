@@ -212,6 +212,8 @@ class ZotxtTest < MiniTest::Test
       "styleId" => "chicago-author-date",
       "citationGroups" => [
         { "citationItems" => [ { "easyKey" => "doe:2005ambiguous" } ],
+          "properties" => { "noteIndex" => 0 } },
+        { "citationItems" => [ { "easyKey" => "doe:2005first" } ],
           "properties" => { "noteIndex" => 0 } }
       ]
     }
