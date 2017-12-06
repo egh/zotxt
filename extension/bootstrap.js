@@ -70,7 +70,7 @@ function collectionSearch(name) {
             return Promise.resolve(collection.getChildItems());
         }
     }
-    return makeClientError('Collection not found.');
+    return makeClientError(`collection ${name} not found`);
 }
 
 function processCitationItem (citation) {

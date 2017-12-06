@@ -327,6 +327,12 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
   end
 
+  def test_collection_search_bad_name
+    resp = @client.get(@item_url, {"collection" => "missing collection"})
+    assert_equal 400, resp.status
+    assert_equal "collection missing collection not found", resp.body
+  end
+
   def test_format_bibtex
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "bibtex"})
     assert_equal 200, resp.status
