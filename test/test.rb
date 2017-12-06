@@ -207,6 +207,20 @@ class ZotxtTest < MiniTest::Test
     assert_equal ["(Doe 2005)"], i["citationClusters"]
   end
 
+  def test_bibliography_error
+    r = {
+      "styleId" => "chicago-author-date",
+      "citationGroups" => [
+        { "citationItems" => [ { "easyKey" => "doe:2005ambiguous" } ],
+          "properties" => { "noteIndex" => 0 } }
+      ]
+    }
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
+    assert_equal 400, resp.status
+    assert_equal "search return multiple items", resp.body
+  end
+
   def test_ambiguous_bibliography
     r = {
       "styleId" => "chicago-author-date",
