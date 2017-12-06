@@ -124,6 +124,7 @@ class ZotxtTest < MiniTest::Test
     assert_equal 400, resp.status
     assert_equal "doe:2005foobar had no results", resp.body
   end
+
   def test_betterbibtexkey
     resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first", "format" => "key"})
     assert_equal 200, resp.status
@@ -182,6 +183,7 @@ class ZotxtTest < MiniTest::Test
   def test_items_bad_key
     resp = @client.get(@item_url, {"key" => "1_ZBZQ4KMXXXX", "format" => "key"})
     assert_equal 400, resp.status
+    assert_equal "1_ZBZQ4KMXXXX not found", resp.body
   end
 
   def test_items_multiple_easykeys

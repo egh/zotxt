@@ -68,7 +68,7 @@ function item2key(item) {
 function findByKey(key, zotero) {
     let rejectIfUndefined = (item)=>{
         if (!item) {
-            return makeClientError('Item not found.');
+            return makeClientError(`${key} not found`);
         } else {
             return item;
         }
