@@ -70,11 +70,11 @@ parameters. you can query using the params ``easykey``, ``key``,
 For ``collection`` or ``key``, provide the Zotero key (e.g.
 ``0_VWYXZ1A1``)
 
-You can return the data in different formats by using the ``format``
-parameter, including ``easykey`` (an array of easykeys),
-``betterbibtexkey`` (an array of better bibtex keys), ``key`` (an
-array of Zotero keys), ``bibtex``, ``bibliography`` (see also the
-``style`` parameter). For example:
+You can return the data in different formats by using the ``format`` parameter,
+including ``easykey`` (an array of easykeys), ``betterbibtexkey`` (an array of
+better bibtex keys), ``key`` (an array of Zotero keys), ``bibtex``,
+``bibliography`` (see also the ``style`` parameter), or ``json`` (which output
+CSL-JSON format, using Zotero BetterBibTeX’s export if available). For example:
 
   http://127.0.0.1:23119/zotxt/items?easykey=roe-doe:2015hyphens&format=easykey
 
