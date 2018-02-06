@@ -256,7 +256,7 @@ function buildPathsResponse(items) {
             return Zotero.Items.get(attachmentId);
         });
         return Zotero.Promise.filter(attachments, (attachment)=>{
-            return attachment.isAttachment();
+            return attachment.isFileAttachment();
         }).then ((attachments)=>{
             return attachments.map((a)=> {
                 return a.getFilePathAsync().then((path)=>{
