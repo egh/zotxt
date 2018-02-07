@@ -233,19 +233,32 @@ function buildQuickBibResponse(items) {
     for (let item of items) {
         if (item.isRegularItem()) {
             let creators = item.getCreators();
-            let creatorString = "";
-            if (creators.length > 0) {
-                creatorString = creators[0].lastName + ', ' + creators[0].firstName;
+            let authors = [];
+            for (let i=0; i<creators.length; i++) {
+                if (creators[i].creatorTypeID == 1) {
+                    authors.push(creators[i]);
+                }
             }
-            if (creators.length > 1) {
-                creatorString += ", et al.";
-            }
+            // only authors if there are any
+            let creatorString = namesOrEtAl(authors) || namesOrEtAl(creators) || "N.A.";
             responseData.push({'key': ((item.libraryID || '0') + '_' + item.key),
                                'quickBib': creatorString + ' - ' + item.getField('date',true).substr(0, 4) + ' - ' + item.getField('title')});
         }
     }
     return [okCode, jsonMediaType, jsonStringify(responseData)];
 };
+
+function namesOrEtAl(names) {
+    if (names.length > 0) {
+        let nameString = names[0].lastName + ', ' + names[0].firstName;
+        if (names.length == 2) {
+            nameString += " & " + names[1].lastName + ', ' + names[1].firstName;
+        } else if (names.length > 1) {
+            nameString += ", et al.";
+        }
+        return nameString;
+    }
+}
 
 function buildPathsResponse(items) {
     let regularItems = items.filter((item)=>{
