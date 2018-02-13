@@ -86,4 +86,8 @@ param as in the ``items`` endpoint. For example:
 
 You can supply an argument to the ``method`` parameter to change the
 quicksearch version, either ``titleCreatorYear`` (the default),
-``everything`` or ``fields``.
+``everything`` or ``fields``. By default, search is done only in the
+private library, but the parameter ``library`` allows you to provide a
+specific libraryID to use, or the string ``all`` for searching in all
+libraries.
+

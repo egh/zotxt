@@ -348,6 +348,11 @@ function searchEndpoint(options) {
     const query = cleanQuery(options.query);
     if (query.q) {
         let search = buildSearch(new Zotero.Search(), query.q, query.method);
+        if (!query.library) {
+            search.libraryID = Zotero.Libraries.userLibraryID;
+        } else if (query.library !== "all") {
+            search.libraryID = query.library;
+        }
         return runSearch(search, Zotero).then((items)=>{
             return buildResponse(items, query.format, query.style);
         });
