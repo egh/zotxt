@@ -6,12 +6,17 @@ test-doc:
 		-o test/doc-is.html test/doc.md
 	cmp test/doc-is.html test/doc-should.html
 
-
 test-bbt:
 	rm -f test/bbt-is.html
 	pandoc --lua-filter ./pandoc-zotxt.lua -F pandoc-citeproc \
 		-o test/bbt-is.html test/bbt.md
 	cmp test/bbt-is.html test/bbt-should.html
+
+test-key:
+	rm -f test/key-is.html
+	pandoc --lua-filter ./pandoc-zotxt.lua -F pandoc-citeproc \
+		-o test/key-is.html test/key.md
+	cmp test/key-is.html test/key-should.html
 
 test-call-citeproc:
 	rm -f test/call-citeproc-is.html

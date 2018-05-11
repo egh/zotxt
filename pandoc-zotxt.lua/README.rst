@@ -22,7 +22,7 @@ try `pandoc-zotxt <https://github.com/egh/zotxt>`_,
 which works with Pandoc 1.12 or later (but also requires Python_ 2.7).
 
 1. Download the `current release
-   <https://codeload.github.com/odkr/pandoc-zotxt/tar.gz/v0.2>`_.
+   <https://codeload.github.com/odkr/pandoc-zotxt/tar.gz/v0.2.1>`_.
 2. Unpack it.
 3. Copy the whole directory to the ``filters``
    subdirectory of your Pandoc data directory.
@@ -39,9 +39,9 @@ If you are using a Unix-ish operating system, you can do all of the above by::
         sed -n 's/^Default user data directory: //p')
     mkdir -p "${PANDOC_DATA_DIR:?}/filters"
     cd "${PANDOC_DATA_DIR:?}/filters"
-    curl https://codeload.github.com/odkr/pandoc-zotxt.lua/tar.gz/v0.2 |
+    curl https://codeload.github.com/odkr/pandoc-zotxt.lua/tar.gz/v0.2.1 |
         tar -xz
-    sudo cp pandoc-zotxt.lua-0.2/man/pandoc-zotxt.lua.1 \
+    sudo cp pandoc-zotxt.lua-0.2.1/man/pandoc-zotxt.lua.1 \
         /usr/local/share/man/man1
 
 
@@ -54,15 +54,24 @@ support LuaSocket_ (a library for retrieving data via a network) and only
 provides a blocking method to fetch data from a network itself. So, there is
 no way to retrieve data for multiple citation items concurrently. 
 As a consequence, ``pandoc-zotxt.lua`` is typically about as fast as
-``pandoc-zotxt``. It is faster for long, complex documents though.
+``pandoc-zotxt``. However, if your document is *very* complex (e.g., a
+highly stylised reveal.js_ presentation prepared in Markdown) 
+``pandoc-zotxt.lua`` will be a bit faster; if you are using BetterBibTex_,
+it will be about twice as fast.
+
+Moreover, ``pandoc-zotxt.lua`` supports using Zotero_ item IDs as
+citation keys.
 
 +------------------------------------+---------------------------------------+
 | ``pandoc-zotxt.lua``               | ``pandoc-zotxt``                      |
 +====================================+=======================================+
 | Requires only Pandoc_ 2.0          | Requires Pandoc_ 1.12 and Python_ 2.7 |
 +------------------------------------+---------------------------------------+
-| Faster for complex documents.      | Apparently, a tiny bit faster         |
-|                                    | for short and/or simple documents.    |
+| Faster for complex documents       | Apparently, a tiny bit faster         |
+| or if you're using BetterBibTex_.  | for short and/or simple documents.    |
++------------------------------------+---------------------------------------+
+| Supports using Zotero_ item IDs    | Doesn't support Zotero_ item IDs.     |
+| as citation keys.                  |                                       |
 +------------------------------------+---------------------------------------+
 | Doesn't use temporary files.       | Does use a temporary file.            |
 +------------------------------------+---------------------------------------+
@@ -79,12 +88,20 @@ To run the test suite, just say::
 
     make test
 
-If you want to test BetterBibTex_ support, you also need BetterBixTex and
+If you want to test BetterBibTex_ support, you also need BetterBibTex and
 the source from the file ``bbt.rdf``.
 
-To run the the BetterBixTex test, say::
+To run the the BetterBibTex test, say::
 
     make test-bbt
+
+There is also a test for using Zotero item IDs as citation keys.
+But since item IDs are particular to the datebase used, you
+need to adapt this test yourself. Have a look at ``key.md``,
+``key-is.html`` and ``key-should.html`` in ``test``. Once you've
+adapted those to your database, you can run the test by::
+
+    make test-key
 
 
 Documentation
@@ -141,5 +158,6 @@ See also
 .. _Zotero: https://www.zotero.org/
 .. _Pandoc: https://www.pandoc.org/
 .. _BetterBibTex: https://retorque.re/zotero-better-bibtex/
+.. _reveal.js: https://github.com/hakimel/reveal.js/
 .. _Python: https://www.python.org/
 .. _LuaSocket: https://github.com/diegonehab/luasocket
