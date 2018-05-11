@@ -157,23 +157,20 @@ end
 
 do
     local citekeys = {}
+    local seen = {}
 
-    do
-        local seen = {}
-
-        --- Collects all citekeys used in a document.
-        --
-        -- Saves them into the variable ``citekeys``,
-        -- which is shared with ``add_references``.
-        --
-        -- @param citations A pandoc.Cite element.
-        function collect_sources (citations)
-            for _, citation in ipairs(citations.citations) do
-                id = citation.id
-                if seen[id] == nil then
-                    seen[id] = true
-                    table.insert(citekeys, id)
-                end
+    --- Collects all citekeys used in a document.
+    --
+    -- Saves them into the variable ``citekeys``,
+    -- which is shared with ``add_references``.
+    --
+    -- @param citations A pandoc.Cite element.
+    function collect_sources (citations)
+        for _, citation in ipairs(citations.citations) do
+            id = citation.id
+            if seen[id] == nil then
+                seen[id] = true
+                table.insert(citekeys, id)
             end
         end
     end
