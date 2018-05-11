@@ -6,6 +6,13 @@ test-doc:
 		-o test/doc-is.html test/doc.md
 	cmp test/doc-is.html test/doc-should.html
 
+
+test-bbt:
+	rm -f test/bbt-is.html
+	pandoc --lua-filter ./pandoc-zotxt.lua -F pandoc-citeproc \
+		-o test/bbt-is.html test/bbt.md
+	cmp test/bbt-is.html test/bbt-should.html
+
 test-call-citeproc:
 	rm -f test/call-citeproc-is.html
 	pandoc --lua-filter ./pandoc-zotxt.lua \
@@ -22,5 +29,5 @@ performance-comparison:
 	time pandoc -F pandoc-zotxt -o /dev/null test/long.md
 	time pandoc --lua-filter ./pandoc-zotxt.lua -o /dev/null test/long.md
 
-.PHONY: test test-doc test-call-citeproc test-dont-call-citeproc \
+.PHONY: test test-doc test-bbt test-call-citeproc test-dont-call-citeproc \
 	performance-comparison 

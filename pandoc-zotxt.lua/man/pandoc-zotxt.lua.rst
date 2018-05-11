@@ -8,14 +8,14 @@ Looks up sources in Zotero
 
 :Author: Odin Kroeger
 :Date: May 9, 2018
-:Version: 0.1.1
+:Version: 0.2
 :Manual section: 1
 
 
 SYNOPSIS
 ========
 
-pandoc [...] --lua-filter pandoc-zotxt.lua-0.1.1/pandoc-zotxt.lua [...]
+pandoc [...] --lua-filter pandoc-zotxt.lua-0.2/pandoc-zotxt.lua [...]
 
 
 DESCRIPTION

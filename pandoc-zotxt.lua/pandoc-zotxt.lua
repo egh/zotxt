@@ -1,7 +1,7 @@
 #!/usr/local/bin/lua
 --- pandoc-zotxt.lua Looks up citations in Zotero and adds references. 
 --
--- @release 0.1
+-- @release 0.2
 -- @author Odin Kroeger
 -- @copyright 2018 Odin Kroeger
 --
@@ -28,7 +28,12 @@
 
 -- The URL to lookup citation data.
 -- See <https://github.com/egh/zotxt> for details.
-local ZOTERO_LOOKUP_URL = 'http://127.0.0.1:23119/zotxt/items?easykey='
+local ZOTXT_LOOKUP_URL = 'http://localhost:23119/zotxt/items'
+
+
+-- Keytypes.
+-- See the source of ``pandoc-zotxt`` for details for details.
+local ZOTXT_KEYTYPES = {'easykey', 'betterbibtexkey'}
 
 
 -- Boilerplate
@@ -68,16 +73,20 @@ end
 
 --- Gets bibliographic data from Zotero.
 -- 
--- Uses the constant ZOTERO_LOOKUP_URL (see above).
+-- Uses the constant ZOTXT_LOOKUP_URL (see above).
 -- See <https://github.com/egh/zotxt> for details.
 --
 -- @param citekey A citation key.
+-- @param keytype The type of citekey, either 'easykey' or 'betterbixtexkey';
+--                defaults to 'easykey'.
 --
 -- @return If the cited source was found, bibliographic data for
 --         that source as CSL JSON string.
 -- @return Otherwise, nil and and error message.
-function get_source_data (citekey)
-    local _, reply = pandoc.mediabag.fetch(ZOTERO_LOOKUP_URL .. citekey, '.')
+function get_source_data (citekey, keytype)
+    keytype = keytype or 'easykey'
+    local _, reply = pandoc.mediabag.fetch(ZOTXT_LOOKUP_URL .. 
+        '?' .. keytype .. '=' .. citekey, '.')
     if reply:sub(1, 1) ~= '[' then return nil, reply end
     return reply
 end
@@ -138,8 +147,23 @@ do
     -- Prints error messages to STDERR if a source cannot be found.
     function add_references (meta)
         local sources = {}
+        local keytypes = ZOTXT_KEYTYPES
         for citekey, _ in pairs(citekeys) do
-            local data, msg = get_source_data(citekey)
+            local msg = citekey .. ': not found\n'
+            local data
+            for i = 1, #keytypes do
+                if i == 1 then
+                    data, msg = get_source_data(citekey, keytypes[i])
+                    if data ~= nil then break end
+                else
+                    data = get_source_data(citekey, keytypes[i])
+                    if data ~= nil then
+                        local kt = table.remove(keytypes, i)
+                        table.insert(keytypes, 1, kt)
+                        break
+                    end
+                end
+            end
             if data == nil then
                 io.stderr:write('pandoc-zotxt.lua: ' .. msg .. '\n')
             else
