@@ -8,7 +8,7 @@ Looks up sources in Zotero
 
 :Author: Odin Kroeger
 :Date: May 9, 2018
-:Version: 0.2.1
+:Version: 0.2.2
 :Manual section: 1
 
 

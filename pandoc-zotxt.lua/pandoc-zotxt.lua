@@ -1,7 +1,7 @@
 #!/usr/local/bin/lua
 --- pandoc-zotxt.lua Looks up citations in Zotero and adds references. 
 --
--- @release 0.2.1
+-- @release 0.2.2
 -- @author Odin Kroeger
 -- @copyright 2018 Odin Kroeger
 --
@@ -57,13 +57,10 @@ end
 -- C-JSON is slightly faster; just in case you're writing a book.
 local json
 do
-    local cjson
-    cjson, json = pcall(function() return require 'cjson' end)
-    if cjson then
-        json.encode_number_precision(1)
-    else
-        json = require 'lunajson'
-    end
+    local cjson_loaded
+    cjson_loaded, json = pcall(function() return require 'cjson' end)
+    if cjson_loaded then json.encode_number_precision(1)
+    else json = require 'lunajson' end
 end
 
 
@@ -84,8 +81,6 @@ do
     -- The constant ``ZOTXT_KEYTYPES`` defines what keytypes to try.
     -- See <https://github.com/egh/zotxt> for details.
     --
-    -- @return The cited sources
-    --         as a list of CSL-compliant multi-dimensional tables.
     -- @return If the cited source was found, bibliographic data for
     --         that source as CSL JSON string.
     -- @return Otherwise, nil and the error message of the lookup
@@ -93,8 +88,8 @@ do
     function get_source_json (citekey)
         local _, reply
         for i = 1, #keytypes do
-            local query = ZOTXT_QUERY_URL .. keytypes[i] .. '=' .. citekey
-            _, reply = fetch(query, '.')
+            local query_url = ZOTXT_QUERY_URL .. keytypes[i] .. '=' .. citekey
+            _, reply = fetch(query_url, '.')
             if reply:sub(1, 1) == '[' then
                 if i > 1 then
                     local keytype = table.remove(keytypes, i)
@@ -104,6 +99,29 @@ do
             end
         end
         return nil, reply
+    end
+end
+
+
+--- Converts all numbers in a multi-dimensional table to strings.
+--
+-- Also converts floating point numbers to integers.
+-- This is needed because in JavaScript, all numbers are
+-- floating point numbers. But Pandoc expects integers.
+--
+-- @parem data Data of any type.
+--
+-- @return The given data, with all numbers converted into strings.
+function stringify_values (data)
+    local data_type = type(data)
+    if data_type == 'table' then
+        local s = {}
+        for k, v in pairs(data) do s[k] = stringify_values(v) end
+        return s
+    elseif data_type == 'number' then
+        return tostring(math.floor(data))
+    else
+        return data
     end
 end
 
@@ -129,29 +147,6 @@ function get_sources (citekeys)
         end
     end
     return sources
-end
-
-
---- Converts all numbers in a multi-dimensional table to strings.
---
--- Also converts floating point numbers to integers.
--- This is needed because in JavaScript, all numbers are
--- floating point numbers. But Pandoc expects integers.
---
--- @parem data Data of any type.
---
--- @return The given data, with all numbers converted into strings.
-function stringify_values (data)
-    local data_type = type(data)
-    if data_type == 'table' then
-        local s = {}
-        for k, v in pairs(data) do s[k] = stringify_values(v) end
-        return s
-    elseif data_type == 'number' then
-        return tostring(math.floor(data))
-    else
-        return data
-    end
 end
 
 
@@ -181,10 +176,10 @@ do
     -- Reads citekeys of cited sources from the variable ```citekeys``,
     -- which is shared with ``collect_sources``.
     --
-    -- @param meta The metadata block of a document, as Pandoc.Meta.
+    -- @param meta The metadata block of a document, as pandoc.Meta.
     --
     -- @return If sources were found, an updated metadata block, 
-    --         as Pandoc.Meta, with the field ```references`` added.
+    --         as pandoc.Meta, with the field ```references`` added.
     -- @return Otherwise, nil.
     function add_references (meta)
         sources = get_sources(citekeys)
@@ -212,4 +207,4 @@ function call_citeproc (doc)
     end
 end
 
-return {{Cite = collect_sources}, {Meta = add_references}, {Pandoc = call_citeproc}}
+return {{Cite = collect_sources, Meta = add_references, Pandoc = call_citeproc}}
