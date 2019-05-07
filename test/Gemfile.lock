@@ -1,9 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    httpclient (2.6.0.1)
-    json (1.8.3)
-    minitest (5.7.0)
+    httpclient (2.8.3)
+    json (2.1.0)
+    minitest (5.11.3)
 
 PLATFORMS
   ruby
@@ -12,3 +12,6 @@ DEPENDENCIES
   httpclient
   json
   minitest
+
+BUNDLED WITH
+   1.17.2
