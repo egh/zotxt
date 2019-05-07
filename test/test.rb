@@ -354,7 +354,7 @@ class ZotxtTest < MiniTest::Test
     assert_match(
       Regexp.new(
         Regexp.quote("""
-@article{doe_article_2006,
+@article{doe:2006article,
 	title = {Article},
 	volume = {6},
 	journal = {Journal of Generic Studies},
