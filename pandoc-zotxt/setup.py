@@ -8,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='pandoc-zotxt',
-    version='5.0.3',
+    version='5.0.4',
     description='Pandoc filter for interacting with Zotero via zotxt.',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
