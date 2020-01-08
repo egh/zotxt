@@ -364,7 +364,6 @@ function searchEndpoint(options) {
 function selectEndpoint(options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
         getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
-    ZoteroPane.show();
     let q = cleanQuery(options.query);
     let promise = null;
     if (q.easykey) {
