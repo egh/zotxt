@@ -32,7 +32,7 @@ function fixStyleId(styleId) {
  * Prepare query values for us.
  */
 function cleanQuery(q) {
-    let retval = [];
+    let retval = {};
     for (let key in q) {
         retval[key] = q[key].replace('+', ' ');
     }
