@@ -11,6 +11,8 @@
     <em:name>zotxt</em:name>
     <em:description>Plain text extensions for Zotero</em:description>
     <em:creator>Erik Hetzner</em:creator>
+    <em:homepageURL>https://github.com/egh/zotxt</em:homepageURL>
+    <em:updateURL>https://raw.githubusercontent.com/egh/zotxt/master/update.rdf</em:updateURL>
 
     <em:targetApplication>
       <Description>
