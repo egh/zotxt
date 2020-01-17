@@ -328,6 +328,14 @@ function bibliographyEndpoint(options) {
     }
 }
 
+function makeVersionEndpoint(data) {
+    let dataCopy = Object.assign({}, data);
+    return (options)=>{
+        let retval = {"version": dataCopy.version};
+        return [okCode, jsonMediaType, jsonStringify(retval)];
+    }
+}
+
 function completeEndpoint(options) {
     if (!options.query.easykey) {
         return makeClientError('Option easykey is required.');
@@ -420,9 +428,14 @@ function itemsEndpoint(options) {
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
-function loadEndpoints () {
+function loadEndpoints (data) {
     loadZotero().then(function () {
         let endpoints = {
+            'version': {
+                supportedMethods: ['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : makeVersionEndpoint(data)
+            },
             'complete' : {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
@@ -457,7 +470,7 @@ function loadEndpoints () {
     });
 }
 
-function makeStartupObserver() {
+function makeStartupObserver(addonData) {
     return {
         'observe': function(subject, topic, data) {
             loadZotero().then(function () {
@@ -468,7 +481,7 @@ function makeStartupObserver() {
                 /* load exporters */
                 // installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
 
-                loadEndpoints();
+                loadEndpoints(addonData);
             });
         }
     };
@@ -480,7 +493,7 @@ function startup(data, reason) {
           getService(Components.interfaces.nsIObserverService);
     /* wait until after zotero is loaded */
     Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
-    observerService.addObserver(makeStartupObserver(), 'final-ui-startup', false);
+    observerService.addObserver(makeStartupObserver(data), 'final-ui-startup', false);
 }
 
 
@@ -509,10 +522,9 @@ function installTranslator(metadata, filename) {
 function install(data, reason) {
     Components.utils.import('resource://gre/modules/FileUtils.jsm');
     Components.utils.import('resource://gre/modules/NetUtil.jsm');
-
+    
     loadZotero().then(function () {
-        loadEndpoints();
-
+        loadEndpoints(data);
         /* load exporters */
         installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
     });

@@ -10,6 +10,7 @@ class ZotxtTest < MiniTest::Test
     @base_url = "http://127.0.0.1:23119/zotxt"
     @item_url = "#{@base_url}/items"
     @complete_url = "#{@base_url}/complete"
+    @version_url = "#{@base_url}/version"
     @bibliography_url = "#{@base_url}/bibliography"
     @search_url = "#{@base_url}/search"
     @select_url = "#{@base_url}/select"
@@ -500,5 +501,11 @@ class ZotxtTest < MiniTest::Test
   def test_python
     out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt`
     assert_equal "<p><span class=\"citation\" data-cites=\"hüning:2012foo\">@hüning:2012foo</span></p>\n", out
+  end
+
+  def test_version
+    resp = @client.get(@version_url)
+    assert_equal 200, resp.status
+    assert_match /^5/, JSON.parse(resp.body)['version']
   end
 end
