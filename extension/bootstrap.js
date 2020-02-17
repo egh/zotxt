@@ -476,11 +476,6 @@ function makeStartupObserver(addonData) {
             loadZotero().then(function () {
                 Components.utils.import('resource://gre/modules/FileUtils.jsm');
                 Components.utils.import('resource://gre/modules/NetUtil.jsm');
-
-
-                /* load exporters */
-                // installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
-
                 loadEndpoints(addonData);
             });
         }
@@ -496,36 +491,11 @@ function startup(data, reason) {
     observerService.addObserver(makeStartupObserver(data), 'final-ui-startup', false);
 }
 
-
 function shutdown (data, reason) {
 }
 
 function uninstall(data, reason) {
-    /* TODO uninstall exporters? */
-}
-
-function installTranslator(metadata, filename) {
-    let file = FileUtils.getFile('ProfD', ['extensions', 'zotxt@e6h.org',
-                                           'resource', 'translators', filename]);
-    NetUtil.asyncFetch(file, function(inputStream, status) {
-        if (!Components.isSuccessCode(status)) {
-            Zotero.debug('error reading file');
-            return;
-        }
-
-        let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-        Zotero.Translators.save(metadata, data);
-        Zotero.Translators.init();
-    });
 }
 
 function install(data, reason) {
-    Components.utils.import('resource://gre/modules/FileUtils.jsm');
-    Components.utils.import('resource://gre/modules/NetUtil.jsm');
-    
-    loadZotero().then(function () {
-        loadEndpoints(data);
-        /* load exporters */
-        installTranslator(makeEasyKeyExporterMetadata(), 'EasyKeyExporter.js');
-    });
 }
