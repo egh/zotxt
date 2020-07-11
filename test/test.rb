@@ -498,11 +498,6 @@ class ZotxtTest < MiniTest::Test
     assert_equal 400, resp.status
   end
 
-  def test_python
-    out = `echo @hüning:2012foo | pandoc -F pandoc-zotxt`
-    assert_equal "<p><span class=\"citation\" data-cites=\"hüning:2012foo\">@hüning:2012foo</span></p>\n", out
-  end
-
   def test_version
     resp = @client.get(@version_url)
     assert_equal 200, resp.status

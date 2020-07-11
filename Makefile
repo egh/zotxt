@@ -13,6 +13,3 @@ unittest:
 
 test: unittest
 	cd test && ruby test.rb
-	cd pandoc-zotxt && ./venv/bin/nosetests
-pypi: test
-	cd pandoc-zotxt && python setup.py sdist upload
