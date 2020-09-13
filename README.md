@@ -23,7 +23,8 @@ For example:
 
 ## emacs integration
 
-    See [zotxt-emacs](https://github.com/egh/zotxt-emacs)
+See [zotxt-emacs](https://github.com/egh/zotxt-emacs)
+
 Zotxt API
 ---------
 
