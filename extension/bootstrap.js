@@ -19,25 +19,6 @@
 var Zotero;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
 
-function makeEasyKeyExporterMetadata() {
-    return {
-        'translatorID':'9d774afe-a51d-4055-a6c7-23bc96d19fe7',
-        'label': 'Easy Citekey',
-        'creator': 'Erik Hetzner',
-        'target': 'txt',
-        'minVersion': '2.1.9',
-        'maxVersion': '',
-        'priority': 200,
-        'inRepository': false,
-        'translatorType': 2,
-        'browserSupport': 'gcs',
-        'displayOptions': {
-            'Alternate (@DoeTitle2000)': false
-        },
-        'lastUpdated':'2013-07-15 07:03:17'
-    };
-}
-
 const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain; charset=UTF-8';
 const badRequestCode = 400;
@@ -146,9 +127,7 @@ function buildResponse(items, format, style) {
     return ensureLoaded(items, Zotero).then((items)=>{
         if (format === 'key') {
             return [okCode, 'application/json', jsonStringify(items.map(item2key))];
-        } else if (format === 'easykey') {
-            return buildEasyKeyResponse(items);
-        } else if (format === 'betterbibtexkey') {
+        } else if (format === 'easykey' || format == 'citekey' || format === 'betterbibtexkey') {
             return buildBBTKeyResponse(items);
         } else if (format === 'bibtex') {
             return buildBibTeXResponse(items);
@@ -190,10 +169,6 @@ function buildKeyResponse(items, translatorId) {
             return [okCode, jsonMediaType, jsonStringify(keys2)];
         });
     }
-}
-
-function buildEasyKeyResponse(items) {
-    return buildKeyResponse(items, makeEasyKeyExporterMetadata().translatorID);
 }
 
 function buildBBTKeyResponse(items) {

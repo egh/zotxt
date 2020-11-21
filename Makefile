@@ -2,7 +2,7 @@
 
 VERSION=$(shell grep em:version extension/install.rdf | grep -o "[0-9\\.]*")
 
-zotxt-$(VERSION).xpi: extension/install.rdf extension/bootstrap.js extension/resource/translators/EasyKeyExporter.js unittest
+zotxt-$(VERSION).xpi: extension/install.rdf extension/bootstrap.js unittest
 	cd extension && zip -r ../zotxt-$(VERSION).xpi *
 
 clean:

@@ -311,11 +311,6 @@ class ZotxtTest < MiniTest::Test
     assert_equal 400, resp.status
   end
 
-  def test_custom_key
-    resp = @client.get(@item_url, {"easykey" => "hüning:2012foo"})
-    assert_equal 200, resp.status
-  end
-
   def test_accent_easykey_export
     key = find_item_key("acćénts")
     resp = @client.get(@item_url, {"key" => key, "format" => "easykey"})
