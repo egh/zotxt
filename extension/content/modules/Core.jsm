@@ -204,7 +204,11 @@ function findByEasyKey(key, zotero) {
 
 function findByBBTKey(citekey, zotero) {
     let libraryID = zotero.Libraries.userLibraryID;
-    let itemId = zotero.BetterBibTeX.KeyManager.keys.findOne({ libraryID, citekey }).itemID;
+    let item = zotero.BetterBibTeX.KeyManager.keys.findOne({ libraryID, citekey });
+    if (item === null) {
+        return makeClientError(`${citekey} had no results`);
+    }
+    let itemId = item.itemID;
     return zotero.Items.getAsync(itemId);
 }
 
