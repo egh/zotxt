@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded, extractCiteKey */
 'use strict';
 
 var Zotero;
@@ -367,6 +367,7 @@ function itemsEndpoint(options) {
     const q = cleanQuery(options.query);
     let items = [];
     let responder = (items) => { return buildResponse(items, q.format, q.style); };
+    const citekey = extractCiteKey(q);
     if (q.selected) {
         return responder(Zotero.getActiveZoteroPane().getSelectedItems());
     } else if (q.key) {
@@ -375,14 +376,8 @@ function itemsEndpoint(options) {
             keys.map((key)=>{
                 return findByKey(key, Zotero);
             })).then(responder);
-    } else if (q.easykey) {
-        let keys = q.easykey.split(',');
-        return Promise.all(
-            keys.map((key) => {
-                return findByEasyKey(key, Zotero);
-            })).then(responder);
-    } else if (q.betterbibtexkey) {
-        let keys = q.betterbibtexkey.split(',');
+    } else if (citekey) {
+        let keys = citekey.split(',');
         return Promise.all(
             keys.map((key) => {
                 return findByBBTKey(key, Zotero);

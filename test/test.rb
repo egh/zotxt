@@ -15,7 +15,9 @@ class ZotxtTest < MiniTest::Test
     @search_url = "#{@base_url}/search"
     @select_url = "#{@base_url}/select"
     @doe_first_book_key = find_item_key("doe first book 2005")
+    @doe_first_book_citekey = find_item_citekey("doe first book 2005")
     @doe_article_key = find_item_key("doe article 2006")
+    @doe_article_citekey = find_item_citekey("doe article 2006")
     @roe_doe_hyphens_key = find_item_key("roe doe hyphens")
   end
 
@@ -24,13 +26,18 @@ class ZotxtTest < MiniTest::Test
     JSON.parse(resp.body)[0]
   end
 
+  def find_item_citekey(q)
+    resp = @client.get(@search_url, {"q" => q, "format" => "citekey"})
+    JSON.parse(resp.body)[0]
+  end
+
   def test_items_nothing
     resp = @client.get(@item_url)
     assert_equal 400, resp.status
   end
 
-  def test_items_easykey
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005"})
+  def test_items_citekey
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal "book", i[0]["type"]
@@ -38,18 +45,18 @@ class ZotxtTest < MiniTest::Test
     assert_equal "Doe", i[0]["author"][0]["family"]
   end
 
-  def test_items_easykey_key_format
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "key"})
+  def test_items_citekey_key_format
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal @doe_first_book_key, i[0]
   end
 
-  def test_items_easykey_json_format
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "json"})
+  def test_items_citekey_json_format
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "json"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({'id'=>"doe:2005first",
+    assert_equal({'id'=>@doe_first_book_citekey,
                   'type'=>'book',
                   'title'=>'First Book',
                   'publisher'=>'Cambridge University Press',
@@ -60,8 +67,8 @@ class ZotxtTest < MiniTest::Test
                  }, i[0])
   end
 
-  def test_items_easykey_paths_format
-    resp = @client.get(@item_url, {'easykey' => 'doe:2006article', 'format' => 'paths'})
+  def test_items_citekey_paths_format
+    resp = @client.get(@item_url, {'citekey' => 'doe:2006article', 'format' => 'paths'})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal(@doe_article_key, i[0]['key'])
@@ -70,7 +77,7 @@ class ZotxtTest < MiniTest::Test
 
     # should be fetched afer deletion
     File.unlink(i[0]['paths'][0])
-    resp = @client.get(@item_url, {'easykey' => 'doe:2006article', 'format' => 'paths'})
+    resp = @client.get(@item_url, {'citekey' => 'doe:2006article', 'format' => 'paths'})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal(@doe_article_key, i[0]['key'])
@@ -78,91 +85,47 @@ class ZotxtTest < MiniTest::Test
     assert(i[0]['paths'][0] =~ %r{storage/QWFHQ73F/doe$}, 'no path')
   end
 
-  def test_items_easykey_two_word
-    key = find_item_key("united nations wonderful")
-    resp = @client.get(@item_url, {"easykey" => "united_nations:2005book", "format" => "key"})
-    assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
-    assert_equal key, i[0]
-  end
-
-  def test_items_easykey_double_name
-    key = find_item_key("roe doe double")
-    resp = @client.get(@item_url, {"easykey" => "roe_doe:2015double", "format" => "key"})
-    assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
-    assert_equal key, i[0]
-  end
-
-  def test_items_easykey_hyphenated_name
-    resp = @client.get(@item_url, {"easykey" => "roe-doe:2015hyphens", "format" => "key"})
-    assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
-    assert_equal @roe_doe_hyphens_key, i[0]
-  end
-
-  def test_items_easykey_alternate_key_format
-    resp = @client.get(@item_url, {"easykey" => "doe:2005first", "format" => "key"})
-    assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
-    assert_equal @doe_first_book_key, i[0]
-  end
-
-  def test_items_easykey_two_items
-    resp = @client.get(@item_url, {"easykey" => "doe:2005first,roe-doe:2015hyphens", "format" => "key"})
-    assert_equal 200, resp.status
-    i = JSON.parse(resp.body)
-    assert_equal [@doe_first_book_key, @roe_doe_hyphens_key].sort, i.sort
-  end
-
-  def test_items_easykey_ambiguous
-    resp = @client.get(@item_url, {"easykey" => "doe:2005ambiguous"})
-    assert_equal 400, resp.status
-    assert_equal "doe:2005ambiguous returned multiple items", resp.body
-  end
-
-  def test_items_easykey_bad
-    resp = @client.get(@item_url, {"easykey" => "doe:2005foobar"})
+  def test_items_citekey_bad
+    resp = @client.get(@item_url, {"citekey" => "doe:2005foobar"})
     assert_equal 400, resp.status
     assert_equal "doe:2005foobar had no results", resp.body
   end
 
-  def test_betterbibtexkey
-    resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first", "format" => "key"})
+  def test_citekey
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key], i
   end
 
-  def test_betterbibtexkey_two_items
-    resp = @client.get(@item_url, {"betterbibtexkey" => "doe:2005first,doe:2006article", "format" => "key"})
+  def test_deprecated_betterbibtexkey
+    resp = @client.get(@item_url, {"betterbibtexkey" => @doe_first_book_citekey, "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal [@doe_first_book_key], i
+  end
+
+  def test_citekey_two_items
+    resp = @client.get(@item_url, {"citekey" => "doe:2005first,doe:2006article", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key,@doe_article_key].sort, i.sort
   end
 
-# doesn't work
-#  def test_betterbibtexkey_hyphen
-#    resp = @client.get(@item_url, {"betterbibtexkey" => "Roe-Doe2005", "format" => "key"})
-#    assert_equal 200, resp.status
-#    i = JSON.parse(resp.body)
-#    assert_equal ["xyz"], i
-#  end
-
-  def test_items_easykey_bibliography_format
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography"})
+  def test_items_citekey_bibliography_format
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "bibliography"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert(i[0].key? 'html')
 
     # with style
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography", "style" => "http://www.zotero.org/styles/chicago-note-bibliography"})
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "bibliography", "style" => "http://www.zotero.org/styles/chicago-note-bibliography"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert(i[0].key? 'html')
 
     # with short style
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005", "format" => "bibliography", "style" => "chicago-note-bibliography"})
+    resp = @client.get(@item_url, {"citekey" => @doe_first_book_citekey, "format" => "bibliography", "style" => "chicago-note-bibliography"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert(i[0].key? 'html')
@@ -188,8 +151,15 @@ class ZotxtTest < MiniTest::Test
     assert_equal "1_ZBZQ4KMXXXX not found", resp.body
   end
 
-  def test_items_multiple_easykeys
-    resp = @client.get(@item_url, {"easykey" => "DoeBook2005,DoeArticle2006", "format" => "key"})
+  def test_items_deprecated_easykey_param
+    resp = @client.get(@item_url, {"easykey" => @doe_first_book_citekey, "format" => "key"})
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal 1, i.length
+  end
+
+  def test_items_multiple_citekeys
+    resp = @client.get(@item_url, {"citekey" => "#{@doe_first_book_citekey},#{@doe_article_citekey}", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal 2, i.length
@@ -211,7 +181,7 @@ class ZotxtTest < MiniTest::Test
     r = {
       "styleId" => "chicago-author-date",
       "citationGroups" => [
-        { "citationItems" => [ { "citekey" => "doe:2005first" } ],
+        { "citationItems" => [ { "citekey" => @doe_first_book_citekey } ],
           "properties" => { "noteIndex" => 0 } }
       ]
     }
@@ -226,7 +196,7 @@ class ZotxtTest < MiniTest::Test
     r = {
       "styleId" => "chicago-author-date",
       "citationGroups" => [
-        { "citationItems" => [ { "easyKey" => "doe:2005first" } ],
+        { "citationItems" => [ { "easyKey" => @doe_first_book_citekey } ],
           "properties" => { "noteIndex" => 0 } }
       ]
     }
@@ -296,39 +266,29 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
   end
 
-  def test_bad_easykey
-    resp = @client.get(@item_url, {"easykey" => "XXX"})
+  def test_bad_citekey
+    resp = @client.get(@item_url, {"citekey" => "XXX"})
     assert_equal 400, resp.status
   end
 
-  def test_unicode_easykey
-    resp = @client.get(@item_url, {"easykey" => "HüningRelatie2012"})
-    assert_equal 200, resp.status
-  end
-
-  def test_bad_easykey
-    resp = @client.get(@item_url, {"easykey" => "XXX"})
-    assert_equal 400, resp.status
-  end
-
-  def test_accent_easykey_export
+  def test_accent_citekey_export
     key = find_item_key("acćénts")
-    resp = @client.get(@item_url, {"key" => key, "format" => "easykey"})
+    resp = @client.get(@item_url, {"key" => key, "format" => "citekey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "hüáéèñ:2015acćénts", results[0]
   end
 
-  def test_accent_easykey_fetch
+  def test_accent_citekey_fetch
     key = find_item_key("acćénts")
-    resp = @client.get(@item_url, {"easykey" => "hüáéèñ:2015acćénts", "format" => "key"})
+    resp = @client.get(@item_url, {"citekey" => "hüáéèñ:2015acćénts", "format" => "key"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal key, results[0]
   end
 
   def test_duplicate_in_group_library
-    resp = @client.get(@item_url, {"easykey" => "doe:2015duplicated", "format" => "key"})
+    resp = @client.get(@item_url, {"citekey" => "doe:2015duplicated", "format" => "key"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "1_UCA4RC22", results[0]
@@ -380,29 +340,36 @@ class ZotxtTest < MiniTest::Test
     assert_equal({ "key" => "1_4T8MCITQ", "quickBib" => "Doe, John - 2006 - Article"}, results[0])
   end
 
-  def test_format_easykey
-    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "easykey"})
+  def test_format_citekey
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "citekey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "doe:2006article", results[0]
   end
 
-  def test_format_easykey_clean_html
-    resp = @client.get(@item_url, {"easykey" => "doe:2007why", "format" => "easykey"})
+  def test_format_citekey_clean_html
+    resp = @client.get(@item_url, {"citekey" => "doe:2007why", "format" => "citekey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "doe:2007why", results[0]
   end
 
   def test_select
-    resp = @client.get(@item_url, {"selected" => "t", "format" => "easykey"})
+    resp = @client.get(@item_url, {"selected" => "t", "format" => "citekey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert results == [] || results == ["doe:2006article"]
   end
 
-  def test_format_betterbibtex
+  def test_format_betterbibtex_deprecated
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "betterbibtexkey"})
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal "doe:2006article", results[0]
+  end
+
+  def test_format_citekey
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "citekey"})
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal "doe:2006article", results[0]
@@ -444,19 +411,19 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_completion
-    resp = @client.get(@complete_url, {"easykey" => "doe:"})
+    resp = @client.get(@complete_url, {"citekey" => "doe:"})
     results = JSON.parse(resp.body)
     assert (results.size > 4)
 
-    resp = @client.get(@complete_url, {"easykey" => "doe:20"})
+    resp = @client.get(@complete_url, {"citekey" => "doe:20"})
     results = JSON.parse(resp.body)
     assert (results.size > 4)
 
-    resp = @client.get(@complete_url, {"easykey" => "doe:2006"})
+    resp = @client.get(@complete_url, {"citekey" => "doe:2006"})
     results = JSON.parse(resp.body)
     assert_equal ["doe:2006article"], results
 
-    resp = @client.get(@complete_url, {"easykey" => "doe:2006art"})
+    resp = @client.get(@complete_url, {"citekey" => "doe:2006art"})
     results = JSON.parse(resp.body)
     assert_equal ["doe:2006article"], results
   end
@@ -485,12 +452,12 @@ class ZotxtTest < MiniTest::Test
   def test_select
     resp = @client.get(@select_url, {"key" => @doe_article_key})
     assert_equal 200, resp.status
-    resp = @client.get(@select_url, {"easykey" => "doe:2006article"})
+    resp = @client.get(@select_url, {"citekey" => "doe:2006article"})
     assert_equal 200, resp.status
     # bad key
     resp = @client.get(@select_url, {"key" => "1_4T8MCITQXXX"})
     assert_equal 400, resp.status
-    resp = @client.get(@select_url, {"easykey" => "XXX"})
+    resp = @client.get(@select_url, {"citekey" => "XXX"})
     assert_equal 400, resp.status
   end
 
