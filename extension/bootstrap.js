@@ -345,12 +345,11 @@ function selectEndpoint(options) {
         getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
     let q = cleanQuery(options.query);
     let promise = null;
-    if (q.easykey) {
-        promise = findByEasyKey(q.easykey, Zotero);
+    const citekey = extractCiteKey(q);
+    if (citekey) {
+        promise = findByBBTKey(citekey, Zotero);
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
-    } else if (q.betterbibtexkey) {
-        promise = findByBBTKey(q.betterbibtexkey, Zotero);
     } else {
         return makeClientError('No param supplied!');
     }

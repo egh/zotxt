@@ -225,10 +225,15 @@ function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, completeBBTKey];
+function extractCiteKey(q) {
+    return q.citekey || q.betterbibtexkey || q.easykey;
+}
+
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, completeBBTKey, extractCiteKey];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
 if (typeof process !== 'undefined') {
     toExport.forEach((s) => { module.exports[s.name] = s; });
 }
+
