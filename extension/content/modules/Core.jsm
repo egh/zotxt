@@ -1,23 +1,3 @@
-/**
- * Parses an easy key. Returns {creator: ..., title: ..., date: ...} or null if it
- * did not parse correctly.
- */
-function parseEasyKey(key, zotero) {
-    const easyKeyRe = zotero.Utilities.XRegExp('^(\\p{Lu}[\\p{Ll}_-]+)(\\p{Lu}\\p{Ll}+)?([0-9]{4})?');
-    const alternateEasyKeyRe = zotero.Utilities.XRegExp('^([\\p{Ll}_-]+):([0-9]{4})?(\\p{Ll}+)?');
-    let result = easyKeyRe.exec(key);
-    if (result) {
-        return {creator: result[1], title: result[2], date: result[3]};
-    } else {
-        result = alternateEasyKeyRe.exec(key);
-        if (result) {
-            return {creator: result[1], title: result[3], date: result[2]};
-        } else {
-            return null;
-        }
-    }
-}
-
 function fixStyleId(styleId) {
     if (!styleId) {
         return  'http://www.zotero.org/styles/chicago-note-bibliography';
@@ -126,24 +106,6 @@ function buildRawSearch(s, key) {
     return s;
 }
 
-/**
- * Find many items by a (possibly incomplete) parsed easy key.
- */
-function buildEasyKeySearch(s, parsedKey) {
-    /* allow multiple names separated by _ */
-    var splitName = parsedKey.creator.split('_');
-    for (let name of splitName) {
-        s.addCondition('creator', 'contains', name);
-    }
-    if (parsedKey.title != null) {
-        s.addCondition('title', 'contains', parsedKey.title);
-    }
-    if (parsedKey.date != null) {
-        s.addCondition('date', 'is', parsedKey.date);
-    }
-    return s;
-}
-
 function buildSearch(s, query, method) {
     if (!method) { method = 'titleCreatorYear'; }
     s.addCondition('joinMode', 'all');
@@ -164,42 +126,6 @@ ClientError.prototype = new Error;
 
 function makeClientError(str) {
     return Promise.reject(new ClientError(str));
-}
-
-/**
- * Find a single item by its easy key, caching the result.
- */
-function findByEasyKey(key, zotero) {
-    let parsedKey = parseEasyKey(key, zotero);
-    if (!parsedKey) {
-        return makeClientError(`${key} must be of the form DoeTitle2000 or doe:2000title`);
-    } else {
-        /* first try raw search */
-        let search = buildRawSearch(new zotero.Search(), key);
-        return runSearch(search, zotero).then(function(items) {
-            if (items.length === 1) {
-                return items[0];
-            } else if (items.length > 1) {
-                return makeClientError(`${key} returned multiple items`);
-            } else {
-                let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
-                return runSearch(search, zotero).then (function (items) {
-                    if (items.length > 1) {
-                        // hack to ignore group library duplicates
-                        // remove all items not in the local library
-                        items = items.filter(function (item) { return item.libraryID === zotero.Libraries.userLibraryID; });
-                    }
-                    if (items.length === 1) {
-                        return items[0];
-                    } else if (items.length > 1) {
-                        return makeClientError(`${key} returned multiple items`);
-                    } else {
-                        return makeClientError(`${key} had no results`);
-                    }
-                });
-            }
-        });
-    }
 }
 
 function findByBBTKey(citekey, zotero) {
@@ -229,7 +155,7 @@ function extractCiteKey(q) {
     return q.citekey || q.betterbibtexkey || q.easykey;
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, completeBBTKey, extractCiteKey];
+const toExport = [fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, runSearch, buildSearch, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, completeBBTKey, extractCiteKey];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

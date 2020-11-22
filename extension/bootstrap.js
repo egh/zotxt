@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded, extractCiteKey */
+/* global Components, Set, FileUtils, NetUtil, Q, runSearch, buildRawSearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded, extractCiteKey */
 'use strict';
 
 var Zotero;
