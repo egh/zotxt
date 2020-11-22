@@ -312,18 +312,12 @@ function makeVersionEndpoint(data) {
 }
 
 function completeEndpoint(options) {
+    const query = cleanQuery(options.query);
     if (!options.query.easykey) {
         return makeClientError('Option easykey is required.');
     } else {
-        let q = cleanQuery(options.query);
-        let search = buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero));
-        return runSearch(search, Zotero).then((items)=>{
-            if (!items) {
-                return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
-            } else {
-                return buildResponse(items, 'easykey');
-            }
-        });
+        let items = completeBBTKey(query.easykey, Zotero);
+        return Promise.resolve([okCode, jsonMediaType, jsonStringify(items)]);
     }
 }
 

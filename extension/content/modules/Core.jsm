@@ -212,11 +212,20 @@ function findByBBTKey(citekey, zotero) {
     return zotero.Items.getAsync(itemId);
 }
 
+function completeBBTKey(citekey, zotero) {
+    let libraryID = zotero.Libraries.userLibraryID;
+    return zotero.BetterBibTeX.KeyManager.keys.find(
+        { 'libraryID': libraryID, 'citekey': { '$contains' : citekey } }
+    ).map((item) => {
+        return item.citekey;
+    });
+}
+
 function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, completeBBTKey];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
