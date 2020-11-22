@@ -102,14 +102,14 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_items_easykey_alternate_key_format
-    resp = @client.get(@item_url, {"easykey" => "doe:2005book", "format" => "key"})
+    resp = @client.get(@item_url, {"easykey" => "doe:2005first", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal @doe_first_book_key, i[0]
   end
 
   def test_items_easykey_two_items
-    resp = @client.get(@item_url, {"easykey" => "doe:2005book,roe-doe:2015hyphens", "format" => "key"})
+    resp = @client.get(@item_url, {"easykey" => "doe:2005first,roe-doe:2015hyphens", "format" => "key"})
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal [@doe_first_book_key, @roe_doe_hyphens_key].sort, i.sort
@@ -211,7 +211,7 @@ class ZotxtTest < MiniTest::Test
     r = {
       "styleId" => "chicago-author-date",
       "citationGroups" => [
-        { "citationItems" => [ { "easyKey" => "DoeBook2005" } ],
+        { "citationItems" => [ { "citekey" => "doe:2005first" } ],
           "properties" => { "noteIndex" => 0 } }
       ]
     }
@@ -222,29 +222,42 @@ class ZotxtTest < MiniTest::Test
     assert_equal ["(Doe 2005)"], i["citationClusters"]
   end
 
-  def test_bibliography_error
+  def test_bibliography_deprecated_easykey_param
     r = {
       "styleId" => "chicago-author-date",
       "citationGroups" => [
-        { "citationItems" => [ { "easyKey" => "doe:2005ambiguous" } ],
-          "properties" => { "noteIndex" => 0 } },
         { "citationItems" => [ { "easyKey" => "doe:2005first" } ],
           "properties" => { "noteIndex" => 0 } }
       ]
     }
     header = { 'Content-Type' => 'application/json' }
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
-    assert_equal 400, resp.status
-    assert_equal "doe:2005ambiguous returned multiple items", resp.body
+    assert_equal 200, resp.status
+    i = JSON.parse(resp.body)
+    assert_equal ["(Doe 2005)"], i["citationClusters"]
   end
 
-  def test_ambiguous_bibliography
+  def test_bibliography_not_found
     r = {
       "styleId" => "chicago-author-date",
       "citationGroups" => [
-        { "citationItems" => [ { "easyKey" => "jenkins:2011jesus" } ],
+        { "citationItems" => [ { "citekey" => "doe:2005xxx" } ],
+          "properties" => { "noteIndex" => 0 } }
+      ]
+    }
+    header = { 'Content-Type' => 'application/json' }
+    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
+    assert_equal 400, resp.status
+    assert_equal "doe:2005xxx had no results", resp.body
+  end
+
+  def test_bibliography_multiple
+    r = {
+      "styleId" => "chicago-author-date",
+      "citationGroups" => [
+        { "citationItems" => [ { "citekey" => "jenkins:2011jesus" } ],
           "properties" => { "index" => 0, "noteIndex" => 0 } },
-        { "citationItems" => [ { "easyKey" => "jenkins:2009lost" } ],
+        { "citationItems" => [ { "citekey" => "jenkins:2009lost" } ],
           "properties" => { "index" => 1, "noteIndex" => 0 } }
       ]
     }
@@ -270,19 +283,6 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal ["(Doe 2005)"], i["citationClusters"]
-  end
-
-  def test_bad_bibliography
-    r = {
-      "styleId" => "chicago-author-date",
-      "citationGroups" => [
-        { "citationItems" => [ { "easyKey" => "FooBar0000" } ],
-          "properties" => { "noteIndex" => 0 } }
-      ]
-    }
-    header = { 'Content-Type' => 'application/json' }
-    resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
-    assert_equal 400, resp.status
   end
 
   def test_no_param

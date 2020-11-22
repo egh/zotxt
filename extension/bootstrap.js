@@ -63,7 +63,9 @@ function processCitationItem (citation) {
         return retval;
     };
     if ('easyKey' in citation) {
-        return findByEasyKey(citation.easyKey, Zotero).then(cloneButSetId);
+        return findByBBTKey(citation.easyKey, Zotero).then(cloneButSetId);
+    } else if ('citekey' in citation) {
+        return findByBBTKey(citation.citekey, Zotero).then(cloneButSetId);
     } else if ('key' in citation) {
         return findByKey(citation.key, Zotero).then(cloneButSetId);
     } else {
