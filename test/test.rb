@@ -55,7 +55,8 @@ class ZotxtTest < MiniTest::Test
                   'publisher'=>'Cambridge University Press',
                   'author'=>[{'family'=>'Doe', 'given'=>'John'}],
                   'issued'=>{'date-parts'=>[[2005]]},
-                  'publisher-place'=>'Cambridge'
+                  'publisher-place'=>'Cambridge',
+                  'event-place'=>'Cambridge'
                  }, i[0])
   end
 
