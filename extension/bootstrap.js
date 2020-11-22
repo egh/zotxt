@@ -315,10 +315,11 @@ function makeVersionEndpoint(data) {
 
 function completeEndpoint(options) {
     const query = cleanQuery(options.query);
-    if (!options.query.easykey) {
-        return makeClientError('Option easykey is required.');
+    const citekey = extractCiteKey(query);
+    if (!citekey) {
+        return makeClientError('Option citekey is required.');
     } else {
-        let items = completeBBTKey(query.easykey, Zotero);
+        let items = completeBBTKey(citekey, Zotero);
         return Promise.resolve([okCode, jsonMediaType, jsonStringify(items)]);
     }
 }
