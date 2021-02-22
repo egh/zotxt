@@ -148,7 +148,7 @@ function buildResponse(items, format, style) {
             return [okCode, 'application/json', jsonStringify(items.map(item2key))];
         } else if (format === 'easykey') {
             return buildEasyKeyResponse(items);
-        } else if (format === 'betterbibtexkey') {
+        } else if (format === 'betterbibtexkey' || format === 'citekey') {
             return buildBBTKeyResponse(items);
         } else if (format === 'bibtex') {
             return buildBibTeXResponse(items);
@@ -380,6 +380,8 @@ function selectEndpoint(options) {
         promise = findByKey(q.key, Zotero);
     } else if (q.betterbibtexkey) {
         promise = findByBBTKey(q.betterbibtexkey, Zotero);
+    } else if (q.citekey) {
+        promise = findByBBTKey(q.citekey, Zotero);
     } else {
         return makeClientError('No param supplied!');
     }
@@ -410,8 +412,8 @@ function itemsEndpoint(options) {
             keys.map((key) => {
                 return findByEasyKey(key, Zotero);
             })).then(responder);
-    } else if (q.betterbibtexkey) {
-        let keys = q.betterbibtexkey.split(',');
+    } else if (q.betterbibtexkey || q.citekey) {
+        let keys = (q.betterbibtexkey ? q.betterbibtexkey.split(',') : q.citekey.split(',');
         return Promise.all(
             keys.map((key) => {
                 return findByBBTKey(key, Zotero);
