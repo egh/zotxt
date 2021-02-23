@@ -413,7 +413,7 @@ function itemsEndpoint(options) {
                 return findByEasyKey(key, Zotero);
             })).then(responder);
     } else if (q.betterbibtexkey || q.citekey) {
-        let keys = (q.betterbibtexkey ? q.betterbibtexkey.split(',') : q.citekey.split(',');
+        let keys = (q.betterbibtexkey ? q.betterbibtexkey.split(',') : q.citekey.split(','));
         return Promise.all(
             keys.map((key) => {
                 return findByBBTKey(key, Zotero);
