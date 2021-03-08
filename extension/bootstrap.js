@@ -427,6 +427,10 @@ function itemsEndpoint(options) {
     }
 }
 
+function stylesEndpoint(options) {
+    return [okCode, jsonMediaType, jsonStringify(Zotero.Styles.getVisible())];
+}
+
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
@@ -462,8 +466,12 @@ function loadEndpoints (data) {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : handleErrors(itemsEndpoint)
+            },
+            'styles': {
+                supportedMethods:['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : stylesEndpoint
             }
-
         };
         for (let e in endpoints) {
             let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
