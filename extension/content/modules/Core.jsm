@@ -20,7 +20,7 @@ function parseEasyKey(key, zotero) {
 
 function fixStyleId(styleId) {
     if (!styleId) {
-        return  'http://www.zotero.org/styles/chicago-note-bibliography';
+        return 'http://www.zotero.org/styles/chicago-note-bibliography';
     } else if (!styleId.match(/^https?:/)) {
         return 'http://www.zotero.org/styles/' + styleId;
     } else {
@@ -84,8 +84,18 @@ function findByKey(key, zotero) {
     }
 }
 
-function makeCslEngine (styleId, locale, zotero) {
-    let style = zotero.Styles.get(fixStyleId(styleId));
+function checkStyleId(styleId, zotero) {
+    const styleIds = Object.keys(zotero.Styles.getAll());
+    if (styleIds.indexOf(styleId) === -1) {
+        throw new ClientError(`Style ${styleId} is not installed.`);
+    }
+    return styleId;
+}
+
+function makeCslEngine (styleIdRaw, locale, zotero) {
+    const styleId = fixStyleId(styleIdRaw);
+    checkStyleId(styleId, zotero);
+    let style = zotero.Styles.get(styleId);
     if (!style) {
         return null;
     } else {
@@ -212,7 +222,7 @@ function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, checkStyleId];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 

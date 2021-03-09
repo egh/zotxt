@@ -23,6 +23,27 @@ describe('#core.fixStyleId()', () => {
 });
 
 
+describe('#core.checkStyleId()', () => {
+    const styleId = "http://example.org/chicago"
+    beforeEach(()=>{
+        getAll = sinon.stub().returns({[styleId]: {"styleID": styleId}});
+        zotero = { Styles : { getAll } };
+    });
+
+    it('should do nothing for good styles', ()=>{
+        assert.equal(styleId, core.checkStyleId(styleId, zotero));
+    });
+
+    it('should throw an exception for a bad style', ()=>{
+        assert.throws(
+            ()=> {
+                core.checkStyleId('http://example.org/bad', zotero);
+            },
+            /Style .*bad is not installed/);
+    });
+});
+
+
 describe('#core.parseEasyKey()', () => {
     const zotero = { Utilities: { XRegExp: xregexp } };
     const altRes = {
@@ -131,16 +152,18 @@ describe('#core.findByKey()', () => {
 
 
 describe('#core.makeCslEngine()', () => {
-    let opt, getCiteProc, style, get, zotero, styleName, locale;
+    let opt, getCiteProc, style, get, zotero, styleName, locale, styleId, getAll;
 
     beforeEach(()=>{
         opt = { development_extensions: { wrap_url_and_doi: false } };
-        getCiteProc = sinon.stub().returns({ opt });;
+        getCiteProc = sinon.stub().returns({ opt });
         style = { getCiteProc };
-        get = sinon.stub().returns(style);
-        zotero = { Styles : { get } };
         styleName = 'foo';
         locale = 'en-US';
+        styleId = `http://www.zotero.org/styles/${styleName}`;
+        get = sinon.stub().returns(style);
+        getAll = sinon.stub().returns({[styleId]: {"styleID": styleId}});
+        zotero = { Styles : { get, getAll } };
     });
 
     it("sets wrap_url_and_dio", ()=>{
@@ -151,7 +174,7 @@ describe('#core.makeCslEngine()', () => {
     it("sets calls Styles.get", ()=>{
         core.makeCslEngine(styleName, locale, zotero);
         sinon.assert.calledOnce(get);
-        sinon.assert.calledWith(get, `http://www.zotero.org/styles/${styleName}`);
+        sinon.assert.calledWith(get, styleId);
     });
 
     it("sets calls getCiteProc with locale", ()=>{

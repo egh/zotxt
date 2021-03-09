@@ -397,6 +397,12 @@ class ZotxtTest < MiniTest::Test
                    "key"=>@doe_article_key}, results[0])
   end
 
+  def test_format_bibliography_bad_style
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "bibliography", "style": "bad-style"})
+    assert_equal 400, resp.status
+    assert_equal("Style http://www.zotero.org/styles/bad-style is not installed.", resp.body)
+  end
+
   def test_format_quickbib
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "quickBib"})
     assert_equal 200, resp.status
