@@ -15,6 +15,7 @@ class ZotxtTest < MiniTest::Test
     @search_url = "#{@base_url}/search"
     @select_url = "#{@base_url}/select"
     @locales_url = "#{@base_url}/locales"
+    @styles_url = "#{@base_url}/styles"
     @doe_first_book_key = find_item_key("doe first book 2005")
     @doe_article_key = find_item_key("doe article 2006")
     @roe_doe_hyphens_key = find_item_key("roe doe hyphens")
@@ -523,9 +524,19 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     assert_match /^5/, JSON.parse(resp.body)['version']
   end
+
   def test_locales
     resp = @client.get(@locales_url)
     assert_equal 200, resp.status
     assert_equal "Español", JSON.parse(resp.body)['es-ES']
+
+  def test_styles
+    resp = @client.get(@styles_url)
+    assert_equal 200, resp.status
+    style = JSON.parse(resp.body).find do |value|
+      value['styleID'] == 'http://www.zotero.org/styles/chicago-fullnote-bibliography'
+    end
+    assert_equal "note", style["categories"]
+    assert_equal "Chicago Manual of Style 17th edition (full note)", style["title"]
   end
 end
