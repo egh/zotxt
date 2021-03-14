@@ -142,7 +142,7 @@ function myExport (items, translatorId) {
 /**
  * Build a response based on items and a format parameter.
  */
-function buildResponse(items, format, style) {
+function buildResponse(items, format, style, locale) {
     return ensureLoaded(items, Zotero).then((items)=>{
         if (format === 'key') {
             return [okCode, 'application/json', jsonStringify(items.map(item2key))];
@@ -153,9 +153,9 @@ function buildResponse(items, format, style) {
         } else if (format === 'bibtex') {
             return buildBibTeXResponse(items);
         } else if (format === 'bibliography') {
-            return buildBibliographyResponse(items, style);
+            return buildBibliographyResponse(items, style, locale);
         } else if (format === 'quickBib') {
-            return buildQuickBibResponse(items, style);
+            return buildQuickBibResponse(items);
         } else if (format === 'paths') {
             return buildPathsResponse(items, style);
         } else if (format && format.match(uuidRe)) {
@@ -214,8 +214,8 @@ function buildBibTeXResponse(items) {
     return buildExportResponse(items, '9cb70025-a888-4a29-a210-93ec52da40d4');
 }
 
-function buildBibliographyResponse(items, style) {
-    let csl = makeCslEngine(style, Zotero);
+function buildBibliographyResponse(items, style, locale) {
+    let csl = makeCslEngine(style, locale, Zotero);
     let responseData = items.map ((item)=>{
         csl.updateItems([item.id], true);
         return {
@@ -306,7 +306,7 @@ function handleErrors(f) {
 }
 
 function bibliographyEndpoint(options) {
-    let cslEngine = makeCslEngine(options.data.styleId, Zotero);
+    let cslEngine = makeCslEngine(options.data.styleId, options.data.locale, Zotero);
     if (!cslEngine) {
         return makeClientError('No style found.');
     } else {
@@ -362,7 +362,7 @@ function searchEndpoint(options) {
             search.libraryID = query.library;
         }
         return runSearch(search, Zotero).then((items)=>{
-            return buildResponse(items, query.format, query.style);
+            return buildResponse(items, query.format, query.style, query.locale);
         });
     } else {
         return makeClientError('q param required.');
@@ -397,7 +397,7 @@ function selectEndpoint(options) {
 function itemsEndpoint(options) {
     const q = cleanQuery(options.query);
     let items = [];
-    let responder = (items) => { return buildResponse(items, q.format, q.style); };
+    let responder = (items) => { return buildResponse(items, q.format, q.style, q.locale); };
     if (q.selected) {
         return responder(Zotero.getActiveZoteroPane().getSelectedItems());
     } else if (q.key) {

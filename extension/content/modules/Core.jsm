@@ -84,13 +84,13 @@ function findByKey(key, zotero) {
     }
 }
 
-function makeCslEngine (styleId, zotero) {
+function makeCslEngine (styleId, locale, zotero) {
     let style = zotero.Styles.get(fixStyleId(styleId));
     if (!style) {
         return null;
     } else {
         // jshint camelcase: false
-        let csl = style.getCiteProc();
+        let csl = style.getCiteProc(locale);
         csl.opt.development_extensions.wrap_url_and_doi = true;
         return csl;
     }
