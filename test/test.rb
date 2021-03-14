@@ -14,6 +14,7 @@ class ZotxtTest < MiniTest::Test
     @bibliography_url = "#{@base_url}/bibliography"
     @search_url = "#{@base_url}/search"
     @select_url = "#{@base_url}/select"
+    @locales_url = "#{@base_url}/locales"
     @doe_first_book_key = find_item_key("doe first book 2005")
     @doe_article_key = find_item_key("doe article 2006")
     @roe_doe_hyphens_key = find_item_key("roe doe hyphens")
@@ -521,5 +522,10 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@version_url)
     assert_equal 200, resp.status
     assert_match /^5/, JSON.parse(resp.body)['version']
+  end
+  def test_locales
+    resp = @client.get(@locales_url)
+    assert_equal 200, resp.status
+    assert_equal "Español", JSON.parse(resp.body)['es-ES']
   end
 end

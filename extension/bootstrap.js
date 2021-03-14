@@ -431,6 +431,10 @@ function stylesEndpoint(options) {
     return [okCode, jsonMediaType, jsonStringify(Zotero.Styles.getVisible())];
 }
 
+function localesEndpoint(options) {
+    return [okCode, jsonMediaType, jsonStringify(Zotero.Locale.availableLocales)];
+}
+
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
@@ -471,6 +475,11 @@ function loadEndpoints (data) {
                 supportedMethods:['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
                 init : stylesEndpoint
+            },
+            'locales': {
+                supportedMethods:['GET'],
+                supportedDataType : ['application/x-www-form-urlencoded'],
+                init : localesEndpoint
             }
         };
         for (let e in endpoints) {
