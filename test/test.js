@@ -131,7 +131,7 @@ describe('#core.findByKey()', () => {
 
 
 describe('#core.makeCslEngine()', () => {
-    let opt, getCiteProc, style, get, zotero, styleName;
+    let opt, getCiteProc, style, get, zotero, styleName, locale;
 
     beforeEach(()=>{
         opt = { development_extensions: { wrap_url_and_doi: false } };
@@ -140,22 +140,24 @@ describe('#core.makeCslEngine()', () => {
         get = sinon.stub().returns(style);
         zotero = { Styles : { get } };
         styleName = 'foo';
+        locale = 'en-US';
     });
 
     it("sets wrap_url_and_dio", ()=>{
-        core.makeCslEngine(styleName, zotero);
+        core.makeCslEngine(styleName, locale, zotero);
         assert.equal(true, opt.development_extensions.wrap_url_and_doi);
     });
 
     it("sets calls Styles.get", ()=>{
-        core.makeCslEngine(styleName, zotero);
+        core.makeCslEngine(styleName, locale, zotero);
         sinon.assert.calledOnce(get);
         sinon.assert.calledWith(get, `http://www.zotero.org/styles/${styleName}`);
     });
 
-    it("sets calls getCiteProc", ()=>{
-        core.makeCslEngine(styleName, zotero);
+    it("sets calls getCiteProc with locale", ()=>{
+        core.makeCslEngine(styleName, locale, zotero);
         sinon.assert.calledOnce(getCiteProc);
+        sinon.assert.calledWith(getCiteProc, 'en-US');
     });
 });
 

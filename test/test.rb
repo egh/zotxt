@@ -14,6 +14,7 @@ class ZotxtTest < MiniTest::Test
     @bibliography_url = "#{@base_url}/bibliography"
     @search_url = "#{@base_url}/search"
     @select_url = "#{@base_url}/select"
+    @locales_url = "#{@base_url}/locales"
     @styles_url = "#{@base_url}/styles"
     @doe_first_book_key = find_item_key("doe first book 2005")
     @doe_article_key = find_item_key("doe article 2006")
@@ -384,6 +385,18 @@ class ZotxtTest < MiniTest::Test
                    "key"=>@doe_article_key}, results[0])
   end
 
+  def test_format_bibliography_with_locale
+    resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "bibliography", "locale" => "es-ES" })
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert_equal({"text"=>"Doe, John. «Article». Journal of Generic Studies 6 (2006): 33-34.",
+                  "html"=>"""<div class=\"csl-bib-body\" style=\"line-height: 1.35; margin-left: 2em; text-indent:-2em;\">
+  <div class=\"csl-entry\">Doe, John. «Article». <i>Journal of Generic Studies</i> 6 (2006): 33-34.</div>
+  <span class=\"Z3988\" title=\"url_ver=Z39.88-2004&amp;ctx_ver=Z39.88-2004&amp;rfr_id=info%3Asid%2Fzotero.org%3A2&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.atitle=Article&amp;rft.jtitle=Journal%20of%20Generic%20Studies&amp;rft.volume=6&amp;rft.aufirst=John&amp;rft.aulast=Doe&amp;rft.au=John%20Doe&amp;rft.date=2006&amp;rft.pages=33-34&amp;rft.spage=33&amp;rft.epage=34\"></span>
+</div>""",
+                   "key"=>@doe_article_key}, results[0])
+  end
+
   def test_format_quickbib
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "quickBib"})
     assert_equal 200, resp.status
@@ -512,6 +525,11 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     assert_match /^5/, JSON.parse(resp.body)['version']
   end
+
+  def test_locales
+    resp = @client.get(@locales_url)
+    assert_equal 200, resp.status
+    assert_equal "Español", JSON.parse(resp.body)['es-ES']
 
   def test_styles
     resp = @client.get(@styles_url)
