@@ -530,6 +530,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@locales_url)
     assert_equal 200, resp.status
     assert_equal "Español", JSON.parse(resp.body)['es-ES']
+  end
 
   def test_styles
     resp = @client.get(@styles_url)
