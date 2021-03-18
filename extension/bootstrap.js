@@ -297,7 +297,7 @@ function handleErrors(f) {
     return (...args)=>{
         return f(...args).catch((ex)=>{
             if (ex instanceof ClientError) {
-                return [badRequestCode, textMediaType, ex.message];
+                return [badRequestCode, jsonMediaType, `"${ex.message}"`];
             } else {
                 return [500, textMediaType, (ex && (ex.message + ex.stack))];
             }

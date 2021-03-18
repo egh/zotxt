@@ -120,13 +120,13 @@ class ZotxtTest < MiniTest::Test
   def test_items_easykey_ambiguous
     resp = @client.get(@item_url, {"easykey" => "doe:2005ambiguous"})
     assert_equal 400, resp.status
-    assert_equal "doe:2005ambiguous returned multiple items", resp.body
+    assert_equal "\"doe:2005ambiguous returned multiple items\"", resp.body
   end
 
   def test_items_easykey_bad
     resp = @client.get(@item_url, {"easykey" => "doe:2005foobar"})
     assert_equal 400, resp.status
-    assert_equal "doe:2005foobar had no results", resp.body
+    assert_equal "\"doe:2005foobar had no results\"", resp.body
   end
 
   def test_betterbibtexkey
@@ -191,7 +191,7 @@ class ZotxtTest < MiniTest::Test
   def test_items_bad_key
     resp = @client.get(@item_url, {"key" => "1_ZBZQ4KMXXXX", "format" => "key"})
     assert_equal 400, resp.status
-    assert_equal "1_ZBZQ4KMXXXX not found", resp.body
+    assert_equal "\"1_ZBZQ4KMXXXX not found\"", resp.body
   end
 
   def test_items_multiple_easykeys
@@ -241,7 +241,7 @@ class ZotxtTest < MiniTest::Test
     header = { 'Content-Type' => 'application/json' }
     resp = @client.post(@bibliography_url, :header=>header, :body=>JSON.dump(r))
     assert_equal 400, resp.status
-    assert_equal "doe:2005ambiguous returned multiple items", resp.body
+    assert_equal "\"doe:2005ambiguous returned multiple items\"", resp.body
   end
 
   def test_ambiguous_bibliography
@@ -354,7 +354,7 @@ class ZotxtTest < MiniTest::Test
   def test_collection_search_bad_name
     resp = @client.get(@item_url, {"collection" => "missing collection"})
     assert_equal 400, resp.status
-    assert_equal "collection missing collection not found", resp.body
+    assert_equal "\"collection missing collection not found\"", resp.body
   end
 
   def test_format_bibtex
@@ -400,7 +400,7 @@ class ZotxtTest < MiniTest::Test
   def test_format_bibliography_bad_style
     resp = @client.get(@item_url, {"key" => @doe_article_key, "format" => "bibliography", "style": "bad-style"})
     assert_equal 400, resp.status
-    assert_equal("Style http://www.zotero.org/styles/bad-style is not installed.", resp.body)
+    assert_equal("\"Style http://www.zotero.org/styles/bad-style is not installed.\"", resp.body)
   end
 
   def test_format_quickbib
