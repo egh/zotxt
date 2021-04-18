@@ -19,7 +19,7 @@ Using the [citation keys](https://retorque.re/zotero-better-bibtex/citing/) prov
 
 For example:
 
-    pandoc --lua-filter pandoc-zotxt.lua -F pandoc-citeproc file.md -t pdf -o file.pdf
+    pandoc -L pandoc-zotxt.lua -C file.md -t pdf -o file.pdf
 
 ## emacs integration
 
