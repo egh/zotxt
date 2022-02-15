@@ -8,7 +8,7 @@
  xmlns:foaf="http://xmlns.com/foaf/0.1/"
  xmlns:link="http://purl.org/rss/1.0/modules/link/"
  xmlns:vcard="http://nwalsh.com/rdf/vCard#">
-    <bib:Article rdf:about="#item_363">
+    <bib:Article rdf:about="#item_383">
         <z:itemType>journalArticle</z:itemType>
         <dcterms:isPartOf>
             <bib:Journal>
@@ -21,24 +21,22 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Doe</foaf:surname>
-                        <foaf:givenname>John</foaf:givenname>
+                        <foaf:givenName>John</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <link:link rdf:resource="#item_8229"/>
+        <link:link rdf:resource="#item_7438"/>
         <bib:pages>33-34</bib:pages>
         <dc:date>2006</dc:date>
-        <dc:description>bibtex: Doe2006</dc:description>
         <dc:title>Article</dc:title>
     </bib:Article>
-    <z:Attachment rdf:about="#item_8229">
+    <z:Attachment rdf:about="#item_7438">
         <z:itemType>attachment</z:itemType>
-        <rdf:resource rdf:resource="storage:doe"/>
         <dc:title>doe</dc:title>
         <link:type>text/plain</link:type>
     </z:Attachment>
-    <bib:Book rdf:about="#item_709">
+    <bib:Book rdf:about="#item_749">
         <z:itemType>book</z:itemType>
         <bib:authors>
             <rdf:Seq>
@@ -48,16 +46,48 @@
             </rdf:Seq>
         </bib:authors>
         <dc:date>2015</dc:date>
+        <dc:description>Citation Key: hüáéèñ:2015acćénts</dc:description>
         <dc:title>acćénts</dc:title>
     </bib:Book>
-    <rdf:Description rdf:about="#item_1139">
+    <bib:Book rdf:about="urn:isbn:978-0-06-147281-7">
+        <z:itemType>book</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>New York, NY</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>HARPER COLLINS PUBLISHERS</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Jenkins</foaf:surname>
+                        <foaf:givenName>Philip</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <prism:edition>Reprint edition</prism:edition>
+        <dc:identifier>ISBN 978-0-06-147281-7</dc:identifier>
+        <dc:date>1 Dec. 2009</dc:date>
+        <z:libraryCatalog>Amazon</z:libraryCatalog>
+        <z:language>English</z:language>
+        <dcterms:abstract>--This text refers to an alternate Paperback edition.</dcterms:abstract>
+        <dc:title>The Lost History of Christianity</dc:title>
+        <z:numPages>304</z:numPages>
+    </bib:Book>
+    <rdf:Description rdf:about="#item_1199">
         <z:itemType>document</z:itemType>
         <bib:authors>
             <rdf:Seq>
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Roe Doe</foaf:surname>
-                        <foaf:givenname>Jane</foaf:givenname>
+                        <foaf:givenName>Jane</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
@@ -65,13 +95,13 @@
         <dc:date>2015</dc:date>
         <dc:title>Double Name</dc:title>
     </rdf:Description>
-    <bib:Memo rdf:about="#item_1445">
+    <bib:Memo rdf:about="#item_1515">
         <z:itemType>note</z:itemType>
         <rdf:value>&lt;p&gt;Test standalone.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;Hello world.&lt;/p&gt;</rdf:value>
     </bib:Memo>
-    <bib:Book rdf:about="#item_1760">
+    <bib:Book rdf:about="#item_1845">
         <z:itemType>book</z:itemType>
         <bib:authors>
             <rdf:Seq>
@@ -85,20 +115,36 @@
         <dc:date>2005</dc:date>
         <dc:title>A Wonderful book</dc:title>
     </bib:Book>
-    <rdf:Description rdf:about="#item_2300">
+    <rdf:Description rdf:about="#item_1861">
+        <z:itemType>document</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenName>John</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>1 Jan 2001</dc:date>
+        <dc:description>Foo</dc:description>
+        <dc:title>betterbibtex JSON</dc:title>
+    </rdf:Description>
+    <rdf:Description rdf:about="#item_2417">
         <z:itemType>document</z:itemType>
         <bib:authors>
             <rdf:Seq>
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Roe-Doe</foaf:surname>
-                        <foaf:givenname>John</foaf:givenname>
+                        <foaf:givenName>John</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
         <dc:date>2015</dc:date>
-        <dc:description>bibtex: Roe-Doe2015</dc:description>
+        <dc:description>Citation Key: Roe-Doe2015</dc:description>
         <dc:title>Hyphens</dc:title>
     </rdf:Description>
     <bib:BookSection rdf:about="urn:isbn:978-3-11-028354-9">
@@ -138,25 +184,24 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Gunkel</foaf:surname>
-                        <foaf:givenname>Lutz</foaf:givenname>
+                        <foaf:givenName>Lutz</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Zifonun</foaf:surname>
-                        <foaf:givenname>Gisela</foaf:givenname>
+                        <foaf:givenName>Gisela</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
         </bib:editors>
-        <dc:subject>@hüning:2012foo</dc:subject>
         <bib:pages>161-186</bib:pages>
         <dc:date>2012</dc:date>
         <z:libraryCatalog>Open WorldCat</z:libraryCatalog>
         <z:language>German</z:language>
         <dc:title>Wortbildung im niederländisch-deutschen Sprachvergleich</dc:title>
     </bib:BookSection>
-    <bib:BookSection rdf:about="#item_3398">
+    <bib:BookSection rdf:about="#item_3562">
         <z:itemType>bookSection</z:itemType>
         <dcterms:isPartOf>
            <bib:Book><dc:title>Third Book</dc:title></bib:Book>
@@ -176,7 +221,7 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Smith</foaf:surname>
-                        <foaf:givenname>Sam</foaf:givenname>
+                        <foaf:givenName>Sam</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
@@ -186,13 +231,13 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Doe</foaf:surname>
-                        <foaf:givenname>John</foaf:givenname>
+                        <foaf:givenName>John</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Roe</foaf:surname>
-                        <foaf:givenname>Jenny</foaf:givenname>
+                        <foaf:givenName>Jenny</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
@@ -200,14 +245,14 @@
         <dc:date>2007</dc:date>
         <dc:title>&lt;i&gt;Why Water&lt;/i&gt; Is Wet</dc:title>
     </bib:BookSection>
-    <rdf:Description rdf:about="#item_3468">
+    <rdf:Description rdf:about="#item_3632">
         <z:itemType>document</z:itemType>
         <bib:authors>
             <rdf:Seq>
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Doe</foaf:surname>
-                        <foaf:givenname>Jane</foaf:givenname>
+                        <foaf:givenName>Jane</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
@@ -215,7 +260,7 @@
         <dc:date>2015</dc:date>
         <dc:title>Duplicated in group library</dc:title>
     </rdf:Description>
-    <bib:Book rdf:about="#item_3992">
+    <bib:Book rdf:about="#item_4175">
         <z:itemType>book</z:itemType>
         <dc:publisher>
             <foaf:Organization>
@@ -232,13 +277,12 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Doe</foaf:surname>
-                        <foaf:givenname>John</foaf:givenname>
+                        <foaf:givenName>John</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
         <dc:date>2005</dc:date>
-        <dc:description>bibtex: Doe2005</dc:description>
         <dc:title>First Book</dc:title>
     </bib:Book>
     <bib:Book rdf:about="urn:isbn:978-0-06-176893-4">
@@ -258,7 +302,7 @@
                 <rdf:li>
                     <foaf:Person>
                         <foaf:surname>Jenkins</foaf:surname>
-                        <foaf:givenname>John Philip</foaf:givenname>
+                        <foaf:givenName>John Philip</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
@@ -272,35 +316,64 @@
         <z:shortTitle>Jesus Wars</z:shortTitle>
         <z:numPages>352</z:numPages>
     </bib:Book>
-    <bib:Book rdf:about="urn:isbn:978-0-06-147281-7">
-        <z:itemType>book</z:itemType>
-        <dc:publisher>
-            <foaf:Organization>
-                <vcard:adr>
-                    <vcard:Address>
-                       <vcard:locality>New York, NY</vcard:locality>
-                    </vcard:Address>
-                </vcard:adr>
-                <foaf:name>HARPER COLLINS PUBLISHERS</foaf:name>
-            </foaf:Organization>
-        </dc:publisher>
+    <rdf:Description rdf:about="#item_8930">
+        <z:itemType>document</z:itemType>
         <bib:authors>
             <rdf:Seq>
                 <rdf:li>
                     <foaf:Person>
-                        <foaf:surname>Jenkins</foaf:surname>
-                        <foaf:givenname>Philip</foaf:givenname>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenName>Jane</foaf:givenName>
                     </foaf:Person>
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <prism:edition>Reprint edition</prism:edition>
-        <dc:identifier>ISBN 978-0-06-147281-7</dc:identifier>
-        <dc:date>1 Dec. 2009</dc:date>
+        <dc:date>2005</dc:date>
+        <dc:title>Ambiguous One</dc:title>
+    </rdf:Description>
+    <rdf:Description rdf:about="#item_8931">
+        <z:itemType>document</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Doe</foaf:surname>
+                        <foaf:givenName>John</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dc:date>2005</dc:date>
+        <dc:title>Ambiguous Two</dc:title>
+    </rdf:Description>
+    <bib:Book rdf:about="urn:isbn:978-966-284-200-5">
+        <z:itemType>book</z:itemType>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Толстой</foaf:surname>
+                        <foaf:givenName>Лев Николаевич</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_9481"/>
+        <dc:identifier>ISBN 978-966-284-200-5</dc:identifier>
         <z:libraryCatalog>Amazon</z:libraryCatalog>
-        <z:language>English</z:language>
-        <dcterms:abstract>--This text refers to an alternate Paperback edition.</dcterms:abstract>
-        <dc:title>The Lost History of Christianity</dc:title>
-        <z:numPages>304</z:numPages>
+        <dcterms:abstract>Отправка из Нью-Йорка от 7 до 21 дня. Книга 1 том 1-2 Voina i mir Tom 1 2 in Russian (Russian) Hardcover - 2000 Имеется продолжение книга 2 том 3-4. Продается отдельно. There are 2 book that continuation of 3-4. Sold separately.</dcterms:abstract>
+        <dc:title>Война и мир. Книга 1 Том I-2 War and Peace. book 1 Volume I-2 Voina i mir Tom 1 2 in Russian</dc:title>
     </bib:Book>
+    <z:Attachment rdf:about="#item_9481">
+        <z:itemType>attachment</z:itemType>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://smile.amazon.com/%D0%92%D0%BE%D0%B9%D0%BD%D0%B0-%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0-Peace-Voina-Russian/dp/9662842004</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2020-04-04 01:49:14</dcterms:dateSubmitted>
+        <dc:title>Amazon.com Link</dc:title>
+        <z:linkMode>3</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
 </rdf:RDF>

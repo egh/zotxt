@@ -92,7 +92,7 @@ function checkStyleId(styleId, zotero) {
     return styleId;
 }
 
-function makeCslEngine (styleIdRaw, locale, zotero) {
+function makeCslEngine (styleIdRaw, locale, zotero, format) {
     const styleId = fixStyleId(styleIdRaw);
     checkStyleId(styleId, zotero);
     let style = zotero.Styles.get(styleId);
@@ -100,7 +100,7 @@ function makeCslEngine (styleIdRaw, locale, zotero) {
         return null;
     } else {
         // jshint camelcase: false
-        let csl = style.getCiteProc(locale);
+        let csl = style.getCiteProc(locale, format);
         csl.opt.development_extensions.wrap_url_and_doi = true;
         return csl;
     }

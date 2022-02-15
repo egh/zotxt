@@ -51,6 +51,7 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal({ 'id' => 'doe:2005first',
+                   'citation-key' => 'doe:2005first',
                    'type' => 'book',
                    'title' => 'First Book',
                    'publisher' => 'Cambridge University Press',
@@ -468,6 +469,7 @@ class ZotxtTest < MiniTest::Test
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     assert_equal({ 'id' => 'doe:2006article',
+                   'citation-key' => 'doe:2006article',
                    'type' => 'article-journal',
                    'title' => 'Article',
                    'container-title' => 'Journal of Generic Studies',

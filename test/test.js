@@ -167,20 +167,20 @@ describe('#core.makeCslEngine()', () => {
     });
 
     it("sets wrap_url_and_dio", ()=>{
-        core.makeCslEngine(styleName, locale, zotero);
+        core.makeCslEngine(styleName, locale, zotero, 'html');
         assert.equal(true, opt.development_extensions.wrap_url_and_doi);
     });
 
     it("sets calls Styles.get", ()=>{
-        core.makeCslEngine(styleName, locale, zotero);
+        core.makeCslEngine(styleName, locale, zotero, 'text');
         sinon.assert.calledOnce(get);
         sinon.assert.calledWith(get, styleId);
     });
 
     it("sets calls getCiteProc with locale", ()=>{
-        core.makeCslEngine(styleName, locale, zotero);
+        core.makeCslEngine(styleName, locale, zotero, 'html');
         sinon.assert.calledOnce(getCiteProc);
-        sinon.assert.calledWith(getCiteProc, 'en-US');
+        sinon.assert.calledWith(getCiteProc, 'en-US', 'html');
     });
 });
 

@@ -215,14 +215,16 @@ function buildBibTeXResponse(items) {
 }
 
 function buildBibliographyResponse(items, style, locale) {
-    let csl = makeCslEngine(style, locale, Zotero);
+    let htmlCsl = makeCslEngine(style, locale, Zotero, 'html');
+    let textCsl = makeCslEngine(style, locale, Zotero, 'text');
     let responseData = items.map ((item)=>{
-        csl.updateItems([item.id], true);
+        htmlCsl.updateItems([item.id], true);
+        textCsl.updateItems([item.id], true);
         return {
             'key': ((item.libraryID || '0') + '_' + item.key),
-            'html': Zotero.Cite.makeFormattedBibliography(csl, 'html'),
+            'html': Zotero.Cite.makeFormattedBibliography(htmlCsl, 'html'),
             // strip newlines
-            'text': Zotero.Cite.makeFormattedBibliography(csl, 'text').replace(/(\r\n|\n|\r)/gm,'')
+            'text': Zotero.Cite.makeFormattedBibliography(textCsl, 'text').replace(/(\r\n|\n|\r)/gm,'')
         };
     });
     return [okCode, jsonMediaType, jsonStringify(responseData)];
@@ -306,11 +308,10 @@ function handleErrors(f) {
 }
 
 function bibliographyEndpoint(options) {
-    let cslEngine = makeCslEngine(options.data.styleId, options.data.locale, Zotero);
+    let cslEngine = makeCslEngine(options.data.styleId, options.data.locale, Zotero, 'html');
     if (!cslEngine) {
         return makeClientError('No style found.');
     } else {
-        //zotero.localItems = {};
         cslEngine.setOutputFormat('html');
         let groups = options.data.citationGroups.map(processCitationsGroup);
         return Promise.all(groups).then((citationGroups)=>{
