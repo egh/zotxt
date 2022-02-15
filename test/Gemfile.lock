@@ -2,8 +2,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     httpclient (2.8.3)
-    json (2.3.1)
-    minitest (5.14.2)
+    json (2.6.1)
+    minitest (5.15.0)
 
 PLATFORMS
   ruby
