@@ -440,7 +440,7 @@ class ZotxtTest < MiniTest::Test
       resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => name })
       assert_equal 200, resp.status
       results = JSON.parse(resp.body)
-      assert_equal 'doe:2006article', results[0]
+      assert_equal '\\cite{doe:2006article}', results[0]
     end
   end
 
