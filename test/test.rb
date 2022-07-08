@@ -350,7 +350,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_collection_search
-    resp = @client.get(@item_url, { 'collection' => 'Test collection' })
+    resp = @client.get(@item_url, { 'collection' => 'zotxt test' })
     assert_equal 200, resp.status
   end
 
@@ -452,7 +452,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_format_export_bad_uuid
-#    skip('Times out in Zotero 5')
+   skip('Times out in Zotero 5')
     resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => '248bebf1-46ab-dead-beef-ec3d2960d0cd' })
     assert_equal 400, resp.status
   end
@@ -490,11 +490,11 @@ class ZotxtTest < MiniTest::Test
 
     resp = @client.get(@complete_url, { 'easykey' => 'doe:2006' })
     results = JSON.parse(resp.body)
-    assert_equal ['doeArticle2006'], results
+    assert_equal ['doe:2006article'], results
 
     resp = @client.get(@complete_url, { 'easykey' => 'doe:2006art' })
     results = JSON.parse(resp.body)
-    assert_equal ['doeArticle2006'], results
+    assert_equal ['doe:2006article'], results
   end
 
   def test_search
