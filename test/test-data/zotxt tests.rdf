@@ -33,8 +33,11 @@
     </bib:Article>
     <z:Attachment rdf:about="#item_7438">
         <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/7438/doe"/>
         <dc:title>doe</dc:title>
         <link:type>text/plain</link:type>
+        <dc:description>&lt;div data-schema-version=&quot;5&quot;&gt;&lt;p&gt;test&lt;/p&gt;
+&lt;/div&gt;</dc:description>
     </z:Attachment>
     <bib:Book rdf:about="#item_749">
         <z:itemType>book</z:itemType>
