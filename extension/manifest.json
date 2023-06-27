@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "zotxt",
+  "version": "7.0.0",
+  "description": "Plain text extensions for Zotero",
+  "author": "Erik Hetzner",
+  "applications": {
+    "zotero": {
+      "id": "zotxt@e6h.org",
+      "update_url": "https://raw.githubusercontent.com/egh/zotxt/master/update.json",
+      "strict_min_version": "6.999",
+      "strict_max_version": "7.0.*"
+    }
+  }
+}
