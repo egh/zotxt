@@ -221,11 +221,3 @@ function findByBBTKey(citekey, zotero) {
 function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
-
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, checkStyleId];
-
-var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
-
-if (typeof process !== 'undefined') {
-    toExport.forEach((s) => { module.exports[s.name] = s; });
-}

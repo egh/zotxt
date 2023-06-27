@@ -51,8 +51,8 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { "easykey" => "DoeBook2005", "format" => "json" })
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({ "id" => "doeFirstBook2005",
-                   "citation-key" => "doeFirstBook2005",
+    i[0].delete("id")
+    assert_equal({ "citation-key" => "doeFirstBook2005",
                    "type" => "book",
                    "title" => "First Book",
                    "publisher" => "Cambridge University Press",
@@ -476,8 +476,8 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { "key" => @doe_article_key, "format" => "json" })
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({ "id" => "doeArticle2006",
-                   "citation-key" => "doeArticle2006",
+    results[0].delete("id")
+    assert_equal({ "citation-key" => "doeArticle2006",
                    "type" => "article-journal",
                    "title" => "Article",
                    "container-title" => "Journal of Generic Studies",

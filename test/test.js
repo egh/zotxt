@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const xregexp = require('xregexp');
 const bluebird = require('bluebird');
 
-const core = require('../extension/content/modules/Core.jsm');
+const core = require('../extension/core.js');
 
 describe('#core.fixStyleId()', () => {
     it('should return chicago as default', ()=>{

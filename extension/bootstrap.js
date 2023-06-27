@@ -16,7 +16,6 @@
 /* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
 'use strict';
 
-var Zotero;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
 
 function makeEasyKeyExporterMetadata() {
@@ -42,26 +41,6 @@ const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain; charset=UTF-8';
 const badRequestCode = 400;
 const okCode = 200;
-
-function loadZotero () {
-    let callback = function (resolve, reject) {
-        if (!Zotero) {
-            if (!("@zotero.org/Zotero;1" in Components.classes)) {
-                let timer = Components.classes["@mozilla.org/timer;1"].createInstanceComponents.interfaces.nsITimer;
-                return timer.initWithCallback(function () {
-                    return callback(resolve, reject);
-                }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
-            } else {
-                Zotero = Components.classes["@zotero.org/Zotero;1"]
-                    .getService(Components.interfaces.nsISupports).wrappedJSObject;
-                return resolve(Zotero);
-            }
-        } else {
-            return resolve(Zotero);
-        }
-    };
-    return new Promise(callback);
-}
 
 function collectionSearch(name) {
     let collections = Zotero.Collections.getByLibrary(Zotero.Libraries.userLibraryID, true);
@@ -329,10 +308,9 @@ function bibliographyEndpoint(options) {
     }
 }
 
-function makeVersionEndpoint(data) {
-    let dataCopy = Object.assign({}, data);
+function makeVersionEndpoint(version) {  
     return (options)=>{
-        let retval = {"version": dataCopy.version};
+        let retval = {"version": version};
         return [okCode, jsonMediaType, jsonStringify(retval)];
     }
 }
@@ -435,17 +413,16 @@ function stylesEndpoint(options) {
 function localesEndpoint(options) {
     return [okCode, jsonMediaType, jsonStringify(Zotero.Locale.availableLocales)];
 }
-
+ 
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
-function loadEndpoints (data) {
-    loadZotero().then(function () {
+function loadEndpoints (version) {   
         let endpoints = {
             'version': {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : makeVersionEndpoint(data)
+                init : makeVersionEndpoint(version)
             },
             'complete' : {
                 supportedMethods: ['GET'],
@@ -487,35 +464,19 @@ function loadEndpoints (data) {
             let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
             ep.prototype = endpoints[e];
         }
-    });
 }
 
-function makeStartupObserver(addonData) {
-    return {
-        'observe': function(subject, topic, data) {
-            loadZotero().then(function () {
-                Components.utils.import('resource://gre/modules/FileUtils.jsm');
-                Components.utils.import('resource://gre/modules/NetUtil.jsm');
-                loadEndpoints(addonData);
-            });
-        }
-    };
+function startup({id, version, resourceURI, rootURI = resourceURI.spec}) {
+    Zotero.debug(rootURI + 'core.js');
+	Services.scriptloader.loadSubScript(rootURI + 'core.js');
+    loadEndpoints(version);
 }
 
-function startup(data, reason) {
-    Components.utils.import('resource://gre/modules/Services.jsm');
-    const observerService = Components.classes['@mozilla.org/observer-service;1'].
-          getService(Components.interfaces.nsIObserverService);
-    /* wait until after zotero is loaded */
-    Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
-    observerService.addObserver(makeStartupObserver(data), 'final-ui-startup', false);
+function shutdown () {
 }
 
-function shutdown (data, reason) {
+function uninstall() {
 }
 
-function uninstall(data, reason) {
-}
-
-function install(data, reason) {
+function install() {
 }
