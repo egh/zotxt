@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByBBTKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
 'use strict';
 
 var Zotero;
@@ -380,9 +380,9 @@ function selectEndpoint(options) {
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
     } else if (q.betterbibtexkey) {
-        promise = findByBBTKey(q.betterbibtexkey, Zotero);
+        promise = findByCitationKey(q.betterbibtexkey, Zotero);
     } else if (q.citekey) {
-        promise = findByBBTKey(q.citekey, Zotero);
+        promise = findByCitationKey(q.citekey, Zotero);
     } else {
         return makeClientError('No param supplied!');
     }
@@ -417,7 +417,7 @@ function itemsEndpoint(options) {
         let keys = (q.betterbibtexkey ? q.betterbibtexkey.split(',') : q.citekey.split(','));
         return Promise.all(
             keys.map((key) => {
-                return findByBBTKey(key, Zotero);
+                return findByCitationKey(key, Zotero);
             })).then(responder);
     } else if (q.collection)
         return collectionSearch(q.collection).then(responder);
