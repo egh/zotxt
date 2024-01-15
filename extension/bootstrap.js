@@ -379,10 +379,8 @@ function selectEndpoint(options) {
         promise = findByEasyKey(q.easykey, Zotero);
     } else if (q.key) {
         promise = findByKey(q.key, Zotero);
-    } else if (q.betterbibtexkey) {
-        promise = findByCitationKey(q.betterbibtexkey, Zotero);
-    } else if (q.citekey) {
-        promise = findByCitationKey(q.citekey, Zotero);
+    } else if (q.betterbibtexkey || q.citekey) {
+        promise = findByCitationKey(q.betterbibtexkey || q.citekey, Zotero);
     } else {
         return makeClientError('No param supplied!');
     }
