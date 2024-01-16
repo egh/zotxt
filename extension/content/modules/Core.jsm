@@ -213,7 +213,7 @@ function findByEasyKey(key, zotero) {
 }
 
 async function findByCitationKey(citekey, zotero) {
-    const search = new Zotero.Search();
+    const search = new zotero.Search();
     search.addCondition('libraryID', 'is', zotero.Libraries.userLibraryID);
     search.addCondition('citationKey', 'is', citekey);
     const itemID = await search.search();
