@@ -542,7 +542,7 @@ class ZotxtTest < MiniTest::Test
   def test_version
     resp = @client.get(@version_url)
     assert_equal 200, resp.status
-    assert_match(/^6.0.2$/, JSON.parse(resp.body)['version'])
+    assert_match(/^6.0.3$/, JSON.parse(resp.body)['version'])
   end
 
   def test_locales
