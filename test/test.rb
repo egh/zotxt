@@ -51,13 +51,13 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { 'easykey' => 'DoeBook2005', 'format' => 'json' })
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({ 'id' => 'doeFirstBook2005',
-                   'citation-key' => 'doeFirstBook2005',
+    assert_equal({ 'id' => 'doe:2005first',
+                   'citation-key' => 'doe:2005first',
                    'type' => 'book',
                    'title' => 'First Book',
                    'publisher' => 'Cambridge University Press',
                    'author' => [{ 'family' => 'Doe', 'given' => 'John' }],
-                   'issued' => { 'date-parts' => [[2005]] },
+                   'issued' => { 'date-parts' => [["2005"]] },
                    'publisher-place' => 'Cambridge',
                    'event-place' => 'Cambridge' }, i[0])
   end
@@ -136,7 +136,7 @@ class ZotxtTest < MiniTest::Test
 
   def test_betterbibtexkey
     %w[betterbibtexkey citekey].each do |name|
-      resp = @client.get(@item_url, { name => 'doeFirstBook2005', 'format' => 'key' })
+      resp = @client.get(@item_url, { name => 'doe:2005first', 'format' => 'key' })
       assert_equal 200, resp.status
       i = JSON.parse(resp.body)
       assert_equal [@doe_first_book_key], i
@@ -145,7 +145,7 @@ class ZotxtTest < MiniTest::Test
 
   def test_betterbibtexkey_two_items
     %w[betterbibtexkey citekey].each do |name|
-      resp = @client.get(@item_url, { name => 'doeFirstBook2005,doeArticle2006', 'format' => 'key' })
+      resp = @client.get(@item_url, { name => 'doe:2005first,doe:2006article', 'format' => 'key' })
       assert_equal 200, resp.status
       i = JSON.parse(resp.body)
       assert_equal [@doe_first_book_key, @doe_article_key].sort, i.sort
@@ -204,7 +204,7 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_items_multiple_easykeys
-    resp = @client.get(@item_url, { 'easykey' => 'DoeBook2005,DoeArticle2006', 'format' => 'key' })
+    resp = @client.get(@item_url, { 'easykey' => 'DoeBook2005,Doe2006article', 'format' => 'key' })
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert_equal 2, i.length
@@ -372,7 +372,7 @@ class ZotxtTest < MiniTest::Test
     assert_match(
       Regexp.new(
         Regexp.quote(''"
-@article{doeArticle2006,
+@article{doe:2006article,
 	title = {Article},
 	volume = {6},
 	journal = {Journal of Generic Studies},
@@ -441,7 +441,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { 'selected' => 't', 'format' => 'easykey' })
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert [[], ['doeArticle2006']].include?(results)
+    assert [[], ['doe:2006article']].include?(results)
   end
 
   def test_format_betterbibtex
@@ -449,7 +449,7 @@ class ZotxtTest < MiniTest::Test
       resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => name })
       assert_equal 200, resp.status
       results = JSON.parse(resp.body)
-      assert_equal '\\cite{doeArticle2006}', results[0]
+      assert_equal 'doe:2006article', results[0]
     end
   end
 
@@ -476,15 +476,15 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => 'json' })
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({ 'id' => 'doeArticle2006',
-                   'citation-key' => 'doeArticle2006',
+    assert_equal({ 'id' => 'doe:2006article',
+                   'citation-key' => 'doe:2006article',
                    'type' => 'article-journal',
                    'title' => 'Article',
                    'container-title' => 'Journal of Generic Studies',
                    'page' => '33-34',
                    'volume' => '6',
                    'author' => [{ 'family' => 'Doe', 'given' => 'John' }],
-                   'issued' => { 'date-parts' => [[2006]] } }, results[0])
+                   'issued' => { 'date-parts' => [["2006"]] } }, results[0])
   end
 
   def test_completion
