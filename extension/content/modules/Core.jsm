@@ -212,17 +212,19 @@ function findByEasyKey(key, zotero) {
     }
 }
 
-function findByBBTKey(citekey, zotero) {
-    let libraryID = zotero.Libraries.userLibraryID;
-    let itemId = zotero.BetterBibTeX.KeyManager.keys.findOne({ libraryID, citekey }).itemID;
-    return zotero.Items.getAsync(itemId);
+async function findByCitationKey(citekey, zotero) {
+    const search = new zotero.Search();
+    search.addCondition('libraryID', 'is', zotero.Libraries.userLibraryID);
+    search.addCondition('citationKey', 'is', citekey);
+    const itemID = await search.search();
+    return itemID.length ? await zotero.Items.getAsync(itemID[0]) : undefined;
 }
 
 function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
 
-const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByBBTKey, jsonStringify, makeClientError, ClientError, ensureLoaded, checkStyleId];
+const toExport = [parseEasyKey, fixStyleId, cleanQuery, dedupItems, item2key, findByKey, makeCslEngine, getItemOrParent, buildRawSearch, buildEasyKeySearch, runSearch, buildSearch, findByEasyKey, findByCitationKey, jsonStringify, makeClientError, ClientError, ensureLoaded, checkStyleId];
 
 var EXPORTED_SYMBOLS = toExport.map((f) => { return f.name; } );
 
