@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'minitest/autorun'
 require 'httpclient'
 require 'json'
@@ -57,7 +59,7 @@ class ZotxtTest < MiniTest::Test
                    'title' => 'First Book',
                    'publisher' => 'Cambridge University Press',
                    'author' => [{ 'family' => 'Doe', 'given' => 'John' }],
-                   'issued' => { 'date-parts' => [["2005"]] },
+                   'issued' => { 'date-parts' => [['2005']] },
                    'publisher-place' => 'Cambridge',
                    'event-place' => 'Cambridge' }, i[0])
   end
@@ -454,13 +456,13 @@ class ZotxtTest < MiniTest::Test
   end
 
   def test_format_export_uuid
-    resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => 'bc03b4fe-436d-4a1f-ba59-de4d2d7a63f7'})
+    resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => 'bc03b4fe-436d-4a1f-ba59-de4d2d7a63f7' })
     assert_equal 200, resp.status
     assert_equal 'text/plain; charset=UTF-8', resp.content_type
   end
 
   def test_format_export_bad_uuid
-   skip('Times out in Zotero 5')
+    skip('Times out in Zotero 5')
     resp = @client.get(@item_url, { 'key' => @doe_article_key, 'format' => '248bebf1-46ab-dead-beef-ec3d2960d0cd' })
     assert_equal 400, resp.status
   end
@@ -484,7 +486,7 @@ class ZotxtTest < MiniTest::Test
                    'page' => '33-34',
                    'volume' => '6',
                    'author' => [{ 'family' => 'Doe', 'given' => 'John' }],
-                   'issued' => { 'date-parts' => [["2006"]] } }, results[0])
+                   'issued' => { 'date-parts' => [['2006']] } }, results[0])
   end
 
   def test_completion
@@ -524,7 +526,7 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@search_url, { 'q' => 'standalone', 'method' => 'everything', 'format' => 'key' })
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert results.size > 0
+    assert results.size.positive?
   end
 
   def test_select
