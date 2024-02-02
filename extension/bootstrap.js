@@ -63,6 +63,24 @@ function loadZotero () {
     return new Promise(callback);
 }
 
+function buildZoteroLink(item) {
+    // This is almost a direct copy from Zutilo
+    let libraryType = Zotero.Libraries.get(item.libraryID).libraryType;
+    var path = "undefined"
+    switch (libraryType) {
+    case 'group':
+        path = Zotero.URI.getLibraryPath(item.libraryID)
+        break;
+    case 'user':
+        path = 'library'
+        break;
+    default:
+	break;
+    }
+    return 'zotero://select/' + path + '/items/'+ item.key
+}
+
+
 function collectionSearch(name) {
     let collections = Zotero.Collections.getByLibrary(Zotero.Libraries.userLibraryID, true);
     for (let collection of collections) {
@@ -148,6 +166,8 @@ function buildResponse(items, format, style, locale) {
             return [okCode, 'application/json', jsonStringify(items.map(item2key))];
         } else if (format === 'easykey') {
             return buildEasyKeyResponse(items);
+	} else if (format === 'zoteroLink') {
+	    return [okCode, 'application/json', jsonStringify(items.map(buildZoteroLink))];
         } else if (format === 'betterbibtexkey' || format === 'citekey') {
             return buildBBTKeyResponse(items);
         } else if (format === 'bibtex') {
