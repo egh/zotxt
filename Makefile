@@ -1,6 +1,6 @@
 .PHONY: clean test unittest dist
 
-VERSION=$(shell grep em:version extension/install.rdf | grep -o "[0-9\\.]*")
+VERSION=$(shell jq .version extension/manifest.json -r)
 
 dist: test zotxt-$(VERSION).xpi ;
 

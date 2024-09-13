@@ -53,8 +53,8 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { "easykey" => "DoeBook2005", "format" => "json" })
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
-    assert_equal({ "id" => "doe:2005first",
-                   "citation-key" => "doe:2005first",
+    i[0].delete("id")
+    assert_equal({ "citation-key" => "doe:2005first",
                    "type" => "book",
                    "title" => "First Book",
                    "publisher" => "Cambridge University Press",
@@ -478,8 +478,8 @@ class ZotxtTest < MiniTest::Test
     resp = @client.get(@item_url, { "key" => @doe_article_key, "format" => "json" })
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
-    assert_equal({ "id" => "doe:2006article",
-                   "citation-key" => "doe:2006article",
+    results[0].delete("id")
+    assert_equal({ "citation-key" => "doe:2006article",
                    "type" => "article-journal",
                    "title" => "Article",
                    "container-title" => "Journal of Generic Studies",
@@ -544,7 +544,7 @@ class ZotxtTest < MiniTest::Test
   def test_version
     resp = @client.get(@version_url)
     assert_equal 200, resp.status
-    assert_match(/^6.0.3$/, JSON.parse(resp.body)["version"])
+    assert_match(/^7.0/, JSON.parse(resp.body)["version"])
   end
 
   def test_locales

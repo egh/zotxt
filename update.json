@@ -1,0 +1,35 @@
+{
+  "addons": {
+    "zotxt@e6h.org": {
+      "updates": [
+        {
+          "version": "6.0.3",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v6.0.3/zotxt-6.0.3.xpi"
+          "update_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "applications": {
+            "gecko": {
+              "strict_min_version": "60.9",
+              "strict_max_version": "60.9"
+            }
+          }
+        },
+        {
+          "version": "7.0.0",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.0/zotxt-7.0.0.xpi"
+          "update_hash": "sha256:4a6dd04c197629a02a9c6beaa9ebd52a69bb683f8400243bcdf95847f0ee254a",
+          "applications": {
+            "gecko": {
+              "strict_min_version": "60.9",
+              "strict_max_version": "60.9"
+            },
+                          "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "7.0.*"
+            }
+
+          }
+        }
+      ]
+    }
+  }
+}

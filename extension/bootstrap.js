@@ -16,7 +16,6 @@
 /* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
 'use strict';
 
-var Zotero;
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
 
 function makeEasyKeyExporterMetadata() {
@@ -42,26 +41,6 @@ const jsonMediaType = 'application/json; charset=UTF-8';
 const textMediaType = 'text/plain; charset=UTF-8';
 const badRequestCode = 400;
 const okCode = 200;
-
-function loadZotero () {
-    let callback = function (resolve, reject) {
-        if (!Zotero) {
-            if (!("@zotero.org/Zotero;1" in Components.classes)) {
-                let timer = Components.classes["@mozilla.org/timer;1"].createInstanceComponents.interfaces.nsITimer;
-                return timer.initWithCallback(function () {
-                    return callback(resolve, reject);
-                }, 10000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
-            } else {
-                Zotero = Components.classes["@zotero.org/Zotero;1"]
-                    .getService(Components.interfaces.nsISupports).wrappedJSObject;
-                return resolve(Zotero);
-            }
-        } else {
-            return resolve(Zotero);
-        }
-    };
-    return new Promise(callback);
-}
 
 function collectionSearch(name) {
     let collections = Zotero.Collections.getByLibrary(Zotero.Libraries.userLibraryID, true);
@@ -329,20 +308,19 @@ function bibliographyEndpoint(options) {
     }
 }
 
-function makeVersionEndpoint(data) {
-    let dataCopy = Object.assign({}, data);
+function makeVersionEndpoint(version) {  
     return (options)=>{
-        let retval = {"version": dataCopy.version};
+        let retval = {"version": version};
         return [okCode, jsonMediaType, jsonStringify(retval)];
     }
 }
 
 function completeEndpoint(options) {
-    if (!options.query.easykey) {
+    const easykey = options.searchParams.get('easykey');
+    if (!easykey) {
         return makeClientError('Option easykey is required.');
     } else {
-        let q = cleanQuery(options.query);
-        let search = buildEasyKeySearch(new Zotero.Search(), parseEasyKey(q.easykey, Zotero));
+        let search = buildEasyKeySearch(new Zotero.Search(), parseEasyKey(easykey, Zotero));
         return runSearch(search, Zotero).then((items)=>{
             if (!items) {
                 return makeClientError('EasyKey must be of the form DoeTitle2000 or doe:2000title');
@@ -354,16 +332,21 @@ function completeEndpoint(options) {
 }
 
 function searchEndpoint(options) {
-    const query = cleanQuery(options.query);
-    if (query.q) {
-        let search = buildSearch(new Zotero.Search(), query.q, query.method);
-        if (!query.library) {
+    const q = options.searchParams.get('q');
+    const library = options.searchParams.get('library');
+    const method = options.searchParams.get('method');
+    const format = options.searchParams.get('format');
+    const style = options.searchParams.get('style');
+    const locale = options.searchParams.get('locale');
+    if (q) {
+        let search = buildSearch(new Zotero.Search(), q, method);
+        if (!library) {
             search.libraryID = Zotero.Libraries.userLibraryID;
-        } else if (query.library !== "all") {
-            search.libraryID = query.library;
+        } else if (library !== "all") {
+            search.libraryID = library;
         }
         return runSearch(search, Zotero).then((items)=>{
-            return buildResponse(items, query.format, query.style, query.locale);
+            return buildResponse(items, format, style, locale);
         });
     } else {
         return makeClientError('q param required.');
@@ -373,20 +356,23 @@ function searchEndpoint(options) {
 function selectEndpoint(options) {
     let ZoteroPane = Components.classes['@mozilla.org/appshell/window-mediator;1'].
         getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow('navigator:browser').ZoteroPane;
-    let q = cleanQuery(options.query);
     let promise = null;
-    if (q.easykey) {
-        promise = findByEasyKey(q.easykey, Zotero);
-    } else if (q.key) {
-        promise = findByKey(q.key, Zotero);
-    } else if (q.betterbibtexkey || q.citekey) {
-        promise = findByCitationKey(q.betterbibtexkey || q.citekey, Zotero);
+    const easykey = options.searchParams.get('easykey');
+    const key = options.searchParams.get('key');
+    const betterbibtexkey = options.searchParams.get('betterbibtexkey');
+    const citekey = options.searchParams.get('citekey');
+    if (easykey) {
+        promise = findByEasyKey(easykey, Zotero);
+    } else if (key) {
+        promise = findByKey(key, Zotero);
+    } else if (betterbibtexkey || citekey) {
+        promise = findByCitationKey(betterbibtexkey || citekey, Zotero);
     } else {
         return makeClientError('No param supplied!');
     }
     return promise.then(function(item) {
         if (item === false) {
-            return makeClientError('item with key ' + q.key + ' not found!');
+            return makeClientError('item with key ' + key + ' not found!');
         }
         ZoteroPane.selectItem(item.id);
         return [okCode, jsonMediaType, jsonStringify('success')];
@@ -394,32 +380,41 @@ function selectEndpoint(options) {
 }
 
 function itemsEndpoint(options) {
-    const q = cleanQuery(options.query);
+    const selected = options.searchParams.get('selected');
+    const easykey = options.searchParams.get('easykey');
+    const key = options.searchParams.get('key');
+    const betterbibtexkey = options.searchParams.get('betterbibtexkey');
+    const citekey = options.searchParams.get('citekey');
+    const collection = options.searchParams.get('collection');
+    const all = options.searchParams.get('all');
+    const format = options.searchParams.get('format');
+    const style = options.searchParams.get('style');
+    const locale = options.searchParams.get('locale');
     let items = [];
-    let responder = (items) => { return buildResponse(items, q.format, q.style, q.locale); };
-    if (q.selected) {
+    let responder = (items) => { return buildResponse(items, format, style, locale); };
+    if (selected) {
         return responder(Zotero.getActiveZoteroPane().getSelectedItems());
-    } else if (q.key) {
-        let keys = q.key.split(',');
+    } else if (key) {
+        let keys = key.split(',');
         return Promise.all(
             keys.map((key)=>{
                 return findByKey(key, Zotero);
             })).then(responder);
-    } else if (q.easykey) {
-        let keys = q.easykey.split(',');
+    } else if (easykey) {
+        let keys = easykey.split(',');
         return Promise.all(
             keys.map((key) => {
                 return findByEasyKey(key, Zotero);
             })).then(responder);
-    } else if (q.betterbibtexkey || q.citekey) {
-        let keys = (q.betterbibtexkey ? q.betterbibtexkey.split(',') : q.citekey.split(','));
+    } else if (betterbibtexkey || citekey) {
+        let keys = (betterbibtexkey ? betterbibtexkey.split(',') : citekey.split(','));
         return Promise.all(
             keys.map((key) => {
                 return findByCitationKey(key, Zotero);
             })).then(responder);
-    } else if (q.collection)
-        return collectionSearch(q.collection).then(responder);
-    else if (q.all) {
+    } else if (collection)
+        return collectionSearch(collection).then(responder);
+    else if (all) {
         return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(responder);
     } else {
         return makeClientError('No param supplied!');
@@ -433,17 +428,16 @@ function stylesEndpoint(options) {
 function localesEndpoint(options) {
     return [okCode, jsonMediaType, jsonStringify(Zotero.Locale.availableLocales)];
 }
-
+ 
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
-function loadEndpoints (data) {
-    loadZotero().then(function () {
+function loadEndpoints (version) {   
         let endpoints = {
             'version': {
                 supportedMethods: ['GET'],
                 supportedDataType : ['application/x-www-form-urlencoded'],
-                init : makeVersionEndpoint(data)
+                init : makeVersionEndpoint(version)
             },
             'complete' : {
                 supportedMethods: ['GET'],
@@ -485,35 +479,19 @@ function loadEndpoints (data) {
             let ep = Zotero.Server.Endpoints['/zotxt/' + e] = function() {};
             ep.prototype = endpoints[e];
         }
-    });
 }
 
-function makeStartupObserver(addonData) {
-    return {
-        'observe': function(subject, topic, data) {
-            loadZotero().then(function () {
-                Components.utils.import('resource://gre/modules/FileUtils.jsm');
-                Components.utils.import('resource://gre/modules/NetUtil.jsm');
-                loadEndpoints(addonData);
-            });
-        }
-    };
+function startup({id, version, resourceURI, rootURI = resourceURI.spec}) {
+    Zotero.debug(rootURI + 'core.js');
+	Services.scriptloader.loadSubScript(rootURI + 'core.js');
+    loadEndpoints(version);
 }
 
-function startup(data, reason) {
-    Components.utils.import('resource://gre/modules/Services.jsm');
-    const observerService = Components.classes['@mozilla.org/observer-service;1'].
-          getService(Components.interfaces.nsIObserverService);
-    /* wait until after zotero is loaded */
-    Components.utils.import('chrome://zotxt/content/modules/Core.jsm');
-    observerService.addObserver(makeStartupObserver(data), 'final-ui-startup', false);
+function shutdown () {
 }
 
-function shutdown (data, reason) {
+function uninstall() {
 }
 
-function uninstall(data, reason) {
-}
-
-function install(data, reason) {
+function install() {
 }
