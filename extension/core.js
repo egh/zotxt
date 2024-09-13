@@ -223,3 +223,24 @@ async function findByCitationKey(citekey, zotero) {
 function jsonStringify(json) {
     return JSON.stringify(json, null, '  ');
 }
+
+/* Exported for tests in nodejs */
+if (typeof module !== 'undefined') {
+    module.exports = {
+        buildEasyKeySearch,
+        buildRawSearch,
+        buildSearch,
+        checkStyleId,
+        cleanQuery,
+        dedupItems,
+        findByCitationKey,
+        findByEasyKey,
+        findByKey,
+        fixStyleId,
+        getItemOrParent,
+        item2key,
+        jsonStringify,
+        makeCslEngine,
+        parseEasyKey
+    }
+}

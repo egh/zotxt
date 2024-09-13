@@ -2,6 +2,7 @@
     "scripts": {
         "test": "mocha"
     },
+    "type": "commonjs",
     "dependencies": {
         "bluebird": "^3.5.1",
         "mocha": "^9.2.0",
