@@ -5,7 +5,7 @@ require "httpclient"
 require "json"
 require "open3"
 
-class ZotxtTest < MiniTest::Test
+class ZotxtTest < Minitest::Test
   def setup
     @client = HTTPClient.new
     @base_url = "http://127.0.0.1:23119/zotxt"
