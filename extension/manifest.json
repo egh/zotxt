@@ -9,7 +9,7 @@
       "id": "zotxt@e6h.org",
       "update_url": "https://raw.githubusercontent.com/egh/zotxt/master/update.json",
       "strict_min_version": "6.999",
-      "strict_max_version": "7.0.*"
+      "strict_max_version": "7.*"
     }
   }
 }
