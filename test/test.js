@@ -9,7 +9,7 @@ const core = require('../extension/core.js');
 
 describe('#core.fixStyleId()', () => {
     it('should return chicago as default', ()=>{
-        assert.equal('http://www.zotero.org/styles/chicago-note-bibliography', core.fixStyleId());
+        assert.equal('http://www.zotero.org/styles/chicago-notes-bibliography', core.fixStyleId());
     });
 
     it('should append the prefix if necessary', ()=>{

@@ -20,7 +20,7 @@ function parseEasyKey(key, zotero) {
 
 function fixStyleId(styleId) {
     if (!styleId) {
-        return 'http://www.zotero.org/styles/chicago-note-bibliography';
+        return 'http://www.zotero.org/styles/chicago-notes-bibliography';
     } else if (!styleId.match(/^https?:/)) {
         return 'http://www.zotero.org/styles/' + styleId;
     } else {
