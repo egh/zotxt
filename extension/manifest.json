@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "zotxt",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "Plain text extensions for Zotero",
   "author": "Erik Hetzner",
   "applications": {
