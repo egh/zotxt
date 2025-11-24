@@ -179,7 +179,7 @@ class ZotxtTest < Minitest::Test
     # with short style
     resp = @client.get(@item_url,
                        { "easykey" => "DoeBook2005", "format" => "bibliography",
-                         "style" => "chicago-note-bibliography" })
+                         "style" => "chicago-notes-bibliography" })
     assert_equal 200, resp.status
     i = JSON.parse(resp.body)
     assert(i[0].key?("html"))
