@@ -3,6 +3,8 @@
 zotxt is a Zotero extension for supporting utilities that deal with
 plain text files (e.g., markdown, reStructuredText, latex, etc.)
 
+Compatible with **Zotero 7 and Zotero 8**.
+
 ## Installation
 
 1. Visit <https://github.com/egh/zotxt/releases>
