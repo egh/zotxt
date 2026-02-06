@@ -252,4 +252,3 @@ describe("#core.buildSearch()", () => {
         );
     });
 });
-
