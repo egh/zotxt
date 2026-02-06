@@ -427,7 +427,7 @@ class SearchEndpoint {
                 search.libraryID = library;
             }
             const items = await runSearch(search, Zotero);
-            return buildResponse(items, format, style, locale);
+            return await buildResponse(items, format, style, locale);
         } catch (ex) {
             return handleEndpointError(ex);
         }
@@ -517,7 +517,7 @@ class ItemsEndpoint {
                 throw new ClientError("No param supplied!");
             }
 
-            return buildResponse(items, format, style, locale);
+            return await buildResponse(items, format, style, locale);
         } catch (ex) {
             return handleEndpointError(ex);
         }
