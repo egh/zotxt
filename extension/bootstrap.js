@@ -13,29 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, searchByCitationKeyPrefix, jsonStringify, item2key, ClientError, ensureLoaded, checkBBT */
+/* global Components, Set, FileUtils, NetUtil, Q, runSearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByCitationKey, jsonStringify, item2key, ClientError, ensureLoaded, checkBBT */
 "use strict";
 
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
-
-function makeEasyKeyExporterMetadata() {
-    return {
-        translatorID: "9d774afe-a51d-4055-a6c7-23bc96d19fe7",
-        label: "Easy Citekey",
-        creator: "Erik Hetzner",
-        target: "txt",
-        minVersion: "2.1.9",
-        maxVersion: "",
-        priority: 200,
-        inRepository: false,
-        translatorType: 2,
-        browserSupport: "gcs",
-        displayOptions: {
-            "Alternate (@DoeTitle2000)": false,
-        },
-        lastUpdated: "2013-07-15 07:03:17",
-    };
-}
 
 const jsonMediaType = "application/json; charset=UTF-8";
 const textMediaType = "text/plain; charset=UTF-8";
@@ -127,8 +108,6 @@ async function buildResponse(items, format, style, locale) {
     items = await ensureLoaded(items, Zotero);
     if (format === "key") {
         return [okCode, "application/json", jsonStringify(items.map(item2key))];
-    } else if (format === "easykey") {
-        return buildEasyKeyResponse(items);
     } else if (format === "betterbibtexkey" || format === "citekey") {
         return buildBBTKeyResponse(items);
     } else if (format === "bibtex") {
@@ -176,10 +155,6 @@ async function buildKeyResponse(items, translatorId) {
         return key.replace(/[\[\]@]/g, "");
     });
     return [okCode, jsonMediaType, jsonStringify(keys2)];
-}
-
-function buildEasyKeyResponse(items) {
-    return buildKeyResponse(items, makeEasyKeyExporterMetadata().translatorID);
 }
 
 function buildBBTKeyResponse(items) {
@@ -430,15 +405,12 @@ class SelectEndpoint {
             ]
                 .getService(Components.interfaces.nsIWindowMediator)
                 .getMostRecentWindow("navigator:browser").ZoteroPane;
-            const easykey = request.searchParams.get("easykey");
             const key = request.searchParams.get("key");
             const betterbibtexkey = request.searchParams.get("betterbibtexkey");
             const citekey = request.searchParams.get("citekey");
 
             let item;
-            if (easykey) {
-                item = await findByEasyKey(easykey, Zotero);
-            } else if (key) {
+            if (key) {
                 item = await findByKey(key, Zotero);
             } else if (betterbibtexkey || citekey) {
                 item = await findByCitationKey(
@@ -467,7 +439,6 @@ class ItemsEndpoint {
     async init(request) {
         try {
             const selected = request.searchParams.get("selected");
-            const easykey = request.searchParams.get("easykey");
             const key = request.searchParams.get("key");
             const betterbibtexkey = request.searchParams.get("betterbibtexkey");
             const citekey = request.searchParams.get("citekey");
@@ -485,13 +456,6 @@ class ItemsEndpoint {
                 items = await Promise.all(
                     keys.map((key) => {
                         return findByKey(key, Zotero);
-                    }),
-                );
-            } else if (easykey) {
-                let keys = easykey.split(",");
-                items = await Promise.all(
-                    keys.map((key) => {
-                        return findByEasyKey(key, Zotero);
                     }),
                 );
             } else if (betterbibtexkey || citekey) {
