@@ -160,7 +160,7 @@ function jsonStringify(json) {
 
 function checkBBT() {
     if (!Zotero.BetterBibTeX) {
-        throw new ClientError("BetterBibTex not installed.");
+        throw new ClientError("BetterBibTeX not installed.");
     }
 }
 
