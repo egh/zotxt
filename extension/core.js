@@ -45,24 +45,27 @@ function cleanQuery(q) {
 
 /* Given a iterable of promises that return an item, return a deduped iterable
  * of promises (based on the id). */
-function dedupItems(items, zotero) {
+async function dedupItems(items, zotero) {
     let seenIds = new Set([]); // To uniqify results
-    return zotero.Promise.filter(items, (item) => {
-        if (seenIds.has(item.id)) {
-            return false;
-        } else {
+    let resolvedItems = await Promise.all(items);
+    let dedupedItems = [];
+    for (let i = 0; i < resolvedItems.length; i++) {
+        let item = resolvedItems[i];
+        if (!seenIds.has(item.id)) {
             seenIds.add(item.id);
-            return true;
+            dedupedItems.push(item);
         }
-    });
+    }
+    return dedupedItems;
 }
 
 function ensureLoaded(items, zotero) {
-    return zotero.Promise.map(items, (item) => {
-        return item.loadAllData().then(() => {
+    return Promise.all(
+        items.map(async (item) => {
+            await item.loadAllData();
             return item;
-        });
-    });
+        }),
+    );
 }
 
 function item2key(item) {
@@ -72,7 +75,7 @@ function item2key(item) {
 function findByKey(key, zotero) {
     let rejectIfUndefined = (item) => {
         if (!item) {
-            return makeClientError(`${key} not found`);
+            throw new ClientError(`${key} not found`);
         } else {
             return item;
         }
@@ -131,11 +134,13 @@ function getItemOrParent(item, zotero) {
  * Returns a promise resolving to an iterable.
  */
 function runSearch(s, zotero) {
-    return s.search().then((ids) => {
-        let items = zotero.Items.getAsync(ids);
-        let items2 = zotero.Promise.map(items, (item) => {
-            return getItemOrParent(item, zotero);
-        });
+    return s.search().then(async (ids) => {
+        let items = await zotero.Items.getAsync(ids);
+        let items2 = await Promise.all(
+            items.map((item) => {
+                return getItemOrParent(item, zotero);
+            }),
+        );
         return dedupItems(items2, zotero);
     });
 }
@@ -177,16 +182,11 @@ function buildSearch(s, query, method) {
     return s;
 }
 
-function ClientError(message) {
-    this.name = "ClientError";
-    this.message = message;
-    this.stack = new Error().stack;
-}
-
-ClientError.prototype = new Error();
-
-function makeClientError(str) {
-    return Promise.reject(new ClientError(str));
+class ClientError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ClientError";
+    }
 }
 
 /**
@@ -195,7 +195,7 @@ function makeClientError(str) {
 function findByEasyKey(key, zotero) {
     let parsedKey = parseEasyKey(key, zotero);
     if (!parsedKey) {
-        return makeClientError(
+        throw new ClientError(
             `${key} must be of the form DoeTitle2000 or doe:2000title`,
         );
     } else {
@@ -205,7 +205,7 @@ function findByEasyKey(key, zotero) {
             if (items.length === 1) {
                 return items[0];
             } else if (items.length > 1) {
-                return makeClientError(`${key} returned multiple items`);
+                throw new ClientError(`${key} returned multiple items`);
             } else {
                 let search = buildEasyKeySearch(new zotero.Search(), parsedKey);
                 return runSearch(search, zotero).then(function (items) {
@@ -222,11 +222,9 @@ function findByEasyKey(key, zotero) {
                     if (items.length === 1) {
                         return items[0];
                     } else if (items.length > 1) {
-                        return makeClientError(
-                            `${key} returned multiple items`,
-                        );
+                        throw new ClientError(`${key} returned multiple items`);
                     } else {
-                        return makeClientError(`${key} had no results`);
+                        throw new ClientError(`${key} had no results`);
                     }
                 });
             }
@@ -264,5 +262,6 @@ if (typeof module !== "undefined") {
         jsonStringify,
         makeCslEngine,
         parseEasyKey,
+        ClientError,
     };
 }

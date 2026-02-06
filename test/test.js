@@ -86,31 +86,27 @@ describe("#core.dedupItems()", () => {
     const mkPromises = (...rest) => {
         return rest.map(bluebird.resolve);
     };
-    it("should return an Promise that resolves to an iterable", () => {
-        return core.dedupItems(mkPromises(item1), zotero).then((items) => {
-            assert.equal(1, items.length);
-            assert.deepEqual(item1, items[0]);
-        });
+    it("should return an Promise that resolves to an iterable", async () => {
+        const items = await core.dedupItems(mkPromises(item1), zotero);
+        assert.equal(1, items.length);
+        assert.deepEqual(item1, items[0]);
     });
 
-    it("should dedup with the same id", () => {
-        return core
-            .dedupItems(mkPromises(item1, item1), zotero)
-            .then((items) => {
-                assert.equal(1, items.length);
-                assert.deepEqual(item1, items[0]);
-            });
+    it("should dedup with the same id", async () => {
+        const items = await core.dedupItems(mkPromises(item1, item1), zotero);
+        assert.equal(1, items.length);
+        assert.deepEqual(item1, items[0]);
     });
 
-    it("should dedup and return in order", () => {
-        return core
-            .dedupItems(mkPromises(item1, item2, item1, item3, item1), zotero)
-            .then((items) => {
-                assert.equal(3, items.length);
-                assert.deepEqual(item1, items[0]);
-                assert.deepEqual(item2, items[1]);
-                assert.deepEqual(item3, items[2]);
-            });
+    it("should dedup and return in order", async () => {
+        const items = await core.dedupItems(
+            mkPromises(item1, item2, item1, item3, item1),
+            zotero,
+        );
+        assert.equal(3, items.length);
+        assert.deepEqual(item1, items[0]);
+        assert.deepEqual(item2, items[1]);
+        assert.deepEqual(item3, items[2]);
     });
 });
 
@@ -203,20 +199,20 @@ describe("#core.makeCslEngine()", () => {
 });
 
 describe("#core.getItemOrParent()", () => {
-    it("returns item when item is a regularItem", () => {
+    it("returns item when item is a regularItem", async () => {
         const isRegularItem = sinon.stub().returns(true);
         const item = { isRegularItem };
         assert.equal(item, core.getItemOrParent(item, undefined));
     });
 
-    it("returns item when item is not a regularItem but the parentKey is falsey", () => {
+    it("returns item when item is not a regularItem but the parentKey is falsey", async () => {
         const isRegularItem = sinon.stub().returns(false);
         const parentKey = undefined;
         const item = { isRegularItem, parentKey };
-        assert.equal(item, core.getItemOrParent(item, undefined));
+        assert.equal(item, await core.getItemOrParent(item, undefined));
     });
 
-    it("returns item when item is not a regularItem but the parentKey is falsey", () => {
+    it("returns item when item is not a regularItem but the parentKey is falsey", async () => {
         const retval = "foo";
         const isRegularItem = sinon.stub().returns(false);
         const parentKey = "foo_bar";
@@ -226,9 +222,7 @@ describe("#core.getItemOrParent()", () => {
             .returns(Promise.resolve(retval));
         const Items = { getByLibraryAndKeyAsync };
         const zotero = { Items };
-        core.getItemOrParent(item, zotero).then((item) => {
-            assert.equal(retval, item);
-        });
+        assert.equal(retval, await core.getItemOrParent(item, zotero));
     });
 });
 

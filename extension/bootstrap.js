@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, jsonStringify, item2key, makeClientError, ClientError, ensureLoaded */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, jsonStringify, item2key, ClientError, ensureLoaded */
 "use strict";
 
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
@@ -49,13 +49,13 @@ function collectionSearch(name) {
     );
     for (let collection of collections) {
         if (collection.name === name) {
-            return Promise.resolve(collection.getChildItems());
+            return collection.getChildItems();
         }
     }
-    return makeClientError(`collection ${name} not found`);
+    throw new ClientError(`collection ${name} not found`);
 }
 
-function processCitationItem(citation) {
+async function processCitationItem(citation) {
     let cloneButSetId = (item) => {
         let retval = Object.assign({}, citation);
         retval.id = item.id;
@@ -64,25 +64,26 @@ function processCitationItem(citation) {
         return retval;
     };
     if ("easyKey" in citation) {
-        return findByEasyKey(citation.easyKey, Zotero).then(cloneButSetId);
+        const item = await findByEasyKey(citation.easyKey, Zotero);
+        return cloneButSetId(item);
     } else if ("key" in citation) {
-        return findByKey(citation.key, Zotero).then(cloneButSetId);
+        const item = await findByKey(citation.key, Zotero);
+        return cloneButSetId(item);
     } else {
-        return Promise.resolve(citation);
+        return citation;
     }
 }
 
 /**
  * Map the easykeys in the citations to ids.
  */
-function processCitationsGroup(citationGroup) {
+async function processCitationsGroup(citationGroup) {
     let citationItems = citationGroup.citationItems.map(processCitationItem);
-    return Promise.all(citationItems).then((items) => {
-        return {
-            properties: citationGroup.properties,
-            citationItems: items,
-        };
-    });
+    const items = await Promise.all(citationItems);
+    return {
+        properties: citationGroup.properties,
+        citationItems: items,
+    };
 }
 
 /**
@@ -99,7 +100,7 @@ function extractIds(citationGroups) {
 }
 
 function myExport(items, translatorId) {
-    let callback = function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         let translation = new Zotero.Translate.Export();
         translation.setItems(items);
         translation.setTranslator(translatorId);
@@ -116,40 +117,33 @@ function myExport(items, translatorId) {
             translation.setDisplayOptions({ quickCopyMode: "citekeys" });
         }
         translation.translate();
-    };
-    let promise = new Promise(callback);
-    return promise;
+    });
 }
 
 /**
  * Build a response based on items and a format parameter.
  */
-function buildResponse(items, format, style, locale) {
-    return ensureLoaded(items, Zotero).then((items) => {
-        if (format === "key") {
-            return [
-                okCode,
-                "application/json",
-                jsonStringify(items.map(item2key)),
-            ];
-        } else if (format === "easykey") {
-            return buildEasyKeyResponse(items);
-        } else if (format === "betterbibtexkey" || format === "citekey") {
-            return buildBBTKeyResponse(items);
-        } else if (format === "bibtex") {
-            return buildBibTeXResponse(items);
-        } else if (format === "bibliography") {
-            return buildBibliographyResponse(items, style, locale);
-        } else if (format === "quickBib") {
-            return buildQuickBibResponse(items);
-        } else if (format === "paths") {
-            return buildPathsResponse(items, style);
-        } else if (format && format.match(uuidRe)) {
-            return buildExportResponse(items, format);
-        } else {
-            return buildJsonResponse(items);
-        }
-    });
+async function buildResponse(items, format, style, locale) {
+    items = await ensureLoaded(items, Zotero);
+    if (format === "key") {
+        return [okCode, "application/json", jsonStringify(items.map(item2key))];
+    } else if (format === "easykey") {
+        return buildEasyKeyResponse(items);
+    } else if (format === "betterbibtexkey" || format === "citekey") {
+        return buildBBTKeyResponse(items);
+    } else if (format === "bibtex") {
+        return buildBibTeXResponse(items);
+    } else if (format === "bibliography") {
+        return buildBibliographyResponse(items, style, locale);
+    } else if (format === "quickBib") {
+        return buildQuickBibResponse(items);
+    } else if (format === "paths") {
+        return buildPathsResponse(items, style);
+    } else if (format && format.match(uuidRe)) {
+        return buildExportResponse(items, format);
+    } else {
+        return buildJsonResponse(items);
+    }
 }
 
 function buildJsonResponse(items) {
@@ -171,19 +165,17 @@ function buildJsonResponse(items) {
  * Build a response of a set of citation keys based on a set of items and a
  * translatorId via the Zotero export process.
  */
-function buildKeyResponse(items, translatorId) {
+async function buildKeyResponse(items, translatorId) {
     if (items.length === 0) {
         return [okCode, "application/json", jsonStringify([])];
-    } else {
-        return myExport(items, translatorId).then((rawKeys) => {
-            let keys = rawKeys.split(/[ ,]/);
-            // remove leading @
-            let keys2 = keys.map(function (key) {
-                return key.replace(/[\[\]@]/g, "");
-            });
-            return [okCode, jsonMediaType, jsonStringify(keys2)];
-        });
     }
+    const rawKeys = await myExport(items, translatorId);
+    let keys = rawKeys.split(/[ ,]/);
+    // remove leading @
+    let keys2 = keys.map(function (key) {
+        return key.replace(/[\[\]@]/g, "");
+    });
+    return [okCode, jsonMediaType, jsonStringify(keys2)];
 }
 
 function buildEasyKeyResponse(items) {
@@ -192,16 +184,15 @@ function buildEasyKeyResponse(items) {
 
 function buildBBTKeyResponse(items) {
     if (!Zotero.BetterBibTeX) {
-        return makeClientError("BetterBibTex not installed.");
+        throw new ClientError("BetterBibTex not installed.");
     } else {
         return buildKeyResponse(items, "a515a220-6fef-45ea-9842-8025dfebcc8f");
     }
 }
 
-function buildExportResponse(items, translatorId) {
-    return myExport(items, translatorId).then((data) => {
-        return [okCode, textMediaType, data];
-    });
+async function buildExportResponse(items, translatorId) {
+    const data = await myExport(items, translatorId);
+    return [okCode, textMediaType, data];
 }
 
 function buildBibTeXResponse(items) {
@@ -267,71 +258,126 @@ function namesOrEtAl(names) {
     }
 }
 
-function buildPathsResponse(items) {
+async function buildPathsResponse(items) {
     let regularItems = items.filter((item) => {
         return item.isRegularItem();
     });
-    let itemsWithPaths = regularItems.map((item) => {
+    let itemsWithPaths = regularItems.map(async (item) => {
         let attachments = item.getAttachments(false).map((attachmentId) => {
             return Zotero.Items.get(attachmentId);
         });
-        return Zotero.Promise.filter(attachments, (attachment) => {
-            return attachment.isFileAttachment();
-        })
-            .then((attachments) => {
-                return attachments.map((a) => {
-                    return a.getFilePathAsync().then((path) => {
-                        if (path) {
-                            return path;
-                        } else {
-                            return Zotero.Sync.Runner.downloadFile(a).then(
-                                (_) => {
-                                    return a.getFilePathAsync();
-                                },
-                            );
-                        }
-                    });
-                });
-            })
-            .then((paths) => {
-                return Promise.all(paths).then((paths) => {
-                    return {
-                        key: (item.libraryID || "0") + "_" + item.key,
-                        paths: paths,
-                    };
-                });
-            });
-    });
-    return Promise.all(itemsWithPaths).then((responseData) => {
-        return [okCode, jsonMediaType, jsonStringify(responseData)];
-    });
-}
 
-function handleErrors(f) {
-    return (...args) => {
-        return f(...args).catch((ex) => {
-            if (ex instanceof ClientError) {
-                return [badRequestCode, jsonMediaType, `"${ex.message}"`];
-            } else {
-                return [500, textMediaType, ex && ex.message + ex.stack];
+        // Filter attachments to only file attachments
+        let fileAttachments = [];
+        for (let i = 0; i < attachments.length; i++) {
+            let attachment = attachments[i];
+            if (attachment.isFileAttachment()) {
+                fileAttachments.push(attachment);
             }
-        });
-    };
+        }
+
+        let paths = await Promise.all(
+            fileAttachments.map(async (a) => {
+                const path = await a.getFilePathAsync();
+                if (path) {
+                    return path;
+                } else {
+                    await Zotero.Sync.Runner.downloadFile(a);
+                    return a.getFilePathAsync();
+                }
+            }),
+        );
+
+        return {
+            key: (item.libraryID || "0") + "_" + item.key,
+            paths: paths,
+        };
+    });
+
+    const responseData = await Promise.all(itemsWithPaths);
+    return [okCode, jsonMediaType, jsonStringify(responseData)];
 }
 
-function bibliographyEndpoint(options) {
-    let cslEngine = makeCslEngine(
-        options.data.styleId,
-        options.data.locale,
-        Zotero,
-        "html",
-    );
-    if (!cslEngine) {
-        return makeClientError("No style found.");
+/**
+ * Handle errors from endpoint methods and return appropriate HTTP response.
+ */
+function handleEndpointError(ex) {
+    if (ex instanceof ClientError) {
+        return [badRequestCode, jsonMediaType, `"${ex.message}"`];
     } else {
-        cslEngine.setOutputFormat("html");
-        let groups = options.data.citationGroups.map(processCitationsGroup);
-        return Promise.all(groups).then((citationGroups) => {
+        return [500, textMediaType, ex && ex.message + ex.stack];
+    }
+}
+
+class VersionEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    async init(request) {
+        try {
+            return [
+                okCode,
+                jsonMediaType,
+                jsonStringify({ version: VersionEndpoint.version }),
+            ];
+        } catch (ex) {
+            return handleEndpointError(ex);
+        }
+    }
+}
+
+class CompleteEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    async init(request) {
+        try {
+            const easykey = request.searchParams.get("easykey");
+            if (!easykey) {
+                throw new ClientError("Option easykey is required.");
+            }
+
+            let search = buildEasyKeySearch(
+                new Zotero.Search(),
+                parseEasyKey(easykey, Zotero),
+            );
+            const items = await runSearch(search, Zotero);
+
+            if (!items) {
+                throw new ClientError(
+                    "EasyKey must be of the form DoeTitle2000 or doe:2000title",
+                );
+            }
+            return buildResponse(items, "easykey");
+        } catch (ex) {
+            return handleEndpointError(ex);
+        }
+    }
+}
+
+class BibliographyEndpoint {
+    supportedMethods = ["POST"];
+    supportedDataTypes = [
+        "application/x-www-form-urlencoded",
+        "application/json",
+    ];
+
+    async init(request) {
+        try {
+            let cslEngine = makeCslEngine(
+                request.data.styleId,
+                request.data.locale,
+                Zotero,
+                "html",
+            );
+            if (!cslEngine) {
+                throw new ClientError("No style found.");
+            }
+
+            cslEngine.setOutputFormat("html");
+            let groups = request.data.citationGroups.map(processCitationsGroup);
+            const citationGroups = await Promise.all(groups);
+
             cslEngine.updateItems(extractIds(citationGroups));
             let retval = {};
             retval.bibliography = cslEngine.makeBibliography();
@@ -344,201 +390,183 @@ function bibliographyEndpoint(options) {
                     });
             });
             return [okCode, jsonMediaType, jsonStringify(retval)];
-        });
+        } catch (ex) {
+            return handleEndpointError(ex);
+        }
     }
 }
 
-function makeVersionEndpoint(version) {
-    return (options) => {
-        let retval = { version: version };
-        return [okCode, jsonMediaType, jsonStringify(retval)];
-    };
+class SearchEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    async init(request) {
+        try {
+            const q = request.searchParams.get("q");
+            const library = request.searchParams.get("library");
+            const method = request.searchParams.get("method");
+            const format = request.searchParams.get("format");
+            const style = request.searchParams.get("style");
+            const locale = request.searchParams.get("locale");
+            if (!q) {
+                throw new ClientError("q param required.");
+            }
+
+            let search = buildSearch(new Zotero.Search(), q, method);
+            if (!library) {
+                search.libraryID = Zotero.Libraries.userLibraryID;
+            } else if (library !== "all") {
+                search.libraryID = library;
+            }
+            const items = await runSearch(search, Zotero);
+            return buildResponse(items, format, style, locale);
+        } catch (ex) {
+            return handleEndpointError(ex);
+        }
+    }
 }
 
-function completeEndpoint(options) {
-    const easykey = options.searchParams.get("easykey");
-    if (!easykey) {
-        return makeClientError("Option easykey is required.");
-    } else {
-        let search = buildEasyKeySearch(
-            new Zotero.Search(),
-            parseEasyKey(easykey, Zotero),
-        );
-        return runSearch(search, Zotero).then((items) => {
-            if (!items) {
-                return makeClientError(
-                    "EasyKey must be of the form DoeTitle2000 or doe:2000title",
+class SelectEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    async init(request) {
+        try {
+            let ZoteroPane = Components.classes[
+                "@mozilla.org/appshell/window-mediator;1"
+            ]
+                .getService(Components.interfaces.nsIWindowMediator)
+                .getMostRecentWindow("navigator:browser").ZoteroPane;
+            const easykey = request.searchParams.get("easykey");
+            const key = request.searchParams.get("key");
+            const betterbibtexkey = request.searchParams.get("betterbibtexkey");
+            const citekey = request.searchParams.get("citekey");
+
+            let item;
+            if (easykey) {
+                item = await findByEasyKey(easykey, Zotero);
+            } else if (key) {
+                item = await findByKey(key, Zotero);
+            } else if (betterbibtexkey || citekey) {
+                item = await findByCitationKey(
+                    betterbibtexkey || citekey,
+                    Zotero,
                 );
             } else {
-                return buildResponse(items, "easykey");
+                throw new ClientError("No param supplied!");
             }
-        });
+
+            if (item === false) {
+                throw new ClientError("item with key " + key + " not found!");
+            }
+            ZoteroPane.selectItem(item.id);
+            return [okCode, jsonMediaType, jsonStringify("success")];
+        } catch (ex) {
+            return handleEndpointError(ex);
+        }
     }
 }
 
-function searchEndpoint(options) {
-    const q = options.searchParams.get("q");
-    const library = options.searchParams.get("library");
-    const method = options.searchParams.get("method");
-    const format = options.searchParams.get("format");
-    const style = options.searchParams.get("style");
-    const locale = options.searchParams.get("locale");
-    if (q) {
-        let search = buildSearch(new Zotero.Search(), q, method);
-        if (!library) {
-            search.libraryID = Zotero.Libraries.userLibraryID;
-        } else if (library !== "all") {
-            search.libraryID = library;
-        }
-        return runSearch(search, Zotero).then((items) => {
+class ItemsEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    async init(request) {
+        try {
+            const selected = request.searchParams.get("selected");
+            const easykey = request.searchParams.get("easykey");
+            const key = request.searchParams.get("key");
+            const betterbibtexkey = request.searchParams.get("betterbibtexkey");
+            const citekey = request.searchParams.get("citekey");
+            const collection = request.searchParams.get("collection");
+            const all = request.searchParams.get("all");
+            const format = request.searchParams.get("format");
+            const style = request.searchParams.get("style");
+            const locale = request.searchParams.get("locale");
+
+            let items;
+            if (selected) {
+                items = Zotero.getActiveZoteroPane().getSelectedItems();
+            } else if (key) {
+                let keys = key.split(",");
+                items = await Promise.all(
+                    keys.map((key) => {
+                        return findByKey(key, Zotero);
+                    }),
+                );
+            } else if (easykey) {
+                let keys = easykey.split(",");
+                items = await Promise.all(
+                    keys.map((key) => {
+                        return findByEasyKey(key, Zotero);
+                    }),
+                );
+            } else if (betterbibtexkey || citekey) {
+                let keys = betterbibtexkey
+                    ? betterbibtexkey.split(",")
+                    : citekey.split(",");
+                items = await Promise.all(
+                    keys.map((key) => {
+                        return findByCitationKey(key, Zotero);
+                    }),
+                );
+            } else if (collection) {
+                items = await collectionSearch(collection);
+            } else if (all) {
+                items = await Zotero.Items.getAll(
+                    Zotero.Libraries.userLibraryID,
+                );
+            } else {
+                throw new ClientError("No param supplied!");
+            }
+
             return buildResponse(items, format, style, locale);
-        });
-    } else {
-        return makeClientError("q param required.");
-    }
-}
-
-function selectEndpoint(options) {
-    let ZoteroPane = Components.classes[
-        "@mozilla.org/appshell/window-mediator;1"
-    ]
-        .getService(Components.interfaces.nsIWindowMediator)
-        .getMostRecentWindow("navigator:browser").ZoteroPane;
-    let promise = null;
-    const easykey = options.searchParams.get("easykey");
-    const key = options.searchParams.get("key");
-    const betterbibtexkey = options.searchParams.get("betterbibtexkey");
-    const citekey = options.searchParams.get("citekey");
-    if (easykey) {
-        promise = findByEasyKey(easykey, Zotero);
-    } else if (key) {
-        promise = findByKey(key, Zotero);
-    } else if (betterbibtexkey || citekey) {
-        promise = findByCitationKey(betterbibtexkey || citekey, Zotero);
-    } else {
-        return makeClientError("No param supplied!");
-    }
-    return promise.then(function (item) {
-        if (item === false) {
-            return makeClientError("item with key " + key + " not found!");
+        } catch (ex) {
+            return handleEndpointError(ex);
         }
-        ZoteroPane.selectItem(item.id);
-        return [okCode, jsonMediaType, jsonStringify("success")];
-    });
-}
-
-function itemsEndpoint(options) {
-    const selected = options.searchParams.get("selected");
-    const easykey = options.searchParams.get("easykey");
-    const key = options.searchParams.get("key");
-    const betterbibtexkey = options.searchParams.get("betterbibtexkey");
-    const citekey = options.searchParams.get("citekey");
-    const collection = options.searchParams.get("collection");
-    const all = options.searchParams.get("all");
-    const format = options.searchParams.get("format");
-    const style = options.searchParams.get("style");
-    const locale = options.searchParams.get("locale");
-    let items = [];
-    let responder = (items) => {
-        return buildResponse(items, format, style, locale);
-    };
-    if (selected) {
-        return responder(Zotero.getActiveZoteroPane().getSelectedItems());
-    } else if (key) {
-        let keys = key.split(",");
-        return Promise.all(
-            keys.map((key) => {
-                return findByKey(key, Zotero);
-            }),
-        ).then(responder);
-    } else if (easykey) {
-        let keys = easykey.split(",");
-        return Promise.all(
-            keys.map((key) => {
-                return findByEasyKey(key, Zotero);
-            }),
-        ).then(responder);
-    } else if (betterbibtexkey || citekey) {
-        let keys = betterbibtexkey
-            ? betterbibtexkey.split(",")
-            : citekey.split(",");
-        return Promise.all(
-            keys.map((key) => {
-                return findByCitationKey(key, Zotero);
-            }),
-        ).then(responder);
-    } else if (collection) return collectionSearch(collection).then(responder);
-    else if (all) {
-        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID).then(
-            responder,
-        );
-    } else {
-        return makeClientError("No param supplied!");
     }
 }
 
-function stylesEndpoint(options) {
-    return [okCode, jsonMediaType, jsonStringify(Zotero.Styles.getVisible())];
+class StylesEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    init(request) {
+        return [
+            okCode,
+            jsonMediaType,
+            jsonStringify(Zotero.Styles.getVisible()),
+        ];
+    }
 }
 
-function localesEndpoint(options) {
-    return [
-        okCode,
-        jsonMediaType,
-        jsonStringify(Zotero.Locale.availableLocales),
-    ];
+class LocalesEndpoint {
+    supportedMethods = ["GET"];
+    supportedDataTypes = ["application/x-www-form-urlencoded"];
+
+    init(request) {
+        return [
+            okCode,
+            jsonMediaType,
+            jsonStringify(Zotero.Locale.availableLocales),
+        ];
+    }
 }
 
 /**
  * Function to load our endpoints into the Zotero connector server.
  */
 function loadEndpoints(version) {
-    let endpoints = {
-        version: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: makeVersionEndpoint(version),
-        },
-        complete: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: handleErrors(completeEndpoint),
-        },
-        bibliography: {
-            supportedMethods: ["POST"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: handleErrors(bibliographyEndpoint),
-        },
-        search: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: handleErrors(searchEndpoint),
-        },
-        select: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: handleErrors(selectEndpoint),
-        },
-        items: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: handleErrors(itemsEndpoint),
-        },
-        styles: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: stylesEndpoint,
-        },
-        locales: {
-            supportedMethods: ["GET"],
-            supportedDataType: ["application/x-www-form-urlencoded"],
-            init: localesEndpoint,
-        },
-    };
-    for (let e in endpoints) {
-        let ep = (Zotero.Server.Endpoints["/zotxt/" + e] = function () {});
-        ep.prototype = endpoints[e];
-    }
+    // Register all endpoints
+    VersionEndpoint.version = version;
+    Zotero.Server.Endpoints["/zotxt/version"] = VersionEndpoint;
+    Zotero.Server.Endpoints["/zotxt/complete"] = CompleteEndpoint;
+    Zotero.Server.Endpoints["/zotxt/bibliography"] = BibliographyEndpoint;
+    Zotero.Server.Endpoints["/zotxt/search"] = SearchEndpoint;
+    Zotero.Server.Endpoints["/zotxt/select"] = SelectEndpoint;
+    Zotero.Server.Endpoints["/zotxt/items"] = ItemsEndpoint;
+    Zotero.Server.Endpoints["/zotxt/styles"] = StylesEndpoint;
+    Zotero.Server.Endpoints["/zotxt/locales"] = LocalesEndpoint;
 }
 
 function startup({ id, version, resourceURI, rootURI = resourceURI.spec }) {
@@ -547,7 +575,14 @@ function startup({ id, version, resourceURI, rootURI = resourceURI.spec }) {
     loadEndpoints(version);
 }
 
-function shutdown() {}
+function shutdown() {
+    // Clean up all registered endpoints
+    for (const endpoint of Object.keys(Zotero.Server.Endpoints)) {
+        if (endpoint.startsWith("/zotxt/")) {
+            delete Zotero.Server.Endpoints[endpoint];
+        }
+    }
+}
 
 function uninstall() {}
 
