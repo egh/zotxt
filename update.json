@@ -4,7 +4,7 @@
       "updates": [
         {
           "version": "6.0.3",
-          "update_link": "https://github.com/egh/zotxt/releases/download/v6.0.3/zotxt-6.0.3.xpi"
+          "update_link": "https://github.com/egh/zotxt/releases/download/v6.0.3/zotxt-6.0.3.xpi",
           "update_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "applications": {
             "gecko": {
