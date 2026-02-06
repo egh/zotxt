@@ -48,30 +48,27 @@ function item2key(item) {
     return (item.libraryID || "1") + "_" + item.key;
 }
 
-function findByKey(key, zotero) {
-    let rejectIfUndefined = (item) => {
-        if (!item) {
-            throw new ClientError(`${key} not found`);
-        } else {
-            return item;
-        }
-    };
+async function findByKey(key, zotero) {
+    let item;
     if (key.indexOf("/") !== -1) {
         let lkh = zotero.Items.parseLibraryKey(key);
-        return zotero.Items.getByLibraryAndKeyAsync(
+        item = await zotero.Items.getByLibraryAndKeyAsync(
             lkh.libraryID,
             lkh.key,
-        ).then(rejectIfUndefined);
+        );
     } else if (key.indexOf("_") !== -1) {
         let [libraryId, key2] = key.split("_");
-        return zotero.Items.getByLibraryAndKeyAsync(
+        item = await zotero.Items.getByLibraryAndKeyAsync(
             parseInt(libraryId),
             key2,
-        ).then(rejectIfUndefined);
-    } else {
-        return zotero.Items.getByLibraryAndKeyAsync(1, key).then(
-            rejectIfUndefined,
         );
+    } else {
+        item = await zotero.Items.getByLibraryAndKeyAsync(1, key);
+    }
+    if (!item) {
+        throw new ClientError(`${key} not found`);
+    } else {
+        return item;
     }
 }
 
