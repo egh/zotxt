@@ -508,6 +508,14 @@ class ZotxtTest < Minitest::Test
     assert_equal ["doe:2006article"], results
   end
 
+  def test_citationkey_prefix_completion
+    resp = @client.get(@complete_url, { "prefix" => "doe" })
+    assert_equal 200, resp.status
+    results = JSON.parse(resp.body)
+    assert results.is_a?(Array)
+    assert results.all? { |key| key.start_with?("doe") }
+  end
+
   def test_search
     resp = @client.get(@search_url, { "q" => "doe article", "format" => "key" })
     assert_equal 200, resp.status
@@ -557,7 +565,7 @@ class ZotxtTest < Minitest::Test
     resp = @client.get(@styles_url)
     assert_equal 200, resp.status
     style = JSON.parse(resp.body).find do |value|
-      value["styleID"] == "http://www.zotero.org/styles/chicago-fullnote-bibliography"
+      value["styleID"] == "http://www.zotero.org/styles/modern-language-association"
     end
     assert_equal "note", style["categories"]
     assert_equal "Chicago Manual of Style 17th edition (full note)", style["title"]

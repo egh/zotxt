@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, jsonStringify, item2key, ClientError, ensureLoaded */
+/* global Components, Set, FileUtils, NetUtil, Q, parseEasyKey, runSearch, buildRawSearch, buildEasyKeySearch, findByKey, cleanQuery, buildSearch, makeCslEngine, findByEasyKey, findByCitationKey, searchByCitationKeyPrefix, jsonStringify, item2key, ClientError, ensureLoaded, checkBBT */
 "use strict";
 
 var uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/;
@@ -183,11 +183,8 @@ function buildEasyKeyResponse(items) {
 }
 
 function buildBBTKeyResponse(items) {
-    if (!Zotero.BetterBibTeX) {
-        throw new ClientError("BetterBibTex not installed.");
-    } else {
-        return buildKeyResponse(items, "a515a220-6fef-45ea-9842-8025dfebcc8f");
-    }
+    checkBBT();
+    return buildKeyResponse(items, "a515a220-6fef-45ea-9842-8025dfebcc8f");
 }
 
 async function buildExportResponse(items, translatorId) {
@@ -313,7 +310,7 @@ class VersionEndpoint {
     supportedMethods = ["GET"];
     supportedDataTypes = ["application/x-www-form-urlencoded"];
 
-    async init(request) {
+    init(request) {
         try {
             return [
                 okCode,
@@ -332,23 +329,19 @@ class CompleteEndpoint {
 
     async init(request) {
         try {
-            const easykey = request.searchParams.get("easykey");
-            if (!easykey) {
-                throw new ClientError("Option easykey is required.");
+            const prefix = request.searchParams.get("prefix");
+            if (!prefix) {
+                throw new ClientError("Option prefix is required.");
             }
 
-            let search = buildEasyKeySearch(
-                new Zotero.Search(),
-                parseEasyKey(easykey, Zotero),
-            );
-            const items = await runSearch(search, Zotero);
-
-            if (!items) {
-                throw new ClientError(
-                    "EasyKey must be of the form DoeTitle2000 or doe:2000title",
-                );
-            }
-            return buildResponse(items, "easykey");
+            const items = await searchByCitationKeyPrefix(prefix, Zotero);
+            return [
+                okCode,
+                jsonMediaType,
+                jsonStringify(
+                    items.map((item) => item.getField("citationKey")),
+                ),
+            ];
         } catch (ex) {
             return handleEndpointError(ex);
         }
