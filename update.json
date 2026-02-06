@@ -15,7 +15,7 @@
         },
         {
           "version": "7.0.2",
-          "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.2/zotxt-7.0.2.xpi"
+          "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.2/zotxt-7.0.2.xpi",
           "update_hash": "sha256:4a6dd04c197629a02a9c6beaa9ebd52a69bb683f8400243bcdf95847f0ee254a",
           "applications": {
             "gecko": {
