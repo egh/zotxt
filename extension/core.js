@@ -103,19 +103,15 @@ function getItemOrParent(item, zotero) {
     }
 }
 
-/**
- * Returns a promise resolving to an iterable.
- */
-function runSearch(s, zotero) {
-    return s.search().then(async (ids) => {
-        let items = await zotero.Items.getAsync(ids);
-        let items2 = await Promise.all(
-            items.map((item) => {
-                return getItemOrParent(item, zotero);
-            }),
-        );
-        return dedupItems(items2, zotero);
-    });
+async function runSearch(s, zotero) {
+    let results = await s.search();
+    let items = await zotero.Items.getAsync(results);
+    let items2 = await Promise.all(
+        items.map((item) => {
+            return getItemOrParent(item, zotero);
+        }),
+    );
+    return dedupItems(items2, zotero);
 }
 
 function buildSearch(s, query, method) {
