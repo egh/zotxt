@@ -25,7 +25,6 @@ For example:
 
 See [zotxt-emacs](https://github.com/egh/zotxt-emacs)
 
-Zotxt API
----------
+## Zotxt API
 
 The Zotxt API is exposed via `http://127.0.0.1:23119/zotxt/`. To get an idea of what is possible, your best bet is probably to have a look at the `test/test.rb` file.
