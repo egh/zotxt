@@ -283,7 +283,7 @@ class ZotxtTest < Minitest::Test
     style = JSON.parse(resp.body).find do |value|
       value["styleID"] == "http://www.zotero.org/styles/modern-language-association"
     end
-    assert_equal "note", style["categories"]
-    assert_equal "Chicago Manual of Style 17th edition (full note)", style["title"]
+    assert_equal "author", style["categories"]
+    assert_equal "MLA Handbook 9th edition (in-text citations)", style["title"]
   end
 end
