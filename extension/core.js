@@ -240,8 +240,28 @@ async function findByCitationKey(citekey, zotero) {
     return itemID.length ? await zotero.Items.getAsync(itemID[0]) : undefined;
 }
 
+async function searchByCitationKeyPrefix(prefix, zotero) {
+    checkBBT();
+    const search = new zotero.Search();
+    search.addCondition("libraryID", "is", zotero.Libraries.userLibraryID);
+    search.addCondition("citationKey", "contains", prefix);
+    const itemIDs = await search.search();
+    const items = await zotero.Items.getAsync(itemIDs);
+
+    return items.filter((item) => {
+        const key = item.getField("citationKey");
+        return key && key.startsWith(prefix);
+    });
+}
+
 function jsonStringify(json) {
     return JSON.stringify(json, null, "  ");
+}
+
+function checkBBT() {
+    if (!Zotero.BetterBibTeX) {
+        throw new ClientError("BetterBibTex not installed.");
+    }
 }
 
 /* Exported for tests in nodejs */
@@ -250,6 +270,7 @@ if (typeof module !== "undefined") {
         buildEasyKeySearch,
         buildRawSearch,
         buildSearch,
+        checkBBT,
         checkStyleId,
         cleanQuery,
         dedupItems,
@@ -262,6 +283,7 @@ if (typeof module !== "undefined") {
         jsonStringify,
         makeCslEngine,
         parseEasyKey,
+        searchByCitationKeyPrefix,
         ClientError,
     };
 }
