@@ -217,14 +217,15 @@ class ZotxtTest < Minitest::Test
     assert_equal 200, resp.status
     results = JSON.parse(resp.body)
     results[0].delete("id")
-    assert_equal({ "citation-key" => "doe:2006article",
-                   "type" => "article-journal",
-                   "title" => "Article",
+    assert_equal({ "author" => [{ "family" => "Doe", "given" => "John" }],
+                   "citation-key" => "doe:2006article",
                    "container-title" => "Journal of Generic Studies",
-                   "page" => "33-34",
-                   "volume" => "6",
-                   "author" => [{ "family" => "Doe", "given" => "John" }],
-                   "issued" => { "date-parts" => [["2006"]] } }, results[0])
+                   "issued" => { "date-parts" => [["2006"]] },
+                   "page" => "33–34",
+                   "title" => "Article",
+                   "type" => "article-journal",
+                   "volume" => "6" },
+                 results[0])
   end
 
   def test_citationkey_prefix_completion
