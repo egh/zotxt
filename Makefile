@@ -2,11 +2,9 @@
 
 VERSION=$(shell jq .version extension/manifest.json -r)
 
-dist: test zotxt-$(VERSION).xpi ;
+dist: unittest zotxt-$(VERSION).xpi ;
 
-notest: zotxt-$(VERSION).xpi ;
-
-zotxt-$(VERSION).xpi: extension/*.js extension/resource/translators/EasyKeyExporter.js 
+zotxt-$(VERSION).xpi: extension/*.js extension/manifest.json extension/resource/translators/EasyKeyExporter.js
 	cd extension && zip -r ../zotxt-$(VERSION).xpi *
 
 clean:
@@ -17,3 +15,7 @@ unittest:
 
 test: unittest
 	cd test && ruby test.rb
+
+format:
+	prettier -w .
+	rufo .

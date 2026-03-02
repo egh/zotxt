@@ -1,12 +1,12 @@
 {
-    "scripts": {
-        "test": "mocha"
-    },
-    "type": "commonjs",
-    "dependencies": {
-        "bluebird": "^3.5.1",
-        "mocha": "^11.0.1",
-        "sinon": "^4.0.2",
-        "xregexp": "^3.2.0"
-    }
+  "scripts": {
+    "test": "mocha"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "mocha": "^11.0.1",
+    "sinon": "^4.0.2",
+    "xregexp": "^3.2.0"
+  }
 }
