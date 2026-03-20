@@ -3,7 +3,7 @@ GEM
   specs:
     httpclient (2.9.0)
       mutex_m
-    json (2.18.1)
+    json (2.19.2)
     minitest (6.0.1)
       prism (~> 1.5)
     mutex_m (0.3.0)
