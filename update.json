@@ -3,25 +3,54 @@
     "zotxt@e6h.org": {
       "updates": [
         {
-          "version": "6.0.3",
-          "update_link": "https://github.com/egh/zotxt/releases/download/v6.0.3/zotxt-6.0.3.xpi",
-          "update_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "version": "8.0.0",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v8.0.0/zotxt-8.0.0.xpi",
+          "update_hash": "sha256:4d587a9421ec494457ea3b080aaedc765ab22832e000e784bfb6aea42bb09ee5",
           "applications": {
-            "gecko": {
-              "strict_min_version": "60.9",
-              "strict_max_version": "60.9"
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "8.*"
             }
           }
         },
         {
           "version": "7.0.2",
           "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.2/zotxt-7.0.2.xpi",
-          "update_hash": "sha256:4a6dd04c197629a02a9c6beaa9ebd52a69bb683f8400243bcdf95847f0ee254a",
+          "update_hash": "sha256:a88278ce42b7222153ea96f7a990a4ace91fe1ac2d57d84bc9ee3de5beda293a",
           "applications": {
-            "gecko": {
-              "strict_min_version": "60.9",
-              "strict_max_version": "60.9"
-            },
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "7.*"
+            }
+          }
+        },
+        {
+          "version": "7.0.1",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.1/zotxt-7.0.1.xpi",
+          "update_hash": "sha256:dfeac465a5b1cc218b773a55d0a2f0f1928e447879a478c0c71da48068968d78",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "7.*"
+            }
+          }
+        },
+        {
+          "version": "7.0.0",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v7.0.0/zotxt-7.0.0.xpi",
+          "update_hash": "sha256:297908d964a80847038a2166f5449fb1372f74f87e4b7025a7ad5a71464a4f96",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "7.0.*"
+            }
+          }
+        },
+        {
+          "version": "6.0.3",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v6.0.3/zotxt-6.0.3.xpi",
+          "update_hash": "sha256:88fe903ce5f1ed087b0bbeedbd932c2f03ca205f09e4e8f7e3f72e5062bf727a",
+          "applications": {
             "zotero": {
               "strict_min_version": "6.999",
               "strict_max_version": "7.0.*"
