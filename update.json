@@ -3,6 +3,17 @@
     "zotxt@e6h.org": {
       "updates": [
         {
+          "version": "9.0.0",
+          "update_link": "https://github.com/egh/zotxt/releases/download/v9.0.0/zotxt-9.0.0.xpi",
+          "update_hash": "sha256:ffbe69457143c95c5cff45f851b8de8a58d4b4f20ce29908d1d85380d66c7829",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "15.*"
+            }
+          }
+        },
+        {
           "version": "8.0.0",
           "update_link": "https://github.com/egh/zotxt/releases/download/v8.0.0/zotxt-8.0.0.xpi",
           "update_hash": "sha256:4d587a9421ec494457ea3b080aaedc765ab22832e000e784bfb6aea42bb09ee5",
